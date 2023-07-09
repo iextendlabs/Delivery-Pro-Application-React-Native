@@ -1,0 +1,32 @@
+const MainStyles = {
+    container: {
+      flex: 1,
+    },
+    screenContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    screenText: {
+      fontSize: 20,
+    },
+    footerContainer: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      paddingVertical: 10,
+      borderTopWidth: 1,
+      backgroundColor: '#213141',
+    },
+    footerLink: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    footerLinkText: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: '#228866',
+      marginTop: 5,
+    },
+  };
+  export default MainStyles;
