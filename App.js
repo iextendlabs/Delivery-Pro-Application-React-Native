@@ -7,6 +7,7 @@ import HomeScreen from './components/screens/HomeScreen';
 import ServicesScreen from './components/screens/ServicesScreen';
 import SettingsScreen from './components/screens/SettingsScreen';
 import Footer from './components/layout/Footer';
+import OrderList from './components/screens/OrderList';
 
 const Drawer = createDrawerNavigator();
 const App = () => {
@@ -17,8 +18,10 @@ const App = () => {
           <Drawer.Screen name="Home" component={HomeScreen} />
           <Drawer.Screen name="Services" component={ServicesScreen} />
           <Drawer.Screen name="Settings" component={SettingsScreen} />
+          <Drawer.Screen name="OrderList" component={OrderList} />
         </Drawer.Navigator>
       </View>
+
       <Footer />
     </NavigationContainer>
   );

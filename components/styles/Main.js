@@ -16,6 +16,10 @@ const MainStyles = {
       paddingVertical: 10,
       borderTopWidth: 1,
       backgroundColor: '#213141',
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
     },
     footerLink: {
       flex: 1,
