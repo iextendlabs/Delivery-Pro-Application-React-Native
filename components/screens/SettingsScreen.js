@@ -1,11 +1,28 @@
 import { View, Text, StyleSheet } from 'react-native';
 import MainStyles from '../styles/Main';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const styles = StyleSheet.create(MainStyles);
 
-const SettingsScreen = () => {
+const SettingsScreen = ({navigation}) => {
+  const handleLogout = async () => {
+    try {
+      // Remove the user_id from AsyncStorage
+      await AsyncStorage.removeItem('@user_id');
+
+      // Navigate back to the Login screen
+      navigation.navigate('Login');
+    } catch (error) {
+      console.log('Error occurred during logout:', error);
+    }
+  };
+
     return (
       <View style={styles.screenContainer}>
         <Text style={styles.screenText}>Settings Screen</Text>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Logout</Text>
+      </TouchableOpacity>
       </View>
     );
   };

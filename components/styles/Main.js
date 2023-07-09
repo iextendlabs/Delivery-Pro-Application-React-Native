@@ -32,5 +32,12 @@ const MainStyles = {
       color: '#228866',
       marginTop: 5,
     },
+    logoutButton: {
+      marginTop: 12,
+    },
+    logoutButtonText: {
+      color: '#007bff',
+      fontSize: 16,
+    }
   };
   export default MainStyles;
