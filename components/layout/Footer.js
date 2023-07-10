@@ -10,16 +10,16 @@ const Footer = () => {
   
     return (
       <View style={styles.footerContainer}>
-        <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Home')}>
-          <Icon name="home" size={24} color="#FFFFFF" />
+        <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('OrderList')}>
+          <Icon name="home" size={24} color="black" />
           <Text style={styles.footerLinkText}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Services')}>
-          <Icon name="person" size={24} color="#FFFFFF" />
+          <Icon name="person" size={24} color="black" />
           <Text style={styles.footerLinkText}>Services</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Settings')}>
-          <Icon name="settings" size={24} color="#FFFFFF" />
+          <Icon name="settings" size={24} color="black" />
           <Text style={styles.footerLinkText}>Settings</Text>
         </TouchableOpacity>
       </View>

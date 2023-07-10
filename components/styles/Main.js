@@ -14,8 +14,7 @@ const MainStyles = {
       flexDirection: 'row',
       justifyContent: 'space-around',
       paddingVertical: 10,
-      borderTopWidth: 1,
-      backgroundColor: '#213141',
+      backgroundColor: '#9ac4f8',
       position: 'absolute',
       left: 0,
       right: 0,
@@ -29,7 +28,7 @@ const MainStyles = {
     footerLinkText: {
       fontSize: 16,
       fontWeight: 'bold',
-      color: '#228866',
+      color: 'black',
       marginTop: 5,
     },
     logoutButton: {
@@ -38,6 +37,23 @@ const MainStyles = {
     logoutButtonText: {
       color: '#007bff',
       fontSize: 16,
-    }
+    },
+    buttonContainer: {
+      flex: 1,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    button: {
+      fontSize: 24,
+      paddingTop: 35,
+      color: '#fff',
+      backgroundColor: '#9ac4f8',
+      borderRadius: 20,
+      margin: 5,
+      width: 100,
+      height: 100,
+      textAlign: 'center',
+      textAlignVertical: 'center',
+    },
   };
   export default MainStyles;

@@ -3,7 +3,7 @@ import MainStyles from '../styles/Main';
 const styles = StyleSheet.create(MainStyles);
 import { useNavigation } from '@react-navigation/native';
 
-const HomeScreen = () => {
+const OrderLinks = () => {
   const navigation = useNavigation();
 
   const AssignedOrder = () => {
@@ -20,7 +20,6 @@ const HomeScreen = () => {
 
     return (
       <View style={styles.screenContainer}>
-        <Text style={styles.screenText}>Home Screen</Text>
         <View style={styles.buttonContainer}>
         <TouchableHighlight
           style={styles.button}
@@ -44,4 +43,4 @@ const HomeScreen = () => {
     );
   };
 
-  export default HomeScreen;
+  export default OrderLinks;

@@ -11,6 +11,7 @@ import OrderList from './components/screens/OrderList';
 import LoginScreen from './components/screens/LoginScreen';
 
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Add this line
+import { Title } from 'react-native-paper';
 
 const Drawer = createDrawerNavigator();
 const App = () => {
@@ -29,14 +30,17 @@ const App = () => {
     }
   };
 
+  const handleOrderListNavigation = (status) => {
+    console.log('navigating');
+    navigation.navigate('OrderList', { status: status });
+  };
+
   return (
     <NavigationContainer>
       <View style={styles.container}>
         <Drawer.Navigator>
-              <Drawer.Screen name="Home" component={HomeScreen} />
-              <Drawer.Screen name="Services" component={ServicesScreen} />
+              <Drawer.Screen name="OrderList" options={{ title: 'Home' }} component={OrderList} />
               <Drawer.Screen name="Settings" component={SettingsScreen} />
-              <Drawer.Screen name="OrderList" component={OrderList} />
               <Drawer.Screen name="Login" component={LoginScreen} />
         </Drawer.Navigator>
         <Footer />
