@@ -11,7 +11,7 @@ const SettingsScreen = ({navigation}) => {
       await AsyncStorage.removeItem('@user_id');
 
       // Navigate back to the Login screen
-      navigation.navigate('Login');
+      navigation.navigate('OrderList', { status: 'LogOut' });
     } catch (error) {
       console.log('Error occurred during logout:', error);
     }

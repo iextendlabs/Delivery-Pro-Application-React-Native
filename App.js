@@ -24,24 +24,22 @@ const App = () => {
   const checkAuthentication = async () => {
     try {
       const userId = await AsyncStorage.getItem('@user_id');
-      setIsAuthenticated(!!userId);
+      if(!userId){
+        setIsAuthenticated = false;
+      }
+
     } catch (error) {
       console.log('Error retrieving user ID:', error);
     }
-  };
-
-  const handleOrderListNavigation = (status) => {
-    console.log('navigating');
-    navigation.navigate('OrderList', { status: status });
   };
 
   return (
     <NavigationContainer>
       <View style={styles.container}>
         <Drawer.Navigator>
+              <Drawer.Screen name="Login" component={LoginScreen} />
               <Drawer.Screen name="OrderList" options={{ title: 'Home' }} component={OrderList} />
               <Drawer.Screen name="Settings" component={SettingsScreen} />
-              <Drawer.Screen name="Login" component={LoginScreen} />
         </Drawer.Navigator>
         <Footer />
       </View>

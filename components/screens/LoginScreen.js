@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LoginUrl } from '../config/Api';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('staff3@tadhem.com');
+  const [password, setPassword] = useState('Simran@65');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
+
+  const checkAuthentication = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('@user_id');
+      if(userId){
+        navigation.navigate('OrderList');
+      }
+
+    } catch (error) {
+      console.log('Error retrieving user ID:', error);
+    }
+  };
   const handleLogin = async () => {
     try {
-      const response = await fetch('https://demo3959108.mockable.io/user', {
+      const response = await fetch(LoginUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,13 +40,13 @@ const LoginScreen = () => {
 
       if (response.ok) {
         const responseData = await response.json();
-        const userId = responseData.user_id;
-
+        const userId = responseData.user.kb_delivery_boy_id;
+        // console.log(userId);
         // Store the user_id in AsyncStorage
         await AsyncStorage.setItem('@user_id', String(userId));
 
         // Navigate to the Home screen
-        navigation.navigate('Home');
+        navigation.navigate('OrderList');
       } else {
         console.log('Login failed. Please try again.');
       }

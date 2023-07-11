@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -14,8 +14,9 @@ import { OrderUrl } from "../config/Api";
 import PhoneNumber from "../modules/PhoneNumber";
 import { useRoute } from "@react-navigation/native";
 import OrderLinks from "../modules/OrderLinks";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const OrderList = ({initialParams}) => {
+const OrderList = ({ initialParams }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState({
@@ -24,6 +25,7 @@ const OrderList = ({initialParams}) => {
     order_number: "1000",
     total_price: "AED130.00",
     payment_to_be_collected: "0",
+    comment: "",
     shipping_address: {
       firstname: "Cos",
       lastname: "Dubai",
@@ -61,15 +63,23 @@ const OrderList = ({initialParams}) => {
   }, [route.params?.status,initialParams]);
 
   const fetchOrders = async (orderStatus) => {
-    setLoading(true);
-    try {
-      const response = await fetch(OrderUrl+'&status='+orderStatus);
-      const data = await response.json();
-      setOrders(data);
+    const userId = await AsyncStorage.getItem("@user_id");
+    if (userId) {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          OrderUrl + "&status=" + orderStatus + "&user_id=" + userId
+        );
+        const data = await response.json();
+        setOrders(data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        setLoading(false);
+      }
+    } else {
       setLoading(false);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-      setLoading(false);
+      navigation.navigate('Login');
     }
   };
 
@@ -135,6 +145,8 @@ const OrderList = ({initialParams}) => {
                 {selectedOrder.shipping_address.country},{" "}
                 {selectedOrder.shipping_address.postcode}
               </Text>
+              <Text style={styles.orderText}>Comment</Text>
+              <Text style={styles.orderText}>{selectedOrder.comment}</Text>
             </View>
           )}
           <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
@@ -155,23 +167,23 @@ const OrderList = ({initialParams}) => {
 
   return (
     <View style={styles.container}>
-      <View style={{flex:1}}>
+      <View style={{ flex: 1 }}>
         <OrderLinks />
       </View>
       <Text style={styles.orderText}>Order Status: {status}</Text>
       <Text style={styles.orderText}>Total Orders: {orders.length}</Text>
 
       <ScrollView style={{ flex: 4, paddingBottom: 65 }}>
-  {orders.length === 0 ? (
-    <Text style={styles.noItemsText}>No Order</Text>
-  ) : (
-    <FlatList
-      data={orders}
-      renderItem={renderOrder}
-      keyExtractor={(item) => item.order_id.toString()}
-    />
-  )}
-</ScrollView>
+        {orders.length === 0 ? (
+          <Text style={styles.noItemsText}>No Order</Text>
+        ) : (
+          <FlatList
+            data={orders}
+            renderItem={renderOrder}
+            keyExtractor={(item) => item.order_id.toString()}
+          />
+        )}
+      </ScrollView>
 
       <OrderDetailsModal />
     </View>
@@ -224,7 +236,7 @@ const styles = StyleSheet.create({
   orderText: {
     fontSize: 16,
     marginBottom: 5,
-    textAlign: "center"
+    textAlign: "center",
   },
   closeButton: {
     alignSelf: "flex-end",
@@ -238,10 +250,10 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   noItemsText: {
-    color: 'red',
-    textAlign: 'center',
+    color: "red",
+    textAlign: "center",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 20,
   },
 });
