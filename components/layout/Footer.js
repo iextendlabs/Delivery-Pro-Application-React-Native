@@ -14,10 +14,10 @@ const Footer = () => {
           <Icon name="home" size={24} color="black" />
           <Text style={styles.footerLinkText}>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Services')}>
+        {/* <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Services')}>
           <Icon name="person" size={24} color="black" />
           <Text style={styles.footerLinkText}>Services</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Settings')}>
           <Icon name="settings" size={24} color="black" />
           <Text style={styles.footerLinkText}>Settings</Text>

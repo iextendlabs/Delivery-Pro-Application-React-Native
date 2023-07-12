@@ -18,25 +18,35 @@ const OrderLinks = () => {
     navigation.navigate('OrderList', { status: 'DELIVERED' });
   };
 
+  const UnassignedOrder = () => {
+    navigation.navigate('OrderList', { status: 'UNASSIGNED' });
+  };
+
     return (
       <View style={styles.screenContainer}>
         <View style={styles.buttonContainer}>
         <TouchableHighlight
           style={styles.button}
           onPress={InProgressOrder}>
-          <Text>In Progress</Text>
+          <Text style={styles.buttonText}>In Progress</Text>
         </TouchableHighlight>
 
         <TouchableHighlight
           style={styles.button}
           onPress={DeliveredOrder}>
-          <Text>Delivered</Text>
+          <Text style={styles.buttonText}>Delivered</Text>
         </TouchableHighlight>
 
         <TouchableHighlight
           style={styles.button}
           onPress={AssignedOrder}>
-          <Text>Assigned</Text>
+          <Text style={styles.buttonText}>Assigned</Text>
+        </TouchableHighlight>
+
+        <TouchableHighlight
+          style={styles.button}
+          onPress={UnassignedOrder}>
+          <Text style={styles.buttonText}>Un Assigned</Text>
         </TouchableHighlight>
       </View>
       </View>

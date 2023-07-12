@@ -52,7 +52,7 @@ const OrderListStyle = {
     },
     orderText: {
       fontSize: 16,
-      marginBottom: 5,
+      marginBottom: 0,
       textAlign: "center",
     },
     closeButton: {
@@ -101,11 +101,6 @@ const OrderListStyle = {
       justifyContent: "center",
       marginBottom: 10,
     },
-    submitButtonText: {
-      color: "white",
-      fontSize: 16,
-      fontWeight: "bold",
-    },
     successMessage: {
       color: "green",
       fontSize: 16,
@@ -117,6 +112,27 @@ const OrderListStyle = {
       fontSize: 16,
       fontWeight: "bold",
       marginBottom: 10,
+    },
+    acceptButton: {
+      backgroundColor: "green",
+      padding: 10,
+      borderRadius: 5,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 10,
+    },
+    rejectButton: {
+      backgroundColor: "red",
+      padding: 10,
+      borderRadius: 5,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 10,
+    },
+    buttonText: {
+      color: "white",
+      fontSize: 16,
+      fontWeight: "bold",
     },
   };
 

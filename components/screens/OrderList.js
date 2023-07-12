@@ -18,6 +18,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import OrderListStyle from "../styles/OrderListStyle";
 import OrderDetailsModal from "./OrderDetailsModal";
 import OrderCommentModal from "./OrderCommentModal";
+import OrderActionModal from "./OrderActionModal";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const OrderList = ({ initialParams }) => {
@@ -25,6 +26,7 @@ const OrderList = ({ initialParams }) => {
   const [loading, setLoading] = useState(true);
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [commentModalVisible, setCommentModalVisible] = useState(false);
+  const [actionModalVisible, setActionModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const route = useRoute();
@@ -67,7 +69,7 @@ const OrderList = ({ initialParams }) => {
 
   const renderOrder = ({ item }) => (
     <TouchableOpacity style={styles.orderContainer}>
-      <View style={{ flex: 2.5 }}>
+      <View style={{ flex: 1.5 }}>
         <Text style={styles.orderId}>ID: {item.order_id}</Text>
         <Text style={styles.orderDate}>{item.total_price}</Text>
       </View>
@@ -88,6 +90,13 @@ const OrderList = ({ initialParams }) => {
           onPress={() => handleOrderCommentPress(item)}
         />
         <PhoneNumber phoneNumber={item.shipping_address.mobile_no} />
+        <Icon
+          name="ellipsis-vertical"
+          size={25}
+          color="black"
+          style={styles.icons}
+          onPress={() => handleOrderActionPress(item)}
+        />
       </View>
 
       {/* Other order fields */}
@@ -104,9 +113,15 @@ const OrderList = ({ initialParams }) => {
     setCommentModalVisible(true);
   };
 
+  const handleOrderActionPress = (order) => {
+    setSelectedOrder(order);
+    setActionModalVisible(true);
+  };
+
   const closeModal = () => {
     setDetailsModalVisible(false);
     setCommentModalVisible(false);
+    setActionModalVisible(false);
   };
 
   if (loading) {
@@ -125,7 +140,7 @@ const OrderList = ({ initialParams }) => {
       <Text style={styles.orderText}>Order Status: {status}</Text>
       <Text style={styles.orderText}>Total Orders: {orders.length}</Text>
 
-      <ScrollView style={{ flex: 4, paddingBottom: 65 }}>
+      <ScrollView style={{ flex: 5, paddingBottom: 65 }}>
         {orders.length === 0 ? (
           <Text style={styles.noItemsText}>No Order</Text>
         ) : (
@@ -145,6 +160,12 @@ const OrderList = ({ initialParams }) => {
 
       <OrderCommentModal
         visible={commentModalVisible}
+        order={selectedOrder}
+        onClose={closeModal}
+      />
+
+      <OrderActionModal
+        visible={actionModalVisible}
         order={selectedOrder}
         onClose={closeModal}
       />

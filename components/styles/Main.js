@@ -2,11 +2,6 @@ const MainStyles = {
     container: {
       flex: 1,
     },
-    screenContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
     screenText: {
       fontSize: 20,
     },
@@ -32,11 +27,22 @@ const MainStyles = {
       marginTop: 5,
     },
     logoutButton: {
+      backgroundColor: "red",
+      padding: 10,
+      borderRadius: 5,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 10,
       marginTop: 12,
     },
     logoutButtonText: {
-      color: '#007bff',
+      color: 'white',
       fontSize: 16,
+    },
+    screenContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     buttonContainer: {
       flex: 1,
@@ -44,16 +50,19 @@ const MainStyles = {
       flexWrap: 'wrap',
     },
     button: {
-      fontSize: 24,
-      paddingTop: 35,
+      fontSize: 15,
+      paddingTop: 30,
       color: '#fff',
       backgroundColor: '#9ac4f8',
-      borderRadius: 20,
-      margin: 5,
-      width: 100,
-      height: 100,
+      borderRadius: 10,
+      margin: 3,
+      width: 80,
+      height: 80,
       textAlign: 'center',
       textAlignVertical: 'center',
     },
+    buttonText:{
+      fontSize:13
+    }
   };
   export default MainStyles;

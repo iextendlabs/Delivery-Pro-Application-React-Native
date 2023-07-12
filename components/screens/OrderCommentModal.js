@@ -26,7 +26,7 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
 
     setIsLoading(true);
     // Simulating a POST request
-    // try {
+    try {
       const response = await fetch(StatusUrl, {
         method: "POST",
         headers: {
@@ -44,9 +44,9 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
 
       setSuccessMessage("Comment posted successfully.");
       setCommentText("");
-    // } catch (error) {
-    //   setErrorMessage("Failed to post comment. Please try again.");
-    // }
+    } catch (error) {
+      setErrorMessage("Failed to post comment. Please try again.");
+    }
 
     setIsLoading(false);
   };
@@ -76,7 +76,7 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
                 onPress={handleSubmitComment}
                 disabled={isLoading}
               >
-                <Text style={styles.submitButtonText}>
+                <Text style={styles.buttonText}>
                   {isLoading ? "Submitting..." : "Submit"}
                 </Text>
               </TouchableOpacity>

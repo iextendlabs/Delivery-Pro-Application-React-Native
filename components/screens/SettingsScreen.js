@@ -19,7 +19,6 @@ const SettingsScreen = ({navigation}) => {
 
     return (
       <View style={styles.screenContainer}>
-        <Text style={styles.screenText}>Settings Screen</Text>
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
