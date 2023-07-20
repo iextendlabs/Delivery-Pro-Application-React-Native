@@ -11,7 +11,7 @@ const Footer = () => {
     return (
       <View style={styles.footerContainer}>
         <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('OrderList')}>
-          <Icon name="home" size={24} color="black" />
+          <Icon name="home" size={24} color="#fff" />
           <Text style={styles.footerLinkText}>Home</Text>
         </TouchableOpacity>
         {/* <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Services')}>
@@ -19,7 +19,7 @@ const Footer = () => {
           <Text style={styles.footerLinkText}>Services</Text>
         </TouchableOpacity> */}
         <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Settings')}>
-          <Icon name="settings" size={24} color="black" />
+          <Icon name="settings" size={24} color="#fff" />
           <Text style={styles.footerLinkText}>Settings</Text>
         </TouchableOpacity>
       </View>
