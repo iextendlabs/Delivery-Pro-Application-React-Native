@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet, TextInput, Alert } fro
 import PhoneNumber from "../modules/PhoneNumber";
 import OrderListStyle from "../styles/OrderListStyle";
 import { ScrollView } from "react-native-gesture-handler";
-import { StatusUrl } from "../config/Api";
+import { OrderCommentUrl } from "../config/Api";
 
 const OrderCommentModal = ({ visible, order, onClose }) => {
 
@@ -27,17 +27,8 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
     setIsLoading(true);
     // Simulating a POST request
     try {
-      const response = await fetch(StatusUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          order_id: order.order_id,
-          comment: commentText,
-        }),
-      });
-
+      const response = await fetch(OrderCommentUrl+ order.id + '?comment='+commentText);
+        
       if (!response.ok) {
         throw new Error("Failed to post comment.");
       }

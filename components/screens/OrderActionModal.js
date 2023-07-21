@@ -35,7 +35,7 @@ const OrderActionModal = ({ visible, order, onClose }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          order_id: order.order_id,
+          id: order.id,
           time: timeText,
         }),
       });
@@ -65,7 +65,7 @@ const OrderActionModal = ({ visible, order, onClose }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          order_id: order.order_id,
+          id: order.id,
           status: "accept",
         }),
       });
@@ -94,7 +94,7 @@ const OrderActionModal = ({ visible, order, onClose }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          order_id: order.order_id,
+          id: order.id,
           status: "reject",
         }),
       });

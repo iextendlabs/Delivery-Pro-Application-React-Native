@@ -25,7 +25,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 <View style={styles.detailBox}>
                   <Text style={styles.detailBoxTitle}>Order#</Text>
                   <Text style={styles.detailBoxText}>
-                    {selectedOrder.order_id}
+                    {selectedOrder.id}
                   </Text>
                 </View>
 
@@ -33,7 +33,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 <View style={styles.detailBox}>
                   <Text style={styles.detailBoxTitle}>Total Price</Text>
                   <Text style={styles.detailBoxText}>
-                    {selectedOrder.total_price}
+                    {selectedOrder.total_amount}
                   </Text>
                 </View>
 
@@ -43,7 +43,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                     Payment to be Collected
                   </Text>
                   <Text style={styles.detailBoxText}>
-                    {selectedOrder.payment_to_be_collected}
+                    {selectedOrder.total_amount}
                   </Text>
                 </View>
 
@@ -53,7 +53,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                   <View style={styles.phoneNumberContainer}>
                     {/* <Image source={require('../path/to/phone-icon.png')} style={styles.phoneIcon} /> */}
                     <PhoneNumber
-                      phoneNumber={selectedOrder.shipping_address.mobile_no}
+                      phoneNumber={selectedOrder.number}
                       showNumber={true}
                     />
                   </View>
@@ -63,19 +63,10 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 <View style={styles.shippingAddressBox}>
                   <Text style={styles.detailBoxTitle}>Shipping Address</Text>
                   <View style={styles.addressLineContainer}>
-                    <Text style={styles.addressLine}>{selectedOrder.shipping_address.firstname} {selectedOrder.shipping_address.lastname}</Text>
+                    <Text style={styles.addressLine}>{selectedOrder.name}</Text>
                   </View>
                   <View style={styles.addressLineContainer}>
-                    <Text style={styles.addressLine}>Company: {selectedOrder.shipping_address.company}</Text>
-                  </View>
-                  <View style={styles.addressLineContainer}>
-                    <Text style={styles.addressLine}>{selectedOrder.shipping_address.address_1}</Text>
-                  </View>
-                  <View style={styles.addressLineContainer}>
-                    <Text style={styles.addressLine}>{selectedOrder.shipping_address.address_2}</Text>
-                  </View>
-                  <View style={styles.addressLineContainer}>
-                    <Text style={styles.addressLine}>{selectedOrder.shipping_address.city}, {selectedOrder.shipping_address.state} {selectedOrder.shipping_address.postcode}</Text>
+                    <Text style={styles.addressLine}>{selectedOrder.buildingName},{selectedOrder.flatVilla},{selectedOrder.street},{selectedOrder.area},{selectedOrder.city}  </Text>
                   </View>
                 </View>
 
@@ -83,7 +74,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 <View style={styles.commentBox}>
                   <Text style={styles.detailBoxTitle}>Comment</Text>
                   <View style={styles.commentTextContainer}>
-                    <Text style={styles.commentText}>{selectedOrder.comment}</Text>
+                    <Text style={styles.commentText}>{selectedOrder.order_comment}</Text>
                   </View>
                 </View>
               </View>

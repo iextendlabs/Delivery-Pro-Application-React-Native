@@ -70,8 +70,8 @@ const OrderList = ({ initialParams }) => {
   const renderOrder = ({ item }) => (
     <TouchableOpacity style={styles.orderContainer}>
       <View style={{ flex: 1.5 }}>
-        <Text style={styles.orderId}>ID: {item.order_id}</Text>
-        <Text style={styles.orderDate}>{item.total_price}</Text>
+        <Text style={styles.orderId}>ID: {item.id}</Text>
+        <Text style={styles.orderDate}>{item.total_amount}</Text>
       </View>
 
       <View style={styles.OrderLinks}>
@@ -89,7 +89,7 @@ const OrderList = ({ initialParams }) => {
           style={styles.icons}
           onPress={() => handleOrderCommentPress(item)}
         />
-        <PhoneNumber phoneNumber={item.shipping_address.mobile_no} />
+        <PhoneNumber phoneNumber={item.number} />
         <Icon
           name="ellipsis-vertical"
           size={25}
@@ -140,14 +140,14 @@ const OrderList = ({ initialParams }) => {
       <Text style={styles.orderText}>Order Status: {status}</Text>
       <Text style={styles.orderText}>Total Orders: {orders.length}</Text>
 
-      <ScrollView style={{ flex: 5, paddingBottom: 65 }}>
+      <ScrollView style={{ flex: 8, paddingBottom: 65 }}>
         {orders.length === 0 ? (
           <Text style={styles.noItemsText}>No Order</Text>
         ) : (
           <FlatList
             data={orders}
             renderItem={renderOrder}
-            keyExtractor={(item) => item.order_id.toString()}
+            keyExtractor={(item) => item.id.toString()}
           />
         )}
       </ScrollView>
