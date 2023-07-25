@@ -30,7 +30,7 @@ const OrderList = ({ initialParams }) => {
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const route = useRoute();
-  var status = "ASSIGNED";
+  var status = "Assigned";
 
   if (
     route &&
@@ -52,7 +52,7 @@ const OrderList = ({ initialParams }) => {
       setLoading(true);
       try {
         const response = await fetch(
-          OrderUrl + "&status=" + orderStatus + "&user_id=" + userId
+          OrderUrl + "status=" + orderStatus + "&user_id=" + userId
         );
         const data = await response.json();
         setOrders(data);
@@ -82,21 +82,24 @@ const OrderList = ({ initialParams }) => {
           style={styles.icons}
           onPress={() => handleOrderDetailPress(item)}
         />
+        {status != "Complete" &&
         <Icon
           name="chatbubble-ellipses-outline"
           size={25}
           color="black"
           style={styles.icons}
           onPress={() => handleOrderCommentPress(item)}
-        />
-        <PhoneNumber phoneNumber={item.number} />
-        <Icon
-          name="ellipsis-vertical"
-          size={25}
-          color="black"
-          style={styles.icons}
-          onPress={() => handleOrderActionPress(item)}
-        />
+          /> }
+          <PhoneNumber phoneNumber={item.number} />
+        {status == "Assigned" &&
+          <Icon
+            name="ellipsis-vertical"
+            size={25}
+            color="black"
+            style={styles.icons}
+            onPress={() => handleOrderActionPress(item)}
+          /> }
+
       </View>
 
       {/* Other order fields */}

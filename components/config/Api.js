@@ -1,11 +1,11 @@
 const BaseUrl = 'https://localhost/';
 
 const OrderUrl = BaseUrl+'appOrders?';
-const LoginUrl = BaseUrl+'user';
+const LoginUrl = BaseUrl+'appUser?';
 const OrderCommentUrl = BaseUrl+'appAddOrderComment/';
-const ApprovedUrl = 'https://demo1365990.mockable.io/reschedule';
-const DeclineUrl = 'https://demo1365990.mockable.io/reschedule';
-const RescheduleUrl = 'https://demo1365990.mockable.io/reschedule';
+const ApprovedUrl = BaseUrl+'appRescheduleOrder/';
+const DeclineUrl = BaseUrl+'appRescheduleOrder/';
+const RescheduleUrl = BaseUrl+'reschedule';
 export {
     OrderUrl, LoginUrl, OrderCommentUrl, RescheduleUrl, ApprovedUrl, DeclineUrl, BaseUrl
 }

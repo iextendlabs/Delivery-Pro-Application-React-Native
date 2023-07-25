@@ -103,10 +103,10 @@ const OrderListStyle = {
     padding: 10,
     marginBottom: 10,
   },
-  commentTextContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+  horizontalLine: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'gray',
+    marginVertical: 5,
   },
   commentText: {
     fontSize: 16,

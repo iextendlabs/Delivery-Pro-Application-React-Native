@@ -7,19 +7,15 @@ const OrderLinks = () => {
   const navigation = useNavigation();
 
   const AssignedOrder = () => {
-    navigation.navigate('OrderList', { status: 'ASSIGNED' });
+    navigation.navigate('OrderList', { status: 'Assigned' });
   };
 
   const InProgressOrder = () => {
-    navigation.navigate('OrderList', { status: 'INPROGRESS' });
+    navigation.navigate('OrderList', { status: 'Inprogress' });
   };
 
   const DeliveredOrder = () => {
-    navigation.navigate('OrderList', { status: 'DELIVERED' });
-  };
-
-  const UnassignedOrder = () => {
-    navigation.navigate('OrderList', { status: 'UNASSIGNED' });
+    navigation.navigate('OrderList', { status: 'Complete' });
   };
 
     return (
@@ -41,12 +37,6 @@ const OrderLinks = () => {
           style={styles.button}
           onPress={AssignedOrder}>
           <Text style={styles.buttonText}>Assigned</Text>
-        </TouchableHighlight>
-
-        <TouchableHighlight
-          style={styles.button}
-          onPress={UnassignedOrder}>
-          <Text style={styles.buttonText}>Un Assigned</Text>
         </TouchableHighlight>
       </View>
       </View>

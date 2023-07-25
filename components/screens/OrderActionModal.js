@@ -59,16 +59,9 @@ const OrderActionModal = ({ visible, order, onClose }) => {
     // Simulating a POST request for accepting order
     try {
       // Replace the API_URL with your actual API endpoint
-      const response = await fetch(ApprovedUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: order.id,
-          status: "accept",
-        }),
-      });
+      const response = await fetch(
+        ApprovedUrl + order.id+ '?status=Accepted'
+        );
 
       if (!response.ok) {
         throw new Error("Failed to accept order.");
@@ -88,16 +81,9 @@ const OrderActionModal = ({ visible, order, onClose }) => {
     // Simulating a POST request for cancelling order
     try {
       // Replace the API_URL with your actual API endpoint
-      const response = await fetch(DeclineUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id: order.id,
-          status: "reject",
-        }),
-      });
+      const response = await fetch(
+        ApprovedUrl + order.id+ '?status=Rejected'
+        );
 
       if (!response.ok) {
         throw new Error("Failed to reject order.");

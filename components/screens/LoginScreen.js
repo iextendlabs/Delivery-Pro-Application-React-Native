@@ -6,9 +6,10 @@ import { LoginUrl } from '../config/Api';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [username, setUsername] = useState('staff3@tadhem.com');
-  const [password, setPassword] = useState('Simran@65');
+  const [username, setUsername] = useState('staff4@gmail.com');
+  const [password, setPassword] = useState('test');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState();
 
   useEffect(() => {
     checkAuthentication();
@@ -27,20 +28,13 @@ const LoginScreen = () => {
   };
   const handleLogin = async () => {
     try {
-      const response = await fetch(LoginUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
+      const response = await fetch(
+        LoginUrl + "username=" + username + "&password=" + password
+      );
 
       if (response.ok) {
         const responseData = await response.json();
-        const userId = responseData.user.kb_delivery_boy_id;
+        const userId = responseData.user.id;
         // console.log(userId);
         // Store the user_id in AsyncStorage
         await AsyncStorage.setItem('@user_id', String(userId));
@@ -51,12 +45,14 @@ const LoginScreen = () => {
         console.log('Login failed. Please try again.');
       }
     } catch (error) {
+      setError('These credentials do not match our records.')
       console.log('Error occurred during login:', error);
     }
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.error}>{error}</Text>
       <Text style={styles.title}>Login</Text>
       <TextInput
         style={styles.input}
@@ -86,6 +82,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  error: {
+    color:'red',
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 16,
   },

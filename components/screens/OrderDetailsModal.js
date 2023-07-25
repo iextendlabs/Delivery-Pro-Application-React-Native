@@ -24,9 +24,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 {/* Box for Order ID */}
                 <View style={styles.detailBox}>
                   <Text style={styles.detailBoxTitle}>Order#</Text>
-                  <Text style={styles.detailBoxText}>
-                    {selectedOrder.id}
-                  </Text>
+                  <Text style={styles.detailBoxText}>{selectedOrder.id}</Text>
                 </View>
 
                 {/* Box for Total Price */}
@@ -66,16 +64,23 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                     <Text style={styles.addressLine}>{selectedOrder.name}</Text>
                   </View>
                   <View style={styles.addressLineContainer}>
-                    <Text style={styles.addressLine}>{selectedOrder.buildingName},{selectedOrder.flatVilla},{selectedOrder.street},{selectedOrder.area},{selectedOrder.city}  </Text>
+                    <Text style={styles.addressLine}>
+                      {selectedOrder.buildingName},{selectedOrder.flatVilla},
+                      {selectedOrder.street},{selectedOrder.area},
+                      {selectedOrder.city}{" "}
+                    </Text>
                   </View>
                 </View>
 
                 {/* Box for Comment */}
                 <View style={styles.commentBox}>
-                  <Text style={styles.detailBoxTitle}>Comment</Text>
-                  <View style={styles.commentTextContainer}>
-                    <Text style={styles.commentText}>{selectedOrder.order_comment}</Text>
-                  </View>
+                  <Text style={styles.detailBoxTitle}>Comments</Text>
+                    {selectedOrder.comments_text.map((comment, index) => (
+                      <Text key={index} style={styles.commentText}>
+                        {comment}
+                      </Text>
+                    ))}
+                    
                 </View>
               </View>
             )}

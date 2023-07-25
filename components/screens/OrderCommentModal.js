@@ -4,6 +4,7 @@ import PhoneNumber from "../modules/PhoneNumber";
 import OrderListStyle from "../styles/OrderListStyle";
 import { ScrollView } from "react-native-gesture-handler";
 import { OrderCommentUrl } from "../config/Api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const OrderCommentModal = ({ visible, order, onClose }) => {
 
@@ -25,9 +26,10 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
     }
 
     setIsLoading(true);
+    const userId = await AsyncStorage.getItem("@user_id");
     // Simulating a POST request
     try {
-      const response = await fetch(OrderCommentUrl+ order.id + '?comment='+commentText);
+      const response = await fetch(OrderCommentUrl+ order.id + '?comment='+commentText + '&user_id='+userId);
         
       if (!response.ok) {
         throw new Error("Failed to post comment.");
