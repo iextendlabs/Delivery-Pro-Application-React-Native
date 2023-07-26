@@ -6,15 +6,19 @@ import { useNavigation } from '@react-navigation/native';
 const OrderLinks = () => {
   const navigation = useNavigation();
 
-  const AssignedOrder = () => {
-    navigation.navigate('OrderList', { status: 'Assigned' });
+  const AcceptedOrder = () => {
+    navigation.navigate('OrderList', { status: 'Accepted' });
+  };
+   
+  const PendingOrder = () => {
+    navigation.navigate('OrderList', { status: 'Pending' });
   };
 
   const InProgressOrder = () => {
     navigation.navigate('OrderList', { status: 'Inprogress' });
   };
 
-  const DeliveredOrder = () => {
+  const CompleteOrder = () => {
     navigation.navigate('OrderList', { status: 'Complete' });
   };
 
@@ -23,20 +27,23 @@ const OrderLinks = () => {
         <View style={styles.buttonContainer}>
         <TouchableHighlight
           style={styles.button}
+          onPress={PendingOrder}>
+          <Text style={styles.buttonText}>Pending</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={styles.button}
+          onPress={AcceptedOrder}>
+          <Text style={styles.buttonText}>Accepted</Text>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={styles.button}
           onPress={InProgressOrder}>
           <Text style={styles.buttonText}>In Progress</Text>
         </TouchableHighlight>
-
         <TouchableHighlight
           style={styles.button}
-          onPress={DeliveredOrder}>
-          <Text style={styles.buttonText}>Delivered</Text>
-        </TouchableHighlight>
-
-        <TouchableHighlight
-          style={styles.button}
-          onPress={AssignedOrder}>
-          <Text style={styles.buttonText}>Assigned</Text>
+          onPress={CompleteOrder}>
+          <Text style={styles.buttonText}>Complete</Text>
         </TouchableHighlight>
       </View>
       </View>

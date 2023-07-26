@@ -170,6 +170,14 @@ const OrderListStyle = {
     marginBottom: 10,
   },
   acceptButton: {
+    backgroundColor: "#198754",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 10,
+  },
+  completeButton: {
     backgroundColor: "#01AF94",
     padding: 10,
     borderRadius: 5,
@@ -189,6 +197,15 @@ const OrderListStyle = {
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  picker: {
+    backgroundColor: "#fff",
+    width: "100%",
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#ccc",
   },
 };
 

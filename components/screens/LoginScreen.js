@@ -6,7 +6,7 @@ import { LoginUrl } from '../config/Api';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [username, setUsername] = useState('staff4@gmail.com');
+  const [username, setUsername] = useState('staff1@gmail.com');
   const [password, setPassword] = useState('test');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState();

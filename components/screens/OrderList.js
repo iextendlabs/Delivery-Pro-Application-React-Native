@@ -20,17 +20,33 @@ import OrderDetailsModal from "./OrderDetailsModal";
 import OrderCommentModal from "./OrderCommentModal";
 import OrderActionModal from "./OrderActionModal";
 import Icon from "react-native-vector-icons/Ionicons";
+import { OrderStatusUpdateUrl } from "../config/Api";
 
 const OrderList = ({ initialParams }) => {
   const [orders, setOrders] = useState([]);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
+  const setSuccess = (message)=>{
+    setSuccessMessage(message)
+    setTimeout(() => {
+      setSuccessMessage("");
+    }, 2000);
+  }
+
+  const setError = (message)=>{
+    setErrorMessage(message)
+    setTimeout(() => {
+      setErrorMessage(""); 
+    }, 2000);
+  }
   const route = useRoute();
-  var status = "Assigned";
+  var status = "Pending";
 
   if (
     route &&
@@ -82,29 +98,88 @@ const OrderList = ({ initialParams }) => {
           style={styles.icons}
           onPress={() => handleOrderDetailPress(item)}
         />
-        {status != "Complete" &&
-        <Icon
-          name="chatbubble-ellipses-outline"
-          size={25}
-          color="black"
-          style={styles.icons}
-          onPress={() => handleOrderCommentPress(item)}
-          /> }
-          <PhoneNumber phoneNumber={item.number} />
-        {status == "Assigned" &&
+        {status != "Complete" && (
+          <Icon
+            name="chatbubble-ellipses-outline"
+            size={25}
+            color="black"
+            style={styles.icons}
+            onPress={() => handleOrderCommentPress(item)}
+          />
+        )}
+        <PhoneNumber phoneNumber={item.number} />
+        {status == "Accepted" && (
+          <Icon
+            name="md-hourglass"
+            size={25}
+            color="black"
+            style={styles.icons}
+            onPress={() => handleInprogressOrder(item)}
+          />
+        )}
+        {status == "Inprogress" && (
+          <Icon
+            name="md-checkmark-circle"
+            size={25}
+            color="black"
+            style={styles.icons}
+            onPress={() => handleCompleteOrder(item)}
+          />
+        )}
+        {status == "Pending" && (
           <Icon
             name="ellipsis-vertical"
             size={25}
             color="black"
             style={styles.icons}
             onPress={() => handleOrderActionPress(item)}
-          /> }
-
+          />
+        )}
       </View>
 
       {/* Other order fields */}
     </TouchableOpacity>
   );
+
+  const handleInprogressOrder = async (order) => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        OrderStatusUpdateUrl + order.id + "?status=Inprogress"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to Inprogress order.");
+      }
+
+      setSuccess("Order Inprogress successfully.");
+    } catch (error) {
+      setError("Failed to Inprogress order. Please try again.");
+    }
+
+    setLoading(false);
+  };
+
+  const handleCompleteOrder = async (order) => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        OrderStatusUpdateUrl + order.id + "?status=Complete"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to Complete order.");
+      }
+
+      setSuccess("Order Complete successfully.");
+    } catch (error) {
+      setError("Failed to Complete order. Please try again.");
+    }
+
+    setLoading(false);
+  };
 
   const handleOrderDetailPress = (order) => {
     setSelectedOrder(order);
@@ -142,7 +217,12 @@ const OrderList = ({ initialParams }) => {
       </View>
       <Text style={styles.orderText}>Order Status: {status}</Text>
       <Text style={styles.orderText}>Total Orders: {orders.length}</Text>
-
+      {successMessage !== "" && (
+        <Text style={styles.successMessage}>{successMessage}</Text>
+      )}
+      {errorMessage !== "" && (
+        <Text style={styles.errorMessage}>{errorMessage}</Text>
+      )}
       <ScrollView style={{ flex: 8, paddingBottom: 65 }}>
         {orders.length === 0 ? (
           <Text style={styles.noItemsText}>No Order</Text>
