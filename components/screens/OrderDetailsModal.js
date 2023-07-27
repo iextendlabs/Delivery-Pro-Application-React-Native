@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 import PhoneNumber from "../modules/PhoneNumber";
 import OrderListStyle from "../styles/OrderListStyle";
 import { ScrollView } from "react-native-gesture-handler";
+import WhatsAppElement from "../modules/WhatsappElement";
+import GoogleAddressElement from "../modules/GoogleAddressElement";
 
 const OrderDetailsModal = ({ visible, order, onClose }) => {
   if (!visible || !order) {
@@ -57,19 +59,26 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                   </View>
                 </View>
 
+                <View style={styles.detailBox}>
+                  <Text style={styles.detailBoxTitle}>Whatsapp</Text>
+                  <View style={styles.phoneNumberContainer}>
+                    {/* <Image source={require('../path/to/phone-icon.png')} style={styles.phoneIcon} /> */}
+                    <WhatsAppElement
+                      phoneNumber={selectedOrder.whatsapp}
+                    />
+                  </View>
+                </View>
+
+
                 {/* Box for Shipping Address */}
                 <View style={styles.shippingAddressBox}>
                   <Text style={styles.detailBoxTitle}>Shipping Address</Text>
                   <View style={styles.addressLineContainer}>
                     <Text style={styles.addressLine}>{selectedOrder.name}</Text>
                   </View>
-                  <View style={styles.addressLineContainer}>
-                    <Text style={styles.addressLine}>
-                      {selectedOrder.buildingName},{selectedOrder.flatVilla},
-                      {selectedOrder.street},{selectedOrder.area},
-                      {selectedOrder.city}{" "}
-                    </Text>
-                  </View>
+                  <GoogleAddressElement address={ selectedOrder.buildingName + ' ' + 
+                      selectedOrder.street + ',' + selectedOrder.area + ' ' + selectedOrder.city} />
+                  
                 </View>
 
                 {/* Box for Comment */}
