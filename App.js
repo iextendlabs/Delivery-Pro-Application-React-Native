@@ -3,10 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import MainStyles from './components/styles/Main';
-import HomeScreen from './components/screens/HomeScreen';
-import ServicesScreen from './components/screens/ServicesScreen';
 import SettingsScreen from './components/screens/SettingsScreen';
-import Footer from './components/layout/Footer';
 import OrderList from './components/screens/OrderList';
 import LoginScreen from './components/screens/LoginScreen';
 
@@ -41,7 +38,6 @@ const App = () => {
               <Drawer.Screen name="OrderList" options={{ title: 'Home' }} component={OrderList} />
               <Drawer.Screen name="Settings" component={SettingsScreen} />
         </Drawer.Navigator>
-        <Footer />
       </View>
     </NavigationContainer>
   );
