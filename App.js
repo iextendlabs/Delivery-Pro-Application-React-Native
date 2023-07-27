@@ -22,7 +22,7 @@ const App = () => {
     try {
       const userId = await AsyncStorage.getItem('@user_id');
       if(!userId){
-        setIsAuthenticated = false;
+        setIsAuthenticated(false);
       }
 
     } catch (error) {

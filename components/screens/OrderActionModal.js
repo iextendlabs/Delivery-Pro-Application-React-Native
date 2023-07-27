@@ -7,8 +7,8 @@ import {
   StyleSheet,
   TextInput,
   Alert,
-  Picker,
 } from "react-native";
+import {Picker} from '@react-native-picker/picker';
 import { ScrollView } from "react-native-gesture-handler";
 import { Calendar } from "react-native-calendars";
 import OrderListStyle from "../styles/OrderListStyle";
@@ -90,11 +90,11 @@ const OrderActionModal = ({ visible, order, onClose }) => {
           "&date=" +
           selectedDate
       );
-        console.log(response)
       if (!response.ok) {
         throw new Error("Failed to update time slots.");
       } else {
         setSuccessMessage("Time Slots update successfully.");
+        handleModalClose();
         // setErrorMessage('');
       }
     } catch (error) {
@@ -115,6 +115,8 @@ const OrderActionModal = ({ visible, order, onClose }) => {
       }
 
       setSuccessMessage("Order accepted successfully.");
+      handleModalClose();
+
     } catch (error) {
       setErrorMessage("Failed to accept order. Please try again.");
     }
@@ -133,6 +135,8 @@ const OrderActionModal = ({ visible, order, onClose }) => {
       }
 
       setSuccessMessage("Order rejected successfully.");
+      handleModalClose();
+
     } catch (error) {
       setErrorMessage("Failed to reject order. Please try again.");
     }

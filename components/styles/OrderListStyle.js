@@ -3,12 +3,14 @@ const OrderListStyle = {
     flex:1,
     flexDirection:"row",
     alignItems: 'center',
+    paddingTop: 12
   },
   icons:{
     paddingRight:10
   },
   container: {
     flex: 1,
+    paddingTop: 10
   },
   loaderContainer: {
     flex: 1,

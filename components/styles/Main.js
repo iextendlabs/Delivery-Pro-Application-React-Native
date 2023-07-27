@@ -40,14 +40,8 @@ const MainStyles = {
     fontSize: 16,
   },
   screenContainer: {
-    flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: 'row'
   },
   button: {
     fontSize: 15,

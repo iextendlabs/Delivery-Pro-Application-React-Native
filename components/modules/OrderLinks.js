@@ -24,7 +24,6 @@ const OrderLinks = () => {
 
     return (
       <View style={styles.screenContainer}>
-        <View style={styles.buttonContainer}>
         <TouchableHighlight
           style={styles.button}
           onPress={PendingOrder}>
@@ -45,7 +44,6 @@ const OrderLinks = () => {
           onPress={CompleteOrder}>
           <Text style={styles.buttonText}>Complete</Text>
         </TouchableHighlight>
-      </View>
       </View>
     );
   };

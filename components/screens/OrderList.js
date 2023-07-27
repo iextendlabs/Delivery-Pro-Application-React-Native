@@ -212,9 +212,7 @@ const OrderList = ({ initialParams }) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ flex: 1 }}>
         <OrderLinks />
-      </View>
       <Text style={styles.orderText}>Order Status: {status}</Text>
       <Text style={styles.orderText}>Total Orders: {orders.length}</Text>
       {successMessage !== "" && (
@@ -223,7 +221,6 @@ const OrderList = ({ initialParams }) => {
       {errorMessage !== "" && (
         <Text style={styles.errorMessage}>{errorMessage}</Text>
       )}
-      <ScrollView style={{ flex: 8, paddingBottom: 65 }}>
         {orders.length === 0 ? (
           <Text style={styles.noItemsText}>No Order</Text>
         ) : (
@@ -233,7 +230,6 @@ const OrderList = ({ initialParams }) => {
             keyExtractor={(item) => item.id.toString()}
           />
         )}
-      </ScrollView>
 
       <OrderDetailsModal
         visible={detailsModalVisible}
