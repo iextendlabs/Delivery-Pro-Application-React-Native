@@ -157,7 +157,7 @@ const OrderActionModal = ({ visible, order, onClose }) => {
               </View>
             )}
             <View style={styles.commentContainer}>
-              <Text style={styles.commentLabel}>Date:</Text>
+              <Text style={styles.label}>Date:</Text>
               <Calendar
                 markedDates={{
                   [selectedDate]: {
@@ -171,7 +171,7 @@ const OrderActionModal = ({ visible, order, onClose }) => {
               />
               {selectedDate !== "" && (
                 <>
-                  <Text style={styles.commentLabel}>TimeSlots:</Text>
+                  <Text style={styles.label}>TimeSlots:</Text>
                   <Picker
                     style={styles.picker}
                     selectedValue={timeSlot}

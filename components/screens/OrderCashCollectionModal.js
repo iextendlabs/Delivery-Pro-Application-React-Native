@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Modal, StyleSheet, TextInput, Alert } from "react-native";
-import PhoneNumber from "../modules/PhoneNumber";
-import OrderListStyle from "../styles/OrderListStyle";
 import { ScrollView } from "react-native-gesture-handler";
-import { OrderCommentUrl } from "../config/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const OrderCommentModal = ({ visible, order, onClose }) => {
+import OrderListStyle from "../styles/OrderListStyle";
+import { OrderCashCollectionUrl } from "../config/Api";
 
+const OrderCashCollectionModal = ({ visible, order, onClose }) => {
   const [selectedOrder, setSelectedOrder] = useState(order);
-  const [commentText, setCommentText] = useState("");
+  const [description, setDescription] = useState("Cash Collected");
+  const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -18,10 +18,9 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
     onClose();
   };
 
-  const handleSubmitComment = async () => {
-
-    if (commentText.trim() === "") {
-      setErrorMessage("Please enter a comment.");
+  const handleSubmitCashCollection = async () => {
+    if (description.trim() === "" || amount.trim() === "") {
+      setErrorMessage("Please enter a description and an amount.");
       return;
     }
 
@@ -29,16 +28,26 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
     const userId = await AsyncStorage.getItem("@user_id");
     // Simulating a POST request
     try {
-      const response = await fetch(OrderCommentUrl+ order.id + '?comment='+commentText + '&user_id='+userId);
-        
+      const response = await fetch(
+        OrderCashCollectionUrl +
+          order.id +
+          "?description=" +
+          description +
+          "&amount=" +
+          amount +
+          "&user_id=" +
+          userId
+      );
+
       if (!response.ok) {
-        throw new Error("Failed to post comment.");
+        throw new Error("Failed to cash collection.");
       }
 
-      setSuccessMessage("Comment posted successfully.");
-      setCommentText("");
+      setSuccessMessage("Cash Collected successfully.");
+      setDescription("");
+      setAmount("");
     } catch (error) {
-      setErrorMessage("Failed to post comment. Please try again.");
+      setErrorMessage("Failed to Cash Collection. Please try again.");
     }
 
     setIsLoading(false);
@@ -48,25 +57,33 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Order Details</Text>
+          <Text style={styles.modalTitle}>Submit Cash</Text>
           <ScrollView>
-            {selectedOrder && (
+            {order && (
               <View style={styles.orderDetails}>
-                {/* Existing order details */}
+                <Text>Total Amount: {order.total_amount}</Text>
               </View>
             )}
-            <View style={styles.commentContainer}>
-              <Text style={styles.label}>Comment:</Text>
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.label}>Description:</Text>
               <TextInput
                 style={styles.input}
-                value={commentText}
-                onChangeText={setCommentText}
-                placeholder="Enter your comment"
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Enter your description"
                 multiline
+              />
+              <Text style={styles.label}>Amount:</Text>
+              <TextInput
+                style={styles.amountInput}
+                value={amount}
+                onChangeText={setAmount}
+                placeholder="Enter the amount"
+                keyboardType="numeric"
               />
               <TouchableOpacity
                 style={styles.submitButton}
-                onPress={handleSubmitComment}
+                onPress={handleSubmitCashCollection}
                 disabled={isLoading}
               >
                 <Text style={styles.buttonText}>
@@ -95,4 +112,4 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
 
 const styles = StyleSheet.create(OrderListStyle);
 
-export default OrderCommentModal;
+export default OrderCashCollectionModal;

@@ -69,6 +69,16 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                   </View>
                 </View>
 
+                {/* Box for Comment */}
+                <View style={styles.commentBox}>
+                  <Text style={styles.detailBoxTitle}>Comments</Text>
+                    {selectedOrder.comments_text.map((comment, index) => (
+                      <Text key={index} style={styles.commentText}>
+                        {comment}
+                      </Text>
+                    ))}
+                    
+                </View>
 
                 {/* Box for Shipping Address */}
                 <View style={styles.shippingAddressBox}>
@@ -81,16 +91,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                   
                 </View>
 
-                {/* Box for Comment */}
-                <View style={styles.commentBox}>
-                  <Text style={styles.detailBoxTitle}>Comments</Text>
-                    {selectedOrder.comments_text.map((comment, index) => (
-                      <Text key={index} style={styles.commentText}>
-                        {comment}
-                      </Text>
-                    ))}
-                    
-                </View>
+                
               </View>
             )}
 

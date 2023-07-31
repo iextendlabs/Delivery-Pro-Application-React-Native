@@ -137,13 +137,25 @@ const OrderListStyle = {
   commentContainer: {
     marginTop: 20,
   },
-  commentLabel: {
+  descriptionContainer: {
+    marginTop: 20,
+  },
+  label: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
   },
-  commentInput: {
+  input: {
     height: 100,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginBottom: 10,
+  },
+  amountInput: {
+    height: 40,
     borderColor: "gray",
     borderWidth: 1,
     borderRadius: 5,

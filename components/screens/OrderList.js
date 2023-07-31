@@ -19,6 +19,7 @@ import OrderListStyle from "../styles/OrderListStyle";
 import OrderDetailsModal from "./OrderDetailsModal";
 import OrderCommentModal from "./OrderCommentModal";
 import OrderActionModal from "./OrderActionModal";
+import OrderCashCollectionModal from "./OrderCashCollectionModal";
 import Icon from "react-native-vector-icons/Ionicons";
 import { OrderStatusUpdateUrl } from "../config/Api";
 import LocationElement from "../modules/LocationElement";
@@ -31,6 +32,7 @@ const OrderList = ({ initialParams }) => {
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [actionModalVisible, setActionModalVisible] = useState(false);
+  const [cashCollectionModalVisible, setCashCollectionModalVisible] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const setSuccess = (message) => {
@@ -92,7 +94,7 @@ const OrderList = ({ initialParams }) => {
       </View>
 
       <View style={styles.OrderLinks}>
-        <LocationElement latitude={item.latitude} longitude={item.longitude} />
+        <LocationElement latitude={item.latitude} longitude={item.longitude} address={ item.buildingName + ' ' + item.street + ',' + item.area + ' ' + item.city} />
         <Icon
           name="eye"
           size={25}
@@ -135,6 +137,16 @@ const OrderList = ({ initialParams }) => {
             color="blue"  // Change this to your desired color for 'Pending' status.
             style={styles.icons}
             onPress={() => handleOrderActionPress(item)}
+          />
+        )}
+        {status == "Complete" && (
+          <Icon
+            name="cash-outline"
+            size={25}
+
+            color={item.cash_status ? 'green' : 'orange'}
+            style={styles.icons}
+            onPress={() => handleOrderCashCollection(item)}
           />
         )}
       </View>
@@ -198,10 +210,16 @@ const OrderList = ({ initialParams }) => {
     setActionModalVisible(true);
   };
 
+  const handleOrderCashCollection = (order) => {
+    setSelectedOrder(order);
+    setCashCollectionModalVisible(true);
+  };
+
   const closeModal = () => {
     setDetailsModalVisible(false);
     setCommentModalVisible(false);
     setActionModalVisible(false);
+    setCashCollectionModalVisible(false);
   };
 
   if (loading) {
@@ -247,6 +265,12 @@ const OrderList = ({ initialParams }) => {
 
       <OrderActionModal
         visible={actionModalVisible}
+        order={selectedOrder}
+        onClose={closeModal}
+      />
+
+      <OrderCashCollectionModal
+        visible={cashCollectionModalVisible}
         order={selectedOrder}
         onClose={closeModal}
       />
