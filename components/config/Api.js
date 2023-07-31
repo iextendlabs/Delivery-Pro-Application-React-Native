@@ -1,4 +1,4 @@
-const BaseUrl = 'https://localhost/';
+const BaseUrl = 'https://services.upgradeopencart.com/';
 
 const OrderUrl = BaseUrl+'appOrders?';
 const LoginUrl = BaseUrl+'appUser?';
