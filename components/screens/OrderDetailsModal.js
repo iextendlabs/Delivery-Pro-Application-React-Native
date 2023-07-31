@@ -63,7 +63,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                   <Text style={styles.detailBoxTitle}>Whatsapp</Text>
                   <View style={styles.phoneNumberContainer}>
                     {/* <Image source={require('../path/to/phone-icon.png')} style={styles.phoneIcon} /> */}
-                    <WhatsAppElement
+                    <WhatsAppElement showNumber={true}
                       phoneNumber={selectedOrder.whatsapp}
                     />
                   </View>

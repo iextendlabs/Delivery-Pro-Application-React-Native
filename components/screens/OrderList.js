@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useFocusEffect } from "@react-navigation/native";
 import {
   View,
   Text,
-  ScrollView,
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
-  Modal,
   StyleSheet,
 } from "react-native";
 import { OrderUrl } from "../config/Api";
-import PhoneNumber from "../modules/PhoneNumber";
 import { useRoute } from "@react-navigation/native";
 import OrderLinks from "../modules/OrderLinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -23,6 +19,7 @@ import OrderCashCollectionModal from "./OrderCashCollectionModal";
 import Icon from "react-native-vector-icons/Ionicons";
 import { OrderStatusUpdateUrl } from "../config/Api";
 import LocationElement from "../modules/LocationElement";
+import WhatsAppElement from "../modules/WhatsappElement";
 
 const OrderList = ({ initialParams }) => {
   const [orders, setOrders] = useState([]);
@@ -111,7 +108,7 @@ const OrderList = ({ initialParams }) => {
             onPress={() => handleOrderCommentPress(item)}
           />
         )}
-        <PhoneNumber phoneNumber={item.number} />
+        <WhatsAppElement showNumber={false} phoneNumber={item.whatsapp} />
         {status === "Accepted" && (
           <Icon
             name="md-hourglass"
