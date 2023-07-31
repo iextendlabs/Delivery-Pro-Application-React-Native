@@ -88,7 +88,6 @@ const OrderList = ({ initialParams }) => {
             todays_order: formattedDateToday === order.date
           };
         });
-        console.log(updatedData);
         setOrders(updatedData);
         setLoading(false);
       } catch (error) {
