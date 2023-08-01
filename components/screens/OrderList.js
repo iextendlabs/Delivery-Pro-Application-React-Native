@@ -208,8 +208,12 @@ const OrderList = ({ initialParams }) => {
   };
 
   const handleOrderCashCollection = (order) => {
-    setSelectedOrder(order);
-    setCashCollectionModalVisible(true);
+    if(order.cash_status){
+      setCashCollectionModalVisible(false);
+    }else{
+      setSelectedOrder(order);
+      setCashCollectionModalVisible(true);
+    }
   };
 
   const closeModal = () => {

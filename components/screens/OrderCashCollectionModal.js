@@ -43,7 +43,7 @@ const OrderCashCollectionModal = ({ visible, order, onClose }) => {
         throw new Error("Failed to cash collection.");
       }
 
-      setSuccessMessage("Cash Collected successfully.");
+      setSuccessMessage("Cash Collected successfully but not approved by admin.");
       setDescription("");
       setAmount("");
     } catch (error) {
