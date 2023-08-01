@@ -1,12 +1,12 @@
 const BaseUrl = 'https://services.upgradeopencart.com/';
 
-const OrderUrl = BaseUrl+'appOrders?';
-const LoginUrl = BaseUrl+'appUser?';
-const OrderCommentUrl = BaseUrl+'appAddOrderComment/';
-const OrderCashCollectionUrl = BaseUrl+'appCashCollection/';
-const OrderStatusUpdateUrl = BaseUrl+'appOrderStatusUpdate/';
-const RescheduleUrl = BaseUrl+'appRescheduleOrder/';
-const TimeSlotsUrl = BaseUrl+'appTimeSlots?';
+const OrderUrl = BaseUrl+'staffAppOrders?';
+const LoginUrl = BaseUrl+'staffAppUser?';
+const OrderCommentUrl = BaseUrl+'staffAppAddOrderComment/';
+const OrderCashCollectionUrl = BaseUrl+'staffAppCashCollection/';
+const OrderStatusUpdateUrl = BaseUrl+'staffAppOrderStatusUpdate/';
+const RescheduleUrl = BaseUrl+'staffAppRescheduleOrder/';
+const TimeSlotsUrl = BaseUrl+'staffAppTimeSlots?';
 
 export {
     OrderUrl, LoginUrl, OrderCommentUrl, RescheduleUrl, OrderStatusUpdateUrl, BaseUrl,TimeSlotsUrl,OrderCashCollectionUrl
