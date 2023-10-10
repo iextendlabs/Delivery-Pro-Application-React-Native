@@ -16,6 +16,7 @@ import { OrderStatusUpdateUrl } from "../config/Api";
 import { RescheduleUrl } from "../config/Api";
 import { TimeSlotsUrl } from "../config/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const OrderActionModal = ({ visible, order, onClose }) => {
   const [selectedOrder, setSelectedOrder] = useState(order);
@@ -79,28 +80,25 @@ const OrderActionModal = ({ visible, order, onClose }) => {
 
     setIsLoading(true);
 
-    // Simulating a POST request for posting comment
     try {
-      // Replace the API_URL with your actual API endpoint
-      const response = await fetch(
-        RescheduleUrl +
-          order.id +
-          "?time_slot_id=" +
-          selectedTimeSlotsId +
-          "&date=" +
-          selectedDate
-      );
-      if (!response.ok) {
-        throw new Error("Failed to update time slots.");
-      } else {
+      const formData = new FormData();
+  
+      formData.append("order_id", order.id);
+      formData.append("time_slot_id", selectedTimeSlotsId);
+      formData.append("date", selectedDate);
+      
+      const response = await axios.post(RescheduleUrl,formData);
+
+      if (response.status === 200) {
         setSuccessMessage("Time Slots update successfully.");
         handleModalClose();
-        // setErrorMessage('');
+      } else {
+        throw new Error("Failed to update time slots.");
       }
     } catch (error) {
       setErrorMessage("Failed to update time slots. Please try again.");
     }
-
+  
     setIsLoading(false);
   };
 
@@ -108,17 +106,21 @@ const OrderActionModal = ({ visible, order, onClose }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(OrderStatusUpdateUrl + order.id + "?status=Accepted");
+      const formData = new FormData();
+  
+      formData.append("order_id", order.id);
+      formData.append("status", 'Accepted');
+      
+      const response = await axios.post(OrderStatusUpdateUrl,formData);
 
-      if (!response.ok) {
-        throw new Error("Failed to accept order.");
+      if (response.status === 200) {
+        setSuccessMessage("Order Accepted successfully.");
+        handleModalClose();
+      } else {
+        throw new Error("Failed to Accepted order.");
       }
-
-      setSuccessMessage("Order accepted successfully.");
-      handleModalClose();
-
     } catch (error) {
-      setErrorMessage("Failed to accept order. Please try again.");
+      setErrorMessage("Failed to Accepted order. Please try again.");
     }
 
     setIsLoading(false);
@@ -128,17 +130,21 @@ const OrderActionModal = ({ visible, order, onClose }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(OrderStatusUpdateUrl + order.id + "?status=Rejected");
+      const formData = new FormData();
+  
+      formData.append("order_id", order.id);
+      formData.append("status", 'Rejected');
+      
+      const response = await axios.post(OrderStatusUpdateUrl,formData);
 
-      if (!response.ok) {
-        throw new Error("Failed to reject order.");
+      if (response.status === 200) {
+        setSuccessMessage("Order Rejected successfully.");
+        handleModalClose();
+      } else {
+        throw new Error("Failed to Rejected order.");
       }
-
-      setSuccessMessage("Order rejected successfully.");
-      handleModalClose();
-
     } catch (error) {
-      setErrorMessage("Failed to reject order. Please try again.");
+      setErrorMessage("Failed to Rejected order. Please try again.");
     }
 
     setIsLoading(false);

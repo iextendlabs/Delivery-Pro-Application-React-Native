@@ -221,6 +221,26 @@ const OrderListStyle = {
     borderWidth: 1,
     borderColor: "#ccc",
   },
+  fileInputContainer: {
+    marginTop: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
+  fileInputText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedImage: {
+    width: 200,
+    height: 200,
+    resizeMode: "cover",
+    marginTop: 10,
+  },
 };
 
 export default OrderListStyle;

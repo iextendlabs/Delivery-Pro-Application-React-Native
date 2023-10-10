@@ -9,6 +9,7 @@ const SettingsScreen = ({navigation}) => {
     try {
       // Remove the user_id from AsyncStorage
       await AsyncStorage.removeItem('@user_id');
+      await AsyncStorage.removeItem('@access_token');
 
       // Navigate back to the Login screen
       navigation.navigate('OrderList', { status: 'LogOut' });

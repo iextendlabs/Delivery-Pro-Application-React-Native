@@ -5,6 +5,7 @@ import OrderListStyle from "../styles/OrderListStyle";
 import { ScrollView } from "react-native-gesture-handler";
 import { OrderCommentUrl } from "../config/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
 const OrderCommentModal = ({ visible, order, onClose }) => {
 
@@ -27,16 +28,28 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
 
     setIsLoading(true);
     const userId = await AsyncStorage.getItem("@user_id");
-    // Simulating a POST request
     try {
-      const response = await fetch(OrderCommentUrl+ order.id + '?comment='+commentText + '&user_id='+userId);
-        
-      if (!response.ok) {
+      const formData = new FormData();
+  
+      formData.append("order_id", order.id);
+      formData.append("comment", commentText);
+      formData.append("user_id", userId);
+
+      const customHeaders = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+      
+      const response = await axios.post(OrderCommentUrl,formData,{
+        headers: customHeaders
+      });
+
+      if (response.status === 200) {
+        setSuccessMessage("Comment posted successfully.");
+        onClose();
+      } else {
         throw new Error("Failed to post comment.");
       }
-
-      setSuccessMessage("Comment posted successfully.");
-      setCommentText("");
     } catch (error) {
       setErrorMessage("Failed to post comment. Please try again.");
     }

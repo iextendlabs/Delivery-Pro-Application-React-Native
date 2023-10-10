@@ -1,12 +1,12 @@
-const BaseUrl = 'https://services.upgradeopencart.com/';
+const BaseUrl = 'https://lipslay.com/api/';
 
-const OrderUrl = BaseUrl+'staffAppOrders?';
-const LoginUrl = BaseUrl+'staffAppUser?';
-const OrderCommentUrl = BaseUrl+'staffAppAddOrderComment/';
-const OrderCashCollectionUrl = BaseUrl+'staffAppCashCollection/';
-const OrderStatusUpdateUrl = BaseUrl+'staffAppOrderStatusUpdate/';
-const RescheduleUrl = BaseUrl+'staffAppRescheduleOrder/';
-const TimeSlotsUrl = BaseUrl+'staffAppTimeSlots?';
+const OrderUrl = BaseUrl+'orders?';
+const LoginUrl = BaseUrl+'login';
+const OrderCommentUrl = BaseUrl+'addOrderComment';
+const OrderCashCollectionUrl = BaseUrl+'cashCollection';
+const OrderStatusUpdateUrl = BaseUrl+'orderStatusUpdate';
+const RescheduleUrl = BaseUrl+'rescheduleOrder';
+const TimeSlotsUrl = BaseUrl+'timeSlots?';
 
 export {
     OrderUrl, LoginUrl, OrderCommentUrl, RescheduleUrl, OrderStatusUpdateUrl, BaseUrl,TimeSlotsUrl,OrderCashCollectionUrl

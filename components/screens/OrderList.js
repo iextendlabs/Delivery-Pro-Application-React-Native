@@ -20,6 +20,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { OrderStatusUpdateUrl } from "../config/Api";
 import LocationElement from "../modules/LocationElement";
 import WhatsAppElement from "../modules/WhatsappElement";
+import axios from "axios";
 
 const OrderList = ({ initialParams }) => {
   const [orders, setOrders] = useState([]);
@@ -29,22 +30,23 @@ const OrderList = ({ initialParams }) => {
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [actionModalVisible, setActionModalVisible] = useState(false);
-  const [cashCollectionModalVisible, setCashCollectionModalVisible] = useState(false);
+  const [cashCollectionModalVisible, setCashCollectionModalVisible] =
+    useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   const setSuccess = (message) => {
-    setSuccessMessage(message)
+    setSuccessMessage(message);
     setTimeout(() => {
       setSuccessMessage("");
     }, 2000);
-  }
+  };
 
   const setError = (message) => {
-    setErrorMessage(message)
+    setErrorMessage(message);
     setTimeout(() => {
       setErrorMessage("");
     }, 2000);
-  }
+  };
   const route = useRoute();
   var status = "Pending";
 
@@ -67,11 +69,10 @@ const OrderList = ({ initialParams }) => {
     if (userId) {
       setLoading(true);
       try {
-        const response = await fetch(
-          OrderUrl + "status=" + orderStatus + "&user_id=" + userId
+        const response = await axios.get(
+          `${OrderUrl}status=${orderStatus}&user_id=${userId}`
         );
-        const data = await response.json();
-        setOrders(data);
+        setOrders(response.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -86,12 +87,27 @@ const OrderList = ({ initialParams }) => {
   const renderOrder = ({ item }) => (
     <TouchableOpacity style={styles.orderContainer}>
       <View style={{ flex: 1.5 }}>
-        <Text style={styles.orderId}>ID: {item.id} <Icon name="ios-calendar" size={15} color="black" /> {item.date} </Text>
+        <Text style={styles.orderId}>
+          ID: {item.id} <Icon name="ios-calendar" size={15} color="black" />{" "}
+          {item.date}{" "}
+        </Text>
         <Text style={styles.orderDate}>{item.time_slot_value}</Text>
       </View>
 
       <View style={styles.OrderLinks}>
-        <LocationElement latitude={item.latitude} longitude={item.longitude} address={item.buildingName + ' ' + item.street + ',' + item.area + ' ' + item.city} />
+        <LocationElement
+          latitude={item.latitude}
+          longitude={item.longitude}
+          address={
+            item.buildingName +
+            " " +
+            item.street +
+            "," +
+            item.area +
+            " " +
+            item.city
+          }
+        />
         <Icon
           name="eye"
           size={25}
@@ -113,7 +129,7 @@ const OrderList = ({ initialParams }) => {
           <Icon
             name="md-hourglass"
             size={25}
-            color="orange"  // Change this to your desired color for 'Accepted' status.
+            color="orange" // Change this to your desired color for 'Accepted' status.
             style={styles.icons}
             onPress={() => handleInprogressOrder(item)}
           />
@@ -122,7 +138,7 @@ const OrderList = ({ initialParams }) => {
           <Icon
             name="md-checkmark-circle"
             size={25}
-            color="green"  // Change this to your desired color for 'Inprogress' status.
+            color="green" // Change this to your desired color for 'Inprogress' status.
             style={styles.icons}
             onPress={() => handleCompleteOrder(item)}
           />
@@ -131,7 +147,7 @@ const OrderList = ({ initialParams }) => {
           <Icon
             name="ellipsis-vertical"
             size={25}
-            color="blue"  // Change this to your desired color for 'Pending' status.
+            color="blue" // Change this to your desired color for 'Pending' status.
             style={styles.icons}
             onPress={() => handleOrderActionPress(item)}
           />
@@ -140,8 +156,7 @@ const OrderList = ({ initialParams }) => {
           <Icon
             name="cash-outline"
             size={25}
-
-            color={item.cash_status ? 'green' : 'orange'}
+            color={item.cash_status ? "green" : "orange"}
             style={styles.icons}
             onPress={() => handleOrderCashCollection(item)}
           />
@@ -156,15 +171,18 @@ const OrderList = ({ initialParams }) => {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        OrderStatusUpdateUrl + order.id + "?status=Inprogress"
-      );
+      const formData = new FormData();
+  
+      formData.append("order_id", order.id);
+      formData.append("status", 'Inprogress');
+      
+      const response = await axios.post(OrderStatusUpdateUrl,formData);
 
-      if (!response.ok) {
+      if (response.status === 200) {
+        setSuccess("Order Inprogress successfully.");
+      } else {
         throw new Error("Failed to Inprogress order.");
       }
-
-      setSuccess("Order Inprogress successfully.");
     } catch (error) {
       setError("Failed to Inprogress order. Please try again.");
     }
@@ -176,15 +194,18 @@ const OrderList = ({ initialParams }) => {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        OrderStatusUpdateUrl + order.id + "?status=Complete"
-      );
+      const formData = new FormData();
+  
+      formData.append("order_id", order.id);
+      formData.append("status", 'Complete');
 
-      if (!response.ok) {
+      const response = await axios.post(OrderStatusUpdateUrl,formData);
+
+      if (response.status === 200) {
+        setSuccess("Order Complete successfully.");
+      } else {
         throw new Error("Failed to Complete order.");
       }
-
-      setSuccess("Order Complete successfully.");
     } catch (error) {
       setError("Failed to Complete order. Please try again.");
     }
@@ -208,9 +229,9 @@ const OrderList = ({ initialParams }) => {
   };
 
   const handleOrderCashCollection = (order) => {
-    if(order.cash_status){
+    if (order.cash_status) {
       setCashCollectionModalVisible(false);
-    }else{
+    } else {
       setSelectedOrder(order);
       setCashCollectionModalVisible(true);
     }
