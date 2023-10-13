@@ -34,15 +34,8 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
       formData.append("order_id", order.id);
       formData.append("comment", commentText);
       formData.append("user_id", userId);
-
-      const customHeaders = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
       
-      const response = await axios.post(OrderCommentUrl,formData,{
-        headers: customHeaders
-      });
+      const response = await axios.post(OrderCommentUrl,formData);
 
       if (response.status === 200) {
         setSuccessMessage("Comment posted successfully.");

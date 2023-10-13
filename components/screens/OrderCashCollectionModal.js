@@ -8,7 +8,7 @@ import {
   TextInput,
   Alert,
   Image,
-  Platform 
+  Platform,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -54,23 +54,22 @@ const OrderCashCollectionModal = ({ visible, order, onClose }) => {
 
     setIsLoading(true);
     const userId = await AsyncStorage.getItem("@user_id");
+    try {
       const formData = new FormData();
-      if (image) {
-        formData.append("image", image.uri);
-      }
       
+      formData.append('image', {
+        uri: image.assets["0"].uri,
+        type: 'image/jpeg', // or whatever file type the image is
+        name: 'image.jpg',
+      });
+
       formData.append("order_id", order.id);
       formData.append("description", description);
       formData.append("amount", amount);
       formData.append("user_id", userId);
 
-      const response = await axios.post(OrderCashCollectionUrl,formData,{
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Accept': 'application/json'
-        },
-      });
-      
+      const response = await axios.post(OrderCashCollectionUrl, formData);
+
       if (response.status === 200) {
         setSuccessMessage("Request submitted. Awaiting admin approval!");
         setDescription("");
@@ -80,7 +79,10 @@ const OrderCashCollectionModal = ({ visible, order, onClose }) => {
       } else {
         throw new Error("Failed to cash collection.");
       }
-    
+    } catch (error) {
+      setErrorMessage("Failed to cash collection. Please try again.");
+    }
+
     setIsLoading(false);
   };
 
@@ -117,13 +119,11 @@ const OrderCashCollectionModal = ({ visible, order, onClose }) => {
                 style={styles.fileInputContainer}
                 onPress={selectImage}
               >
-                <Text style={styles.fileInputText}>
-                  Select an image
-                </Text>
+                <Text style={styles.fileInputText}>Select an image</Text>
               </TouchableOpacity>
               {image && (
                 <Image
-                  source={{ uri: image.uri }}
+                  source={{ uri: image.assets["0"].uri }}
                   style={styles.selectedImage}
                 />
               )}
@@ -148,7 +148,9 @@ const OrderCashCollectionModal = ({ visible, order, onClose }) => {
             style={styles.closeButton}
             onPress={handleModalClose}
           >
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={styles.closeButtonText}>
+              {isLoading ? "Wait.." : "Close"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -180,6 +180,7 @@ const OrderList = ({ initialParams }) => {
 
       if (response.status === 200) {
         setSuccess("Order Inprogress successfully.");
+        fetchOrders('Accepted');
       } else {
         throw new Error("Failed to Inprogress order.");
       }
@@ -203,6 +204,7 @@ const OrderList = ({ initialParams }) => {
 
       if (response.status === 200) {
         setSuccess("Order Complete successfully.");
+        fetchOrders('Inprogress');
       } else {
         throw new Error("Failed to Complete order.");
       }
@@ -242,6 +244,7 @@ const OrderList = ({ initialParams }) => {
     setCommentModalVisible(false);
     setActionModalVisible(false);
     setCashCollectionModalVisible(false);
+    fetchOrders(status);
   };
 
   if (loading) {

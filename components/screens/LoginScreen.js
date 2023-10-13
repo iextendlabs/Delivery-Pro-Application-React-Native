@@ -13,8 +13,8 @@ import axios from 'axios';
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [username, setUsername] = useState("staff1@gmail.com");
-  const [password, setPassword] = useState("test");
+  const [username, setUsername] = useState("maryiam@tadhem.com");
+  const [password, setPassword] = useState("MARYIAM3534");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState();
 

@@ -15,21 +15,30 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
-      "permissions": {
-        "cameraRoll": true,
-        "camera": true
-      }
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["CAMERA_ROLL", "CAMERA"]
+      "package": "com.hamza0003.saloon"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1d7c977e-2c67-4b1a-bd8c-358fe87b6724"
+      }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ]
+    ]
   }
 }
