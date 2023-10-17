@@ -45,7 +45,7 @@ const OrderCashCollectionModal = ({ visible, order, onClose }) => {
   };
 
   const handleSubmitCashCollection = async () => {
-    if (description.trim() === "" || amount.trim() === "" || !image) {
+    if (description.trim() === "" || amount.trim() === "") {
       setErrorMessage(
         "Please enter a description, an amount, and select an image."
       );
@@ -56,13 +56,14 @@ const OrderCashCollectionModal = ({ visible, order, onClose }) => {
     const userId = await AsyncStorage.getItem("@user_id");
     try {
       const formData = new FormData();
+      if (image) {
+        formData.append("image", {
+          uri: image.assets["0"].uri,
+          type: "image/jpeg", // or whatever file type the image is
+          name: "image.jpg",
+        });
+      }
       
-      formData.append('image', {
-        uri: image.assets["0"].uri,
-        type: 'image/jpeg', // or whatever file type the image is
-        name: 'image.jpg',
-      });
-
       formData.append("order_id", order.id);
       formData.append("description", description);
       formData.append("amount", amount);

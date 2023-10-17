@@ -10,17 +10,31 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoginUrl } from "../config/Api";
 import axios from 'axios';
+import messaging from "@react-native-firebase/messaging";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [username, setUsername] = useState("maryiam@tadhem.com");
   const [password, setPassword] = useState("MARYIAM3534");
+  const [fcmToken, setFcmToken] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState();
 
   useEffect(() => {
     checkAuthentication();
+    unsubscribeOnTokenRefreshed();
   }, []);
+
+  const unsubscribeOnTokenRefreshed = messaging().onTokenRefresh((fcmToken) => {
+    // Save the FCM token to your server or user's device storage
+    console.log('FCM Token:', fcmToken);
+  });
+
+  messaging()
+    .getToken()
+    .then(fcmToken => {
+      setFcmToken(fcmToken);
+    });
 
   const checkAuthentication = async () => {
     try {
@@ -37,6 +51,7 @@ const LoginScreen = () => {
       const response = await axios.post(LoginUrl, {
         username: username,
         password: password,
+        fcmToken: fcmToken,
       });
 
       if (response.status === 200) {

@@ -18,11 +18,12 @@
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.hamza0003.saloon"
+      "package": "com.iextendlabs.saloon"
     },
     "web": {
       "favicon": "./assets/favicon.png"
