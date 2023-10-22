@@ -14,8 +14,8 @@ import messaging from "@react-native-firebase/messaging";
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const [username, setUsername] = useState("maryiam@tadhem.com");
-  const [password, setPassword] = useState("MARYIAM3534");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [fcmToken, setFcmToken] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState();

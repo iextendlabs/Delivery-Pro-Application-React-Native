@@ -64,7 +64,7 @@ const App = () => {
 
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
       const { body, title } = remoteMessage.notification;
-      Alert.alert("New Order", `${body}`);
+      Alert.alert(`${title}`, `${body}`);
     });
 
     return unsubscribe;

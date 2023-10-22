@@ -15,6 +15,8 @@ import OrderListStyle from "../styles/OrderListStyle";
 import OrderDetailsModal from "./OrderDetailsModal";
 import OrderCommentModal from "./OrderCommentModal";
 import OrderActionModal from "./OrderActionModal";
+import DriverOrderStatusModal from "./DriverOrderStatusModal";
+import OrderChatModal from "./OrderChatModal";
 import OrderCashCollectionModal from "./OrderCashCollectionModal";
 import Icon from "react-native-vector-icons/Ionicons";
 import { OrderStatusUpdateUrl } from "../config/Api";
@@ -29,6 +31,8 @@ const OrderList = ({ initialParams }) => {
   const [loading, setLoading] = useState(true);
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [commentModalVisible, setCommentModalVisible] = useState(false);
+  const [driverModalVisible, setDriverModalVisible] = useState(false);
+  const [orderChatModalVisible, setOrderChatModalVisible] = useState(false);
   const [actionModalVisible, setActionModalVisible] = useState(false);
   const [cashCollectionModalVisible, setCashCollectionModalVisible] =
     useState(false);
@@ -86,12 +90,16 @@ const OrderList = ({ initialParams }) => {
 
   const renderOrder = ({ item }) => (
     <TouchableOpacity style={styles.orderContainer}>
-      <View style={{ flex: 1.5 }}>
+      <View style={{ flex: 1 }}>
         <Text style={styles.orderId}>
           ID: {item.id} <Icon name="ios-calendar" size={15} color="black" />{" "}
           {item.date}{" "}
         </Text>
         <Text style={styles.orderDate}>{item.time_slot_value}</Text>
+        <Text style={styles.orderDate}>
+          <Icon name="ios-car" size={15} color="black" />
+          {item.driver_status}
+        </Text>
       </View>
 
       <View style={styles.OrderLinks}>
@@ -115,6 +123,22 @@ const OrderList = ({ initialParams }) => {
           style={styles.icons}
           onPress={() => handleOrderDetailPress(item)}
         />
+        <Icon
+          name="chatbubble"
+          size={25}
+          color="blue" // Change this to your desired color for 'Pending' status.
+          style={styles.icons}
+          onPress={() => handleOrderChatStatus(item)}
+        />
+        {status === "Accepted" && item.driver_status === "Pending" && (
+          <Icon
+            name="ios-car"
+            size={25}
+            color="blue" // Change this to your desired color for 'Pending' status.
+            style={styles.icons}
+            onPress={() => handleDriverOrderStatus(item)}
+          />
+        )}
         {status !== "Complete" && (
           <Icon
             name="chatbubble-ellipses-outline"
@@ -161,6 +185,15 @@ const OrderList = ({ initialParams }) => {
             onPress={() => handleOrderCashCollection(item)}
           />
         )}
+        {status === "Complete" && item.driver_status === "Dropped" && (
+          <Icon
+            name="ios-car"
+            size={25}
+            color="blue" // Change this to your desired color for 'Pending' status.
+            style={styles.icons}
+            onPress={() => handleDriverOrderStatus(item)}
+          />
+        )}
       </View>
 
       {/* Other order fields */}
@@ -172,15 +205,15 @@ const OrderList = ({ initialParams }) => {
 
     try {
       const formData = new FormData();
-  
+
       formData.append("order_id", order.id);
-      formData.append("status", 'Inprogress');
-      
-      const response = await axios.post(OrderStatusUpdateUrl,formData);
+      formData.append("status", "Inprogress");
+
+      const response = await axios.post(OrderStatusUpdateUrl, formData);
 
       if (response.status === 200) {
         setSuccess("Order Inprogress successfully.");
-        fetchOrders('Accepted');
+        fetchOrders("Accepted");
       } else {
         throw new Error("Failed to Inprogress order.");
       }
@@ -196,15 +229,15 @@ const OrderList = ({ initialParams }) => {
 
     try {
       const formData = new FormData();
-  
-      formData.append("order_id", order.id);
-      formData.append("status", 'Complete');
 
-      const response = await axios.post(OrderStatusUpdateUrl,formData);
+      formData.append("order_id", order.id);
+      formData.append("status", "Complete");
+
+      const response = await axios.post(OrderStatusUpdateUrl, formData);
 
       if (response.status === 200) {
         setSuccess("Order Complete successfully.");
-        fetchOrders('Inprogress');
+        fetchOrders("Inprogress");
       } else {
         throw new Error("Failed to Complete order.");
       }
@@ -220,6 +253,14 @@ const OrderList = ({ initialParams }) => {
     setDetailsModalVisible(true);
   };
 
+  const handleOrderChatStatus = (order) => {
+    setSelectedOrder(order);
+    setOrderChatModalVisible(true);
+  };
+  const handleDriverOrderStatus = (order) => {
+    setSelectedOrder(order);
+    setDriverModalVisible(true);
+  };
   const handleOrderCommentPress = (order) => {
     setSelectedOrder(order);
     setCommentModalVisible(true);
@@ -241,6 +282,8 @@ const OrderList = ({ initialParams }) => {
 
   const closeModal = () => {
     setDetailsModalVisible(false);
+    setDriverModalVisible(false);
+    setOrderChatModalVisible(false);
     setCommentModalVisible(false);
     setActionModalVisible(false);
     setCashCollectionModalVisible(false);
@@ -284,6 +327,18 @@ const OrderList = ({ initialParams }) => {
 
       <OrderCommentModal
         visible={commentModalVisible}
+        order={selectedOrder}
+        onClose={closeModal}
+      />
+
+      <OrderChatModal
+        visible={orderChatModalVisible}
+        order={selectedOrder}
+        onClose={closeModal}
+      />
+
+      <DriverOrderStatusModal
+        visible={driverModalVisible}
         order={selectedOrder}
         onClose={closeModal}
       />

@@ -23,15 +23,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.iextendlabs.saloon"
+      "package": "com.iextendlabs.saloon",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "1d7c977e-2c67-4b1a-bd8c-358fe87b6724"
-      }
     },
     "plugins": [
       [
@@ -40,6 +38,11 @@
           "photosPermission": "The app accesses your photos to let you share them with your friends."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "3afa1302-a45b-4396-8e8a-dbae23ffb6bc"
+      }
+    }
   }
 }

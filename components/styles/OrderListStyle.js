@@ -241,6 +241,24 @@ const OrderListStyle = {
     resizeMode: "cover",
     marginTop: 10,
   },
+  userMessageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 10,
+  },
+  otherMessageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    marginBottom: 10,
+  },
+  messageBubble: {
+    backgroundColor: '#DCF8C6', // You can customize the background color of the message bubble
+    padding: 10,
+    borderRadius: 10,
+  },
+  messageText: {
+    fontSize: 16,
+  },
 };
 
 export default OrderListStyle;
