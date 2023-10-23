@@ -143,7 +143,7 @@ const OrderList = ({ initialParams }) => {
           <Icon
             name="chatbubble-ellipses-outline"
             size={25}
-            color="brown"
+            color="black"
             style={styles.icons}
             onPress={() => handleOrderCommentPress(item)}
           />
@@ -254,15 +254,15 @@ const OrderList = ({ initialParams }) => {
   };
 
   const handleOrderChatStatus = (order) => {
-    setSelectedOrder(order);
+    setSelectedOrder(order.id);
     setOrderChatModalVisible(true);
   };
   const handleDriverOrderStatus = (order) => {
-    setSelectedOrder(order);
+    setSelectedOrder(order.id);
     setDriverModalVisible(true);
   };
   const handleOrderCommentPress = (order) => {
-    setSelectedOrder(order);
+    setSelectedOrder(order.id);
     setCommentModalVisible(true);
   };
 

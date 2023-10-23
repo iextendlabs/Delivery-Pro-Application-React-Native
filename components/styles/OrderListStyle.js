@@ -3,7 +3,8 @@ const OrderListStyle = {
     flex:1,
     flexDirection:"row",
     alignItems: 'center',
-    paddingTop: 12
+    paddingTop: 12,
+    justifyContent: 'flex-end'
   },
   icons:{
     paddingRight:10
@@ -21,7 +22,7 @@ const OrderListStyle = {
     padding: 10,
     backgroundColor: "#f8f8f8",
     marginBottom: 10,
-    flexDirection: "row",
+    flexDirection: 'column'
   },
   orderId: {
     fontSize: 16,
@@ -258,6 +259,18 @@ const OrderListStyle = {
   },
   messageText: {
     fontSize: 16,
+  },
+  messageRole: {
+    fontSize: 12,
+    color: '#8f9193',
+  },
+  chatModalContent: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 20,
+    width: "80%",
+    flex: 1, 
+    flexDirection: 'column'
   },
 };
 

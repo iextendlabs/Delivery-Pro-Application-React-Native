@@ -10,7 +10,6 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
   if (!visible || !order) {
     return null;
   }
-  const [selectedOrder, setSelectedOrder] = useState(order);
   const handleModalClose = () => {
     onClose();
   };
@@ -21,19 +20,19 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
           <View style={styles.modalContent}>
             {/* <Text style={styles.modalTitle}>Order Details</Text> */}
 
-            {selectedOrder && (
+            {order && (
               <View style={styles.orderDetails}>
                 {/* Box for Order ID */}
                 <View style={styles.detailBox}>
                   <Text style={styles.detailBoxTitle}>Order#</Text>
-                  <Text style={styles.detailBoxText}>{selectedOrder.id}</Text>
+                  <Text style={styles.detailBoxText}>{order.id}</Text>
                 </View>
 
                 {/* Box for Total Price */}
                 <View style={styles.detailBox}>
                   <Text style={styles.detailBoxTitle}>Total Price</Text>
                   <Text style={styles.detailBoxText}>
-                    {selectedOrder.total_amount}
+                    {order.total_amount}
                   </Text>
                 </View>
 
@@ -43,7 +42,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                     Payment to be Collected
                   </Text>
                   <Text style={styles.detailBoxText}>
-                    {selectedOrder.total_amount}
+                    {order.total_amount}
                   </Text>
                 </View>
 
@@ -53,7 +52,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                   <View style={styles.phoneNumberContainer}>
                     {/* <Image source={require('../path/to/phone-icon.png')} style={styles.phoneIcon} /> */}
                     <PhoneNumber
-                      phoneNumber={selectedOrder.number}
+                      phoneNumber={order.number}
                       showNumber={true}
                     />
                   </View>
@@ -64,7 +63,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                   <View style={styles.phoneNumberContainer}>
                     {/* <Image source={require('../path/to/phone-icon.png')} style={styles.phoneIcon} /> */}
                     <WhatsAppElement showNumber={true}
-                      phoneNumber={selectedOrder.whatsapp}
+                      phoneNumber={order.whatsapp}
                     />
                   </View>
                 </View>
@@ -72,7 +71,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 {/* Box for Comment */}
                 <View style={styles.commentBox}>
                   <Text style={styles.detailBoxTitle}>Comments</Text>
-                    {selectedOrder.comments_text.map((comment, index) => (
+                    {order.comments_text.map((comment, index) => (
                       <Text key={index} style={styles.commentText}>
                         {comment}
                       </Text>
@@ -84,10 +83,10 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 <View style={styles.shippingAddressBox}>
                   <Text style={styles.detailBoxTitle}>Shipping Address</Text>
                   <View style={styles.addressLineContainer}>
-                    <Text style={styles.addressLine}>{selectedOrder.name}</Text>
+                    <Text style={styles.addressLine}>{order.name}</Text>
                   </View>
-                  <GoogleAddressElement address={ selectedOrder.buildingName + ' ' + 
-                      selectedOrder.street + ',' + selectedOrder.area + ' ' + selectedOrder.city} />
+                  <GoogleAddressElement address={ order.buildingName + ' ' + 
+                      order.street + ',' + order.area + ' ' + order.city} />
                   
                 </View>
 

@@ -19,7 +19,6 @@ import { OrderCashCollectionUrl } from "../config/Api";
 import axios from "axios";
 
 const OrderCashCollectionModal = ({ visible, order, onClose }) => {
-  const [selectedOrder, setSelectedOrder] = useState(order);
   const [description, setDescription] = useState("Cash Collected");
   const [amount, setAmount] = useState("");
   const [image, setImage] = useState(null); // State for the selected image

@@ -9,7 +9,6 @@ import axios from "axios";
 
 const OrderCommentModal = ({ visible, order, onClose }) => {
 
-  const [selectedOrder, setSelectedOrder] = useState(order);
   const [commentText, setCommentText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -31,7 +30,7 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
     try {
       const formData = new FormData();
   
-      formData.append("order_id", order.id);
+      formData.append("order_id", order);
       formData.append("comment", commentText);
       formData.append("user_id", userId);
       
@@ -56,11 +55,6 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Order Details</Text>
           <ScrollView>
-            {selectedOrder && (
-              <View style={styles.orderDetails}>
-                {/* Existing order details */}
-              </View>
-            )}
             <View style={styles.commentContainer}>
               <Text style={styles.label}>Comment:</Text>
               <TextInput

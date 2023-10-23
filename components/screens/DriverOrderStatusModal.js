@@ -8,7 +8,6 @@ import axios from "axios";
 
 const DriverOrderStatusModal = ({ visible, order , onClose }) => {
 
-  const [selectedOrder, setSelectedOrder] = useState(order);
   const [text, setText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -29,7 +28,7 @@ const DriverOrderStatusModal = ({ visible, order , onClose }) => {
     try {
       const formData = new FormData();
   
-      formData.append("order_id", order.id);
+      formData.append("order_id", order);
       formData.append("text", text);
       formData.append("user_id", userId);
       formData.append("driver_status", "Pick me");

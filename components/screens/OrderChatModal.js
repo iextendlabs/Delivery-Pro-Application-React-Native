@@ -6,38 +6,41 @@ import {
   Modal,
   StyleSheet,
   TextInput,
-  Alert,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import OrderListStyle from "../styles/OrderListStyle";
-import { ScrollView } from "react-native-gesture-handler";
 import { OrderChatUrl } from "../config/Api";
 import { AddOrderChatUrl } from "../config/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const OrderChatModal = ({ visible, order, onClose }) => {
-  const [selectedOrder, setSelectedOrder] = useState(order);
   const [text, setText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [chats, setChat] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
-
+  const [userId, setUserId] = useState("");
   const handleModalClose = () => {
-    onClose();
+      onClose();
   };
 
   useEffect(() => {
-    fetchChat();
-  }, []);
+    if (visible) {
+      setChat('');
+      fetchChat();
+    }
+  }, [visible]);
 
   const fetchChat = async () => {
-
     setLoading(true);
+    setUserId(await AsyncStorage.getItem("@user_id"));
     try {
-      const response = await axios.get(`${OrderChatUrl}order_id=${selectedOrder.id}`);
+      const response = await axios.get(
+        `${OrderChatUrl}order_id=${order}`
+      );
       setChat(response.data);
       setLoading(false);
     } catch (error) {
@@ -47,8 +50,6 @@ const OrderChatModal = ({ visible, order, onClose }) => {
   };
 
   const handleSubmitChat = async () => {
-    const userId = await AsyncStorage.getItem("@user_id");
-    
     if (text.trim() === "") {
       setErrorMessage("Please enter a Text.");
       return;
@@ -57,7 +58,7 @@ const OrderChatModal = ({ visible, order, onClose }) => {
     try {
       const formData = new FormData();
 
-      formData.append("order_id", selectedOrder.id);
+      formData.append("order_id", order);
       formData.append("text", text);
       formData.append("user_id", userId);
 
@@ -77,71 +78,67 @@ const OrderChatModal = ({ visible, order, onClose }) => {
     setIsLoading(false);
   };
 
-  const renderChat = async ({ item }) => {
-    const userId = await AsyncStorage.getItem("@user_id");
-    console.log(userId)
-    let chatStyle = {};
+  const renderChat = ({ item }) => {
+    const chatStyle =
+      userId === item.user_id
+        ? styles.otherMessageContainer
+        : styles.userMessageContainer;
 
-    if (userId === item.user_id) {
-      chatStyle = styles.userMessageContainer;
-    } else {
-      chatStyle = styles.otherMessageContainer;
-    }
     return (
       <View style={chatStyle}>
-      <View style={styles.messageBubble}>
-        <Text style={styles.messageText}>{item.text}</Text>
+        <View style={styles.messageBubble}>
+          <Text style={styles.messageText}>{item.text}</Text>
+          <Text style={styles.messageRole}>{item.role}</Text>
+        </View>
       </View>
-    </View>
     );
   };
 
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+        <View style={styles.chatModalContent}>
           <Text style={styles.modalTitle}>Chat</Text>
-          {chats.length === 0 ? (
-            <Text style={styles.noItemsText}>No Chat</Text>
+          {loading ? (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
           ) : (
             <FlatList
               data={chats}
               renderItem={renderChat}
               keyExtractor={(item) => item.id.toString()}
+              ListEmptyComponent={
+                <Text style={styles.noItemsText}>No Chat</Text>
+              }
             />
           )}
-          <ScrollView>
-            {selectedOrder && (
-              <View style={styles.orderDetails}>
-                {/* Existing order details */}
-              </View>
+
+          <View style={styles.commentContainer}>
+            <Text style={styles.label}>Text:</Text>
+            <TextInput
+              style={styles.input}
+              value={text}
+              onChangeText={setText}
+              placeholder="Enter your Text"
+              multiline
+            />
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmitChat}
+              disabled={isLoading}
+            >
+              <Text style={styles.buttonText}>
+                {isLoading ? "Submitting..." : "Submit"}
+              </Text>
+            </TouchableOpacity>
+            {successMessage !== "" && (
+              <Text style={styles.successMessage}>{successMessage}</Text>
             )}
-            <View style={styles.commentContainer}>
-              <Text style={styles.label}>Comment:</Text>
-              <TextInput
-                style={styles.input}
-                value={text}
-                onChangeText={setText}
-                placeholder="Enter your comment"
-                multiline
-              />
-              <TouchableOpacity
-                style={styles.submitButton}
-                onPress={handleSubmitChat}
-                disabled={isLoading}
-              >
-                <Text style={styles.buttonText}>
-                  {isLoading ? "Submitting..." : "Submit"}
-                </Text>
-              </TouchableOpacity>
-              {successMessage !== "" && (
-                <Text style={styles.successMessage}>{successMessage}</Text>
-              )}
-              {errorMessage !== "" && (
-                <Text style={styles.errorMessage}>{errorMessage}</Text>
-              )}
-            </View>
-          </ScrollView>
+            {errorMessage !== "" && (
+              <Text style={styles.errorMessage}>{errorMessage}</Text>
+            )}
+          </View>
           <TouchableOpacity
             style={styles.closeButton}
             onPress={handleModalClose}

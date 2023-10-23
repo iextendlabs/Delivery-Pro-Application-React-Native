@@ -19,7 +19,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
 const OrderActionModal = ({ visible, order, onClose }) => {
-  const [selectedOrder, setSelectedOrder] = useState(order);
   const [selectedDate, setSelectedDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -157,11 +156,6 @@ const OrderActionModal = ({ visible, order, onClose }) => {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.modalTitle}>Order Details</Text>
-            {selectedOrder && (
-              <View style={styles.orderDetails}>
-                {/* Existing order details */}
-              </View>
-            )}
             <View style={styles.commentContainer}>
               <Text style={styles.label}>Date:</Text>
               <Calendar
