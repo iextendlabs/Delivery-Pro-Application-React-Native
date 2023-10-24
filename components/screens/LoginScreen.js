@@ -19,12 +19,13 @@ const LoginScreen = () => {
   const [fcmToken, setFcmToken] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState();
-
+  
   useEffect(() => {
     checkAuthentication();
-    unsubscribeOnTokenRefreshed();
+    typeof unsubscribeOnTokenRefreshed === 'function' && unsubscribeOnTokenRefreshed();
   }, []);
-
+  try {
+  
   const unsubscribeOnTokenRefreshed = messaging().onTokenRefresh((fcmToken) => {
     // Save the FCM token to your server or user's device storage
     console.log('FCM Token:', fcmToken);
@@ -35,7 +36,10 @@ const LoginScreen = () => {
     .then(fcmToken => {
       setFcmToken(fcmToken);
     });
-
+  } catch (error) {
+  
+  }
+  
   const checkAuthentication = async () => {
     try {
       const userId = await AsyncStorage.getItem("@user_id");

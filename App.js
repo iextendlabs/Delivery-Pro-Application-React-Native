@@ -30,6 +30,8 @@ const App = () => {
 
   useEffect(() => {
     checkAuthentication();
+    try {
+      
     if (requestUserPermission()) {
       messaging()
         .getToken()
@@ -76,6 +78,10 @@ const App = () => {
       setHasNewNotification(false);
       setIconColor("#000");
     }
+    
+  } catch (error) {
+      
+  }
   }, []);
 
   const checkAuthentication = async () => {

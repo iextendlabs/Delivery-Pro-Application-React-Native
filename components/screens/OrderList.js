@@ -87,11 +87,9 @@ const OrderList = ({ initialParams }) => {
         const response = await axios.get(
           `${OrderUrl}status=${orderStatus}&user_id=${userId}`
         );
-        const data = await response.json();
+        const { data } = response;
         setOrders(data.orders);
-        setNotification(data.notification)
-        console.log(orders);
-        console.log(notification);
+        setNotification(data.notification);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
