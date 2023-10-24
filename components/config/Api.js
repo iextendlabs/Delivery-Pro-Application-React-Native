@@ -10,7 +10,8 @@ const RescheduleUrl = BaseUrl+'rescheduleOrder';
 const TimeSlotsUrl = BaseUrl+'timeSlots?';
 const OrderChatUrl = BaseUrl+'orderChat?';
 const AddOrderChatUrl = BaseUrl+'addOrderChat';
+const NotificationUrl = BaseUrl+'notification?';
 
 export {
-    OrderUrl, LoginUrl, OrderCommentUrl, RescheduleUrl, OrderStatusUpdateUrl, BaseUrl,TimeSlotsUrl,OrderCashCollectionUrl,DriverOrderStatusUpdateUrl,OrderChatUrl,AddOrderChatUrl
+    OrderUrl, LoginUrl, OrderCommentUrl, RescheduleUrl, OrderStatusUpdateUrl, BaseUrl,TimeSlotsUrl,OrderCashCollectionUrl,DriverOrderStatusUpdateUrl,OrderChatUrl,AddOrderChatUrl,NotificationUrl
 }

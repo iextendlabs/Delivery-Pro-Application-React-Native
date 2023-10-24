@@ -12,7 +12,10 @@ const SettingsScreen = ({navigation}) => {
       await AsyncStorage.removeItem('@access_token');
 
       // Navigate back to the Login screen
-      navigation.navigate('OrderList', { status: 'LogOut' });
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
     } catch (error) {
       console.log('Error occurred during logout:', error);
     }

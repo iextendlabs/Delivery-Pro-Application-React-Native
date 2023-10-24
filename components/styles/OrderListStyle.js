@@ -272,6 +272,12 @@ const OrderListStyle = {
     flex: 1, 
     flexDirection: 'column'
   },
+  notificationContainer: {
+    padding: 10,
+    backgroundColor: "#c6d4f8",
+    marginBottom: 10,
+    flexDirection: "row",
+  },
 };
 
 export default OrderListStyle;

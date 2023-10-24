@@ -23,6 +23,7 @@ import { OrderStatusUpdateUrl } from "../config/Api";
 import LocationElement from "../modules/LocationElement";
 import WhatsAppElement from "../modules/WhatsappElement";
 import axios from "axios";
+import { useNavigation } from '@react-navigation/native';
 
 const OrderList = ({ initialParams }) => {
   const [orders, setOrders] = useState([]);
@@ -37,6 +38,8 @@ const OrderList = ({ initialParams }) => {
   const [cashCollectionModalVisible, setCashCollectionModalVisible] =
     useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [notification, setNotification] = useState('');
+  const navigation = useNavigation();
 
   const setSuccess = (message) => {
     setSuccessMessage(message);
@@ -63,27 +66,36 @@ const OrderList = ({ initialParams }) => {
   ) {
     status = route.params.status;
   }
-
   useEffect(() => {
+    setLoading(true);
     fetchOrders(status);
+    setLoading(false);
+
+    const reloadApp = () => {
+      fetchOrders(status);
+    };
+
+    const intervalId = setInterval(reloadApp, 60000); // Reload every 2 seconds
+
+    return () => clearInterval(intervalId);
   }, [route.params?.status, initialParams]);
 
   const fetchOrders = async (orderStatus) => {
     const userId = await AsyncStorage.getItem("@user_id");
     if (userId) {
-      setLoading(true);
       try {
         const response = await axios.get(
           `${OrderUrl}status=${orderStatus}&user_id=${userId}`
         );
-        setOrders(response.data);
-        setLoading(false);
+        const data = await response.json();
+        setOrders(data.orders);
+        setNotification(data.notification)
+        console.log(orders);
+        console.log(notification);
       } catch (error) {
         console.error("Error fetching orders:", error);
-        setLoading(false);
       }
     } else {
-      setLoading(false);
       navigation.navigate("Login");
     }
   };

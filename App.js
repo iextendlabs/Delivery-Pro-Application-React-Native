@@ -7,11 +7,14 @@ import SettingsScreen from "./components/screens/SettingsScreen";
 import OrderList from "./components/screens/OrderList";
 import LoginScreen from "./components/screens/LoginScreen";
 import messaging from "@react-native-firebase/messaging";
-
+import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Notification from "./components/screens/Notification";
 
 const Drawer = createDrawerNavigator();
 const App = () => {
+  const [hasNewNotification, setHasNewNotification] = useState(false);
+  const [iconColor, setIconColor] = useState("#000");
   const requestUserPermission = async () => {
     const authStatus = await messaging().requestPermission();
     const enabled =
@@ -62,12 +65,17 @@ const App = () => {
       console.log("Message handled in the background!", remoteMessage);
     });
 
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+    messaging().onMessage(async (remoteMessage) => {
       const { body, title } = remoteMessage.notification;
       Alert.alert(`${title}`, `${body}`);
+      setHasNewNotification(true);
+      setIconColor("#FF0000");
     });
 
-    return unsubscribe;
+    return() => {
+      setHasNewNotification(false);
+      setIconColor("#000");
+    }
   }, []);
 
   const checkAuthentication = async () => {
@@ -88,10 +96,36 @@ const App = () => {
           <Drawer.Screen name="Login" component={LoginScreen} />
           <Drawer.Screen
             name="OrderList"
-            options={{ title: "Home" }}
+            options={({ navigation }) => ({
+              title: "Home",
+              headerRight: () => (
+                <Icon
+                  name="notifications-outline"
+                  size={24}
+                  color={iconColor}
+                  style={{ marginRight: 10 }}
+                  onPress={() => navigation.navigate("Notification")} // Navigate to Notification screen
+                />
+              ),
+            })}
             component={OrderList}
           />
           <Drawer.Screen name="Settings" component={SettingsScreen} />
+          <Drawer.Screen
+            name="Notification"
+            options={({ navigation }) => ({
+              headerRight: () => (
+                <Icon
+                  name="home-outline"
+                  size={24}
+                  color="#000"
+                  style={{ marginRight: 10 }}
+                  onPress={() => navigation.navigate("OrderList")} // Navigate to Notification screen
+                />
+              ),
+            })}
+            component={Notification}
+          />
         </Drawer.Navigator>
       </View>
     </NavigationContainer>
