@@ -41,10 +41,10 @@ const OrderList = ({ initialParams }) => {
     setLoading(false);
 
     const reloadApp = () => {
-      fetchNotification();
+      navigation.isFocused() && fetchNotification();
     };
 
-    const intervalId = setInterval(reloadApp, 60000); // Reload every 2 seconds
+    const intervalId = setInterval(reloadApp, 2000); // Reload every 2 seconds
 
     return () => clearInterval(intervalId);
   }, []);
