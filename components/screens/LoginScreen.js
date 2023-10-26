@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoginUrl } from "../config/Api";
 import axios from 'axios';
@@ -20,26 +20,32 @@ const LoginScreen = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState();
   
+  useFocusEffect(
+    React.useCallback(() => {
+      checkAuthentication();
+    }, [])
+  );
+
   useEffect(() => {
     checkAuthentication();
     typeof unsubscribeOnTokenRefreshed === 'function' && unsubscribeOnTokenRefreshed();
   }, []);
   try {
-  
-  const unsubscribeOnTokenRefreshed = messaging().onTokenRefresh((fcmToken) => {
-    // Save the FCM token to your server or user's device storage
-    console.log('FCM Token:', fcmToken);
-  });
 
-  messaging()
-    .getToken()
-    .then(fcmToken => {
-      setFcmToken(fcmToken);
+    const unsubscribeOnTokenRefreshed = messaging().onTokenRefresh((fcmToken) => {
+      // Save the FCM token to your server or user's device storage
+      console.log('FCM Token:', fcmToken);
     });
+
+    messaging()
+      .getToken()
+      .then(fcmToken => {
+        setFcmToken(fcmToken);
+      });
   } catch (error) {
-  
+
   }
-  
+
   const checkAuthentication = async () => {
     try {
       const userId = await AsyncStorage.getItem("@user_id");
@@ -61,14 +67,17 @@ const LoginScreen = () => {
       if (response.status === 200) {
         const userId = response.data.user.id;
         const accessToken = response.data.access_token;
-  
+
         // Store access token in AsyncStorage
         await AsyncStorage.setItem('@access_token', accessToken);
         await AsyncStorage.setItem('@user_id', String(userId));
         const headers = {
           Authorization: `Bearer ${accessToken}`,
         };
-        navigation.navigate('OrderList');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'OrderList' }],
+        });
       } else {
         setError("Login failed. Please try again.");
       }

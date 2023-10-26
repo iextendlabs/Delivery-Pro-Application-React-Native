@@ -28,14 +28,22 @@ const OrderChatModal = ({ visible, order, onClose }) => {
   };
 
   useEffect(() => {
-    if (visible) {
-      setChat('');
-      fetchChat();
-    }
+      visible &&  setChat('') && fetchChat();
   }, [visible]);
 
-  const fetchChat = async () => {
-    setLoading(true);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (visible) {
+        fetchChat();
+      }
+    }, 3000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [visible]);
+
+
+  const fetchChat = async (visible) => {
     setUserId(await AsyncStorage.getItem("@user_id"));
     try {
       const response = await axios.get(
@@ -88,7 +96,7 @@ const OrderChatModal = ({ visible, order, onClose }) => {
       <View style={chatStyle}>
         <View style={styles.messageBubble}>
           <Text style={styles.messageText}>{item.text}</Text>
-          <Text style={styles.messageRole}>{item.role}</Text>
+          <Text style={styles.messageRole}>{item.role} {item.time}</Text>
         </View>
       </View>
     );

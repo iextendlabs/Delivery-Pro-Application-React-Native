@@ -29,7 +29,7 @@ const OrderList = ({ initialParams }) => {
   const [orders, setOrders] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
   const [commentModalVisible, setCommentModalVisible] = useState(false);
   const [driverModalVisible, setDriverModalVisible] = useState(false);
@@ -40,6 +40,7 @@ const OrderList = ({ initialParams }) => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [notification, setNotification] = useState('');
   const navigation = useNavigation();
+  const [cancelTokenSource, setCancelTokenSource] = useState(null);
 
   const setSuccess = (message) => {
     setSuccessMessage(message);
@@ -66,31 +67,45 @@ const OrderList = ({ initialParams }) => {
   ) {
     status = route.params.status;
   }
+  
   useEffect(() => {
-    setLoading(true);
-    fetchOrders(status);
-    setLoading(false);
-
     const reloadApp = () => {
-      fetchOrders(status);
+      !orderChatModalVisible && fetchOrders(status);
     };
-
-    const intervalId = setInterval(reloadApp, 60000); // Reload every 2 seconds
-
-    return () => clearInterval(intervalId);
+      const intervalId = setInterval(reloadApp, 3000); // Reload every 60 seconds
+      return () => clearInterval(intervalId);
+  }, [route.params?.status, orderChatModalVisible]);
+  
+  useEffect(() => {
+    cancelTokenSource && cancelTokenSource.cancel('Request canceled by component unmount or re-run');    
+    fetchOrders(status);
   }, [route.params?.status, initialParams]);
-//testing expo flow testing testing gpomg
+  
+  
+
   const fetchOrders = async (orderStatus) => {
+
+    if (!navigation.isFocused())
+    return;
     const userId = await AsyncStorage.getItem("@user_id");
     if (userId) {
       try {
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
+        setCancelTokenSource(source);
+
         const response = await axios.get(
-          `${OrderUrl}status=${orderStatus}&user_id=${userId}`
+          `${OrderUrl}status=${orderStatus}&user_id=${userId}`,{
+            cancelToken: source.token,
+          }
         );
+        setLoading(false);
+        setCancelTokenSource(null);
         const { data } = response;
         setOrders(data.orders);
         setNotification(data.notification);
       } catch (error) {
+        setLoading(false);
         console.error("Error fetching orders:", error);
       }
     } else {
@@ -140,7 +155,7 @@ const OrderList = ({ initialParams }) => {
           style={styles.icons}
           onPress={() => handleOrderChatStatus(item)}
         />
-        {status === "Accepted" && item.driver_status === "Pending" && (
+        {(status === "Accepted" || status === "Complete") && item.driver_status === "Pending" && (
           <Icon
             name="ios-car"
             size={25}
@@ -299,14 +314,6 @@ const OrderList = ({ initialParams }) => {
     setCashCollectionModalVisible(false);
     fetchOrders(status);
   };
-
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
