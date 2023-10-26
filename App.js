@@ -13,8 +13,12 @@ import Notification from "./components/screens/Notification";
 
 const Drawer = createDrawerNavigator();
 const App = () => {
-  const [hasNewNotification, setHasNewNotification] = useState(false);
   const [iconColor, setIconColor] = useState("#000");
+
+  const updateIconColor = (color) => {
+    setIconColor(color);
+  };
+
   const requestUserPermission = async () => {
     const authStatus = await messaging().requestPermission();
     const enabled =
@@ -70,14 +74,7 @@ const App = () => {
     messaging().onMessage(async (remoteMessage) => {
       const { body, title } = remoteMessage.notification;
       Alert.alert(`${title}`, `${body}`);
-      setHasNewNotification(true);
-      setIconColor("#FF0000");
     });
-
-    return() => {
-      setHasNewNotification(false);
-      setIconColor("#000");
-    }
     
   } catch (error) {
       
@@ -110,27 +107,28 @@ const App = () => {
                   size={24}
                   color={iconColor}
                   style={{ marginRight: 10 }}
-                  onPress={() => navigation.navigate("Notification")} // Navigate to Notification screen
+                  onPress={() => navigation.navigate("Notification")}
                 />
               ),
             })}
-            component={OrderList}
+            component={() => <OrderList updateIconColor={updateIconColor} />}
           />
           <Drawer.Screen name="Settings" component={SettingsScreen} />
           <Drawer.Screen
             name="Notification"
             options={({ navigation }) => ({
+              title: "Notification",
               headerRight: () => (
                 <Icon
                   name="home-outline"
                   size={24}
                   color="#000"
                   style={{ marginRight: 10 }}
-                  onPress={() => navigation.navigate("OrderList")} // Navigate to Notification screen
+                  onPress={() => navigation.navigate("OrderList")}
                 />
               ),
             })}
-            component={Notification}
+            component={()=> <Notification updateIconColor={updateIconColor}/>}
           />
         </Drawer.Navigator>
       </View>

@@ -23,9 +23,9 @@ import { OrderStatusUpdateUrl } from "../config/Api";
 import LocationElement from "../modules/LocationElement";
 import WhatsAppElement from "../modules/WhatsappElement";
 import axios from "axios";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 
-const OrderList = ({ initialParams }) => {
+const OrderList = ({ updateIconColor }) => {
   const [orders, setOrders] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -38,7 +38,6 @@ const OrderList = ({ initialParams }) => {
   const [cashCollectionModalVisible, setCashCollectionModalVisible] =
     useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [notification, setNotification] = useState('');
   const navigation = useNavigation();
   const [cancelTokenSource, setCancelTokenSource] = useState(null);
 
@@ -69,6 +68,10 @@ const OrderList = ({ initialParams }) => {
   }
   
   useEffect(() => {
+    setLoading(true);
+    fetchOrders(status);
+    setLoading(false);
+
     const reloadApp = () => {
       !orderChatModalVisible && fetchOrders(status);
     };
@@ -79,10 +82,8 @@ const OrderList = ({ initialParams }) => {
   useEffect(() => {
     cancelTokenSource && cancelTokenSource.cancel('Request canceled by component unmount or re-run');    
     fetchOrders(status);
-  }, [route.params?.status, initialParams]);
+  }, [route.params?.status]);
   
-  
-
   const fetchOrders = async (orderStatus) => {
 
     if (!navigation.isFocused())
@@ -103,7 +104,7 @@ const OrderList = ({ initialParams }) => {
         setCancelTokenSource(null);
         const { data } = response;
         setOrders(data.orders);
-        setNotification(data.notification);
+        setLoading(false);
       } catch (error) {
         setLoading(false);
         console.error("Error fetching orders:", error);
@@ -125,6 +126,7 @@ const OrderList = ({ initialParams }) => {
           <Icon name="ios-car" size={15} color="black" />
           {item.driver_status}
         </Text>
+        <Text style={styles.orderId}>Driver: {item.driver_name}</Text>
       </View>
 
       <View style={styles.OrderLinks}>

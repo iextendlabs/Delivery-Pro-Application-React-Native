@@ -42,8 +42,8 @@ const OrderChatModal = ({ visible, order, onClose }) => {
     return () => clearInterval(intervalId);
   }, [visible]);
 
-
   const fetchChat = async (visible) => {
+
     setUserId(await AsyncStorage.getItem("@user_id"));
     try {
       const response = await axios.get(
@@ -53,7 +53,6 @@ const OrderChatModal = ({ visible, order, onClose }) => {
       setLoading(false);
     } catch (error) {
       console.error("Error fetching orders:", error);
-      setLoading(false);
     }
   };
 

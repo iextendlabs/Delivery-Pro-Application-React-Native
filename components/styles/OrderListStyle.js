@@ -4,7 +4,7 @@ const OrderListStyle = {
     flexDirection:"row",
     alignItems: 'center',
     paddingTop: 12,
-    justifyContent: 'flex-end'
+    justifyContent: 'center'
   },
   icons:{
     paddingRight:10

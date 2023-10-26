@@ -13,14 +13,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import OrderListStyle from "../styles/OrderListStyle";
 import Icon from "react-native-vector-icons/Ionicons";
 import { NotificationUrl } from "../config/Api";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
-const OrderList = ({ initialParams }) => {
+const Notification = ({ updateIconColor }) => {
   const [notification, setNotification] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
   const setSuccess = (message) => {
     setSuccessMessage(message);
     setTimeout(() => {
@@ -38,8 +39,6 @@ const OrderList = ({ initialParams }) => {
   useEffect(() => {
     setLoading(true);
     fetchNotification();
-    setLoading(false);
-
     const reloadApp = () => {
       navigation.isFocused() && fetchNotification();
     };
@@ -53,9 +52,9 @@ const OrderList = ({ initialParams }) => {
     const userId = await AsyncStorage.getItem("@user_id");
     if (userId) {
       try {
-        const response = await fetch(NotificationUrl + "user_id=" + userId);
-        const data = await response.json();
-        setNotification(data);
+        const response = await axios.get(`${NotificationUrl}user_id=${userId}`);
+        setNotification(response.data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching notification:", error);
       }
@@ -85,7 +84,9 @@ const OrderList = ({ initialParams }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.orderText}>Total Notification: {notification.length}</Text>
+      <Text style={styles.orderText}>
+        Total Notification: {notification.length}
+      </Text>
       {successMessage !== "" && (
         <Text style={styles.successMessage}>{successMessage}</Text>
       )}
@@ -107,4 +108,4 @@ const OrderList = ({ initialParams }) => {
 
 const styles = StyleSheet.create(OrderListStyle);
 
-export default OrderList;
+export default Notification;
