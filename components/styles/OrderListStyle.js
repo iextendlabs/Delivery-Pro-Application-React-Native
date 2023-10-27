@@ -7,7 +7,7 @@ const OrderListStyle = {
     justifyContent: 'center'
   },
   icons:{
-    paddingRight:10
+    paddingRight:15
   },
   container: {
     flex: 1,
@@ -272,11 +272,54 @@ const OrderListStyle = {
     flex: 1, 
     flexDirection: 'column'
   },
-  notificationContainer: {
+  newNotificationContainer: {
     padding: 10,
     backgroundColor: "#c6d4f8",
     marginBottom: 10,
     flexDirection: "row",
+  },
+  oldNotificationContainer: {
+    padding: 10,
+    backgroundColor: "#c7fcc2",
+    marginBottom: 10,
+    flexDirection: "row",
+  },
+  heading: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  text: {
+    fontSize: 14,
+    color: "#888",
+  },
+  screenContainer: {
+    justifyContent: "center",
+    flexDirection: "row",
+  },
+  tab: {
+    fontSize: 12,
+    paddingTop: 0,
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    margin: 3,
+    width: 70,
+    height: 45,
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+    textAlignVertical: "center",
+    overflow: "hidden",
+  },
+  selectedTab:{
+    backgroundColor: "#0d6efd",
+  },
+  selectedTabText: {
+    color:"#fff"
+  },
+  tabText: {
+    fontSize: 13,
+    fontWeight: "bold",
   },
 };
 

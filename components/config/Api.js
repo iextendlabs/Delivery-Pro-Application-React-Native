@@ -1,6 +1,6 @@
 const BaseUrl = 'https://lipslay.com/api/';
 
-const OrderUrl = BaseUrl+'orders?';
+const OrderUrl = BaseUrl+'ordersV2?';
 const LoginUrl = BaseUrl+'login';
 const OrderCommentUrl = BaseUrl+'addOrderComment';
 const OrderCashCollectionUrl = BaseUrl+'cashCollection';

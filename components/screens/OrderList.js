@@ -5,11 +5,10 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
+  TouchableHighlight,
   StyleSheet,
 } from "react-native";
 import { OrderUrl } from "../config/Api";
-import { useRoute } from "@react-navigation/native";
-import OrderLinks from "../modules/OrderLinks";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import OrderListStyle from "../styles/OrderListStyle";
 import OrderDetailsModal from "./OrderDetailsModal";
@@ -25,8 +24,11 @@ import WhatsAppElement from "../modules/WhatsappElement";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
 
-const OrderList = ({ updateIconColor }) => {
+const OrderList = ({ updateNotificationCount }) => {
+  const [statusFilter, setStatusFilter] = useState("");
+  const [status, setStatus] = useState("All");
   const [orders, setOrders] = useState([]);
+  const [displayOrder, setDisplayOrder] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,8 +40,12 @@ const OrderList = ({ updateIconColor }) => {
   const [cashCollectionModalVisible, setCashCollectionModalVisible] =
     useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [countAll, setCountAll] = useState(0);
+  const [countPending, setCountPending] = useState(null);
+  const [countAccepted, setCountAccepted] = useState(null);
+  const [countInprogress, setCountInprogress] = useState(null);
+  const [countComplete, setCountComplete] = useState(null);
   const navigation = useNavigation();
-  const [cancelTokenSource, setCancelTokenSource] = useState(null);
 
   const setSuccess = (message) => {
     setSuccessMessage(message);
@@ -54,178 +60,179 @@ const OrderList = ({ updateIconColor }) => {
       setErrorMessage("");
     }, 2000);
   };
-  const route = useRoute();
-  var status = "Pending";
 
-  if (
-    route &&
-    route.constructor === Object &&
-    "params" in route &&
-    route.params &&
-    "status" in route.params
-  ) {
-    status = route.params.status;
-  }
-  
   useEffect(() => {
     setLoading(true);
-    fetchOrders(status);
-    setLoading(false);
+    fetchOrders();
 
     const reloadApp = () => {
-      !orderChatModalVisible && fetchOrders(status);
+      !orderChatModalVisible && fetchOrders();
     };
-      const intervalId = setInterval(reloadApp, 3000); // Reload every 60 seconds
-      return () => clearInterval(intervalId);
-  }, [route.params?.status, orderChatModalVisible]);
-  
-  useEffect(() => {
-    cancelTokenSource && cancelTokenSource.cancel('Request canceled by component unmount or re-run');    
-    fetchOrders(status);
-  }, [route.params?.status]);
-  
-  const fetchOrders = async (orderStatus) => {
+    const intervalId = setInterval(reloadApp, 3000); // Reload every 60 seconds
+    return () => clearInterval(intervalId);
+  }, [orderChatModalVisible]);
 
-    if (!navigation.isFocused())
-    return;
+  useEffect(() => {
+    if (statusFilter) {
+      const apiFilter = orders.filter((order) => order.status === statusFilter);
+      if (JSON.stringify(apiFilter) !== JSON.stringify(displayOrder)) {
+        setDisplayOrder(apiFilter);
+      }
+    } else if (JSON.stringify(orders) !== JSON.stringify(displayOrder)) {
+      setDisplayOrder(orders);
+    }
+
+    setCountAll(orders.length);
+    setCountComplete(
+      orders.filter((order) => order.status === "Complete").length
+    );
+    setCountPending(
+      orders.filter((order) => order.status === "Pending").length
+    );
+    setCountInprogress(
+      orders.filter((order) => order.status === "Inprogress").length
+    );
+    setCountAccepted(
+      orders.filter((order) => order.status === "Accepted").length
+    );
+  }, [orders]);
+
+  useEffect(() => {
+    setLoading(true);
+    const filteredOrder = displayOrder.filter(
+      (order) => order.status === statusFilter
+    );
+    setDisplayOrder(filteredOrder);
+  }, [statusFilter]);
+
+  const fetchOrders = async () => {
+    if (!navigation.isFocused()) return;
     const userId = await AsyncStorage.getItem("@user_id");
     if (userId) {
       try {
-        const CancelToken = axios.CancelToken;
-        const source = CancelToken.source();
-        setCancelTokenSource(source);
 
-        const response = await axios.get(
-          `${OrderUrl}status=${orderStatus}&user_id=${userId}`,{
-            cancelToken: source.token,
-          }
-        );
-        setLoading(false);
-        setCancelTokenSource(null);
+        const response = await axios.get(`${OrderUrl}user_id=${userId}`);
         const { data } = response;
         setOrders(data.orders);
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        console.error("Error fetching orders:", error);
+        // console.error("Error fetching orders:", error);
       }
     } else {
       navigation.navigate("Login");
     }
   };
 
-  const renderOrder = ({ item }) => (
-    <TouchableOpacity style={styles.orderContainer}>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.orderId}>
-          ID: {item.id} <Icon name="ios-calendar" size={15} color="black" />{" "}
-          {item.date}{" "}
-        </Text>
-        <Text style={styles.orderDate}>{item.time_slot_value}</Text>
-        <Text style={styles.orderDate}>
-          <Icon name="ios-car" size={15} color="black" />
-          {item.driver_status}
-        </Text>
-        <Text style={styles.orderId}>Driver: {item.driver_name}</Text>
-      </View>
+  const renderOrder = ({ item }) => {
+    return (
+      <TouchableOpacity style={styles.orderContainer}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.orderId}>
+            ID: {item.id} <Icon name="ios-calendar" size={15} color="black" />{" "}
+            {item.date}{" "}
+          </Text>
+          <Text style={styles.orderDate}>{item.time_slot_value}</Text>
+          <Text style={styles.orderDate}>
+            <Icon name="ios-car" size={15} color="black" />
+            {item.driver_status}
+          </Text>
+          <Text style={styles.orderDate}>Order Status: {item.status}</Text>
+          <Text style={styles.orderId}>Driver: {item.driver_name}</Text>
+        </View>
 
-      <View style={styles.OrderLinks}>
-        <LocationElement
-          latitude={item.latitude}
-          longitude={item.longitude}
-          address={
-            item.buildingName +
-            " " +
-            item.street +
-            "," +
-            item.area +
-            " " +
-            item.city
-          }
-        />
-        <Icon
-          name="eye"
-          size={25}
-          color="orange"
-          style={styles.icons}
-          onPress={() => handleOrderDetailPress(item)}
-        />
-        <Icon
-          name="chatbubble"
-          size={25}
-          color="blue" // Change this to your desired color for 'Pending' status.
-          style={styles.icons}
-          onPress={() => handleOrderChatStatus(item)}
-        />
-        {(status === "Accepted" || status === "Complete") && item.driver_status === "Pending" && (
-          <Icon
-            name="ios-car"
-            size={25}
-            color="blue" // Change this to your desired color for 'Pending' status.
-            style={styles.icons}
-            onPress={() => handleDriverOrderStatus(item)}
+        <View style={styles.OrderLinks}>
+          <LocationElement
+            latitude={item.latitude}
+            longitude={item.longitude}
+            address={
+              item.buildingName +
+              " " +
+              item.street +
+              "," +
+              item.area +
+              " " +
+              item.city
+            }
           />
-        )}
-        {status !== "Complete" && (
           <Icon
-            name="chatbubble-ellipses-outline"
+            name="eye"
             size={25}
-            color="black"
+            color="orange"
             style={styles.icons}
-            onPress={() => handleOrderCommentPress(item)}
+            onPress={() => handleOrderDetailPress(item)}
           />
-        )}
-        <WhatsAppElement showNumber={false} phoneNumber={item.whatsapp} />
-        {status === "Accepted" && (
-          <Icon
-            name="md-hourglass"
-            size={25}
-            color="orange" // Change this to your desired color for 'Accepted' status.
-            style={styles.icons}
-            onPress={() => handleInprogressOrder(item)}
-          />
-        )}
-        {status === "Inprogress" && (
-          <Icon
-            name="md-checkmark-circle"
-            size={25}
-            color="green" // Change this to your desired color for 'Inprogress' status.
-            style={styles.icons}
-            onPress={() => handleCompleteOrder(item)}
-          />
-        )}
-        {status === "Pending" && (
-          <Icon
-            name="ellipsis-vertical"
-            size={25}
-            color="blue" // Change this to your desired color for 'Pending' status.
-            style={styles.icons}
-            onPress={() => handleOrderActionPress(item)}
-          />
-        )}
-        {status == "Complete" && (
-          <Icon
-            name="cash-outline"
-            size={25}
-            color={item.cash_status ? "green" : "orange"}
-            style={styles.icons}
-            onPress={() => handleOrderCashCollection(item)}
-          />
-        )}
-        {status === "Complete" && item.driver_status === "Dropped" && (
-          <Icon
-            name="ios-car"
-            size={25}
-            color="blue" // Change this to your desired color for 'Pending' status.
-            style={styles.icons}
-            onPress={() => handleDriverOrderStatus(item)}
-          />
-        )}
-      </View>
+          {item.driver_id && (
+            <Icon
+              name="chatbubble"
+              size={25}
+              color="blue" // Change this to your desired color for 'Pending' status.
+              style={styles.icons}
+              onPress={() => handleOrderChatStatus(item)}
+            />
+          )}
+          {(status === "Accepted" || status === "Complete") &&
+            item.driver_status === "Pending" && (
+              <Icon
+                name="ios-car"
+                size={25}
+                color="blue" // Change this to your desired color for 'Pending' status.
+                style={styles.icons}
+                onPress={() => handleDriverOrderStatus(item)}
+              />
+            )}
+          {status !== "Complete" && (
+            <Icon
+              name="chatbubble-ellipses-outline"
+              size={25}
+              color="black"
+              style={styles.icons}
+              onPress={() => handleOrderCommentPress(item)}
+            />
+          )}
+          <WhatsAppElement showNumber={false} phoneNumber={item.whatsapp} />
+          {status === "Accepted" && (
+            <Icon
+              name="md-hourglass"
+              size={25}
+              color="orange" // Change this to your desired color for 'Accepted' status.
+              style={styles.icons}
+              onPress={() => handleInprogressOrder(item)}
+            />
+          )}
+          {status === "Inprogress" && (
+            <Icon
+              name="md-checkmark-circle"
+              size={25}
+              color="green" // Change this to your desired color for 'Inprogress' status.
+              style={styles.icons}
+              onPress={() => handleCompleteOrder(item)}
+            />
+          )}
+          {status === "Pending" && (
+            <Icon
+              name="ellipsis-vertical"
+              size={25}
+              color="blue" // Change this to your desired color for 'Pending' status.
+              style={styles.icons}
+              onPress={() => handleOrderActionPress(item)}
+            />
+          )}
+          {status == "Complete" && (
+            <Icon
+              name="cash-outline"
+              size={25}
+              color={item.cashCollection_status ? "green" : "orange"}
+              style={styles.icons}
+              onPress={() => handleOrderCashCollection(item)}
+            />
+          )}
+        </View>
 
-      {/* Other order fields */}
-    </TouchableOpacity>
-  );
+        {/* Other order fields */}
+      </TouchableOpacity>
+    );
+  };
 
   const handleInprogressOrder = async (order) => {
     setLoading(true);
@@ -299,7 +306,7 @@ const OrderList = ({ updateIconColor }) => {
   };
 
   const handleOrderCashCollection = (order) => {
-    if (order.cash_status) {
+    if (order.cashCollection_status) {
       setCashCollectionModalVisible(false);
     } else {
       setSelectedOrder(order);
@@ -314,25 +321,160 @@ const OrderList = ({ updateIconColor }) => {
     setCommentModalVisible(false);
     setActionModalVisible(false);
     setCashCollectionModalVisible(false);
-    fetchOrders(status);
+    fetchOrders();
   };
 
   return (
     <View style={styles.container}>
-      <OrderLinks />
+      <View style={styles.screenContainer}>
+        <TouchableHighlight
+          style={[styles.tab, status == "All" && styles.selectedTab]}
+          onPress={() => {
+            setStatusFilter("");
+            setStatus("All");
+          }}
+        >
+          <View>
+            <Text
+              style={[
+                styles.tabText,
+                status == "All" && styles.selectedTabText,
+              ]}
+            >
+              All
+            </Text>
+            <Text
+              style={[
+                styles.tabText,
+                status == "All" && styles.selectedTabText,
+              ]}
+            >
+              {countAll}
+            </Text>
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={[styles.tab, status == "Pending" && styles.selectedTab]}
+          onPress={() => {
+            setStatusFilter("Pending");
+            setStatus("Pending");
+          }}
+        >
+          <View>
+            <Text
+              style={[
+                styles.tabText,
+                status == "Pending" && styles.selectedTabText,
+              ]}
+            >
+              Pending
+            </Text>
+            <Text
+              style={[
+                styles.tabText,
+                status == "Pending" && styles.selectedTabText,
+              ]}
+            >
+              {countPending}
+            </Text>
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={[styles.tab, status == "Accepted" && styles.selectedTab]}
+          onPress={() => {
+            setStatusFilter("Accepted");
+            setStatus("Accepted");
+          }}
+        >
+          <View>
+            <Text
+              style={[
+                styles.tabText,
+                status == "Accepted" && styles.selectedTabText,
+              ]}
+            >
+              Accepted
+            </Text>
+            <Text
+              style={[
+                styles.tabText,
+                status == "Accepted" && styles.selectedTabText,
+              ]}
+            >
+              {countAccepted}
+            </Text>
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={[styles.tab, status == "Inprogress" && styles.selectedTab]}
+          onPress={() => {
+            setStatusFilter("Inprogress");
+            setStatus("Inprogress");
+          }}
+        >
+          <View>
+            <Text
+              style={[
+                styles.tabText,
+                status == "Inprogress" && styles.selectedTabText,
+              ]}
+            >
+              Inprogress
+            </Text>
+            <Text
+              style={[
+                styles.tabText,
+                status == "Inprogress" && styles.selectedTabText,
+              ]}
+            >
+              {countInprogress}
+            </Text>
+          </View>
+        </TouchableHighlight>
+        <TouchableHighlight
+          style={[styles.tab, status == "Complete" && styles.selectedTab]}
+          onPress={() => {
+            setStatusFilter("Complete");
+            setStatus("Complete");
+          }}
+        >
+          <View>
+            <Text
+              style={[
+                styles.tabText,
+                status == "Complete" && styles.selectedTabText,
+              ]}
+            >
+              Complete
+            </Text>
+            <Text
+              style={[
+                styles.tabText,
+                status == "Complete" && styles.selectedTabText,
+              ]}
+            >
+              {countComplete}
+            </Text>
+          </View>
+        </TouchableHighlight>
+      </View>
       <Text style={styles.orderText}>Order Status: {status}</Text>
-      <Text style={styles.orderText}>Total Orders: {orders.length}</Text>
+      <Text style={styles.orderText}>Total Orders: {displayOrder.length}</Text>
       {successMessage !== "" && (
         <Text style={styles.successMessage}>{successMessage}</Text>
       )}
       {errorMessage !== "" && (
         <Text style={styles.errorMessage}>{errorMessage}</Text>
       )}
-      {orders.length === 0 ? (
+      {loading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="small" color="#0000ff" />
+        </View>
+      ) : displayOrder.length === 0 ? (
         <Text style={styles.noItemsText}>No Order</Text>
       ) : (
         <FlatList
-          data={orders}
+          data={displayOrder}
           renderItem={renderOrder}
           keyExtractor={(item) => item.id.toString()}
         />

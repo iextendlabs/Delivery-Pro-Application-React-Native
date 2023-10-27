@@ -13,12 +13,6 @@ import Notification from "./components/screens/Notification";
 
 const Drawer = createDrawerNavigator();
 const App = () => {
-  const [iconColor, setIconColor] = useState("#000");
-
-  const updateIconColor = (color) => {
-    setIconColor(color);
-  };
-
   const requestUserPermission = async () => {
     const authStatus = await messaging().requestPermission();
     const enabled =
@@ -35,50 +29,46 @@ const App = () => {
   useEffect(() => {
     checkAuthentication();
     try {
-      
-    if (requestUserPermission()) {
+      if (requestUserPermission()) {
+        messaging()
+          .getToken()
+          .then((token) => {
+            console.log(token);
+          });
+      } else {
+        console.log("Failed token status", authStatus);
+      }
+      // Check whether an initial notification is available
       messaging()
-        .getToken()
-        .then((token) => {
-          console.log(token);
+        .getInitialNotification()
+        .then(async (remoteMessage) => {
+          if (remoteMessage) {
+            console.log(
+              "Notification caused app to open from quit state:",
+              remoteMessage.notification
+            );
+          }
         });
-    } else {
-      console.log("Failed token status", authStatus);
-    }
-    // Check whether an initial notification is available
-    messaging()
-      .getInitialNotification()
-      .then(async (remoteMessage) => {
-        if (remoteMessage) {
-          console.log(
-            "Notification caused app to open from quit state:",
-            remoteMessage.notification
-          );
-        }
+
+      // Assume a message-notification contains a "type" property in the data payload of the screen to open
+
+      messaging().onNotificationOpenedApp(async (remoteMessage) => {
+        console.log(
+          "Notification caused app to open from background state:",
+          remoteMessage.notification
+        );
       });
 
-    // Assume a message-notification contains a "type" property in the data payload of the screen to open
+      // Register background handler
+      messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+        console.log("Message handled in the background!", remoteMessage);
+      });
 
-    messaging().onNotificationOpenedApp(async (remoteMessage) => {
-      console.log(
-        "Notification caused app to open from background state:",
-        remoteMessage.notification
-      );
-    });
-
-    // Register background handler
-    messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-      console.log("Message handled in the background!", remoteMessage);
-    });
-
-    messaging().onMessage(async (remoteMessage) => {
-      const { body, title } = remoteMessage.notification;
-      Alert.alert(`${title}`, `${body}`);
-    });
-    
-  } catch (error) {
-      
-  }
+      messaging().onMessage(async (remoteMessage) => {
+        const { body, title } = remoteMessage.notification;
+        Alert.alert(`${title}`, `${body}`);
+      });
+    } catch (error) {}
   }, []);
 
   const checkAuthentication = async () => {
@@ -105,13 +95,13 @@ const App = () => {
                 <Icon
                   name="notifications-outline"
                   size={24}
-                  color={iconColor}
                   style={{ marginRight: 10 }}
                   onPress={() => navigation.navigate("Notification")}
+                  color="#000"
                 />
               ),
             })}
-            component={() => <OrderList updateIconColor={updateIconColor} />}
+            component={() => <OrderList />}
           />
           <Drawer.Screen name="Settings" component={SettingsScreen} />
           <Drawer.Screen
@@ -128,7 +118,7 @@ const App = () => {
                 />
               ),
             })}
-            component={()=> <Notification updateIconColor={updateIconColor}/>}
+            component={() => <Notification />}
           />
         </Drawer.Navigator>
       </View>

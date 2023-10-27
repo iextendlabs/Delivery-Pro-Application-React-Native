@@ -50,7 +50,6 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 <View style={styles.detailBox}>
                   <Text style={styles.detailBoxTitle}>Phone</Text>
                   <View style={styles.phoneNumberContainer}>
-                    {/* <Image source={require('../path/to/phone-icon.png')} style={styles.phoneIcon} /> */}
                     <PhoneNumber
                       phoneNumber={order.number}
                       showNumber={true}
@@ -61,13 +60,34 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 <View style={styles.detailBox}>
                   <Text style={styles.detailBoxTitle}>Whatsapp</Text>
                   <View style={styles.phoneNumberContainer}>
-                    {/* <Image source={require('../path/to/phone-icon.png')} style={styles.phoneIcon} /> */}
                     <WhatsAppElement showNumber={true}
                       phoneNumber={order.whatsapp}
                     />
                   </View>
                 </View>
-
+                
+                {order.driver_number && (
+                <View style={styles.detailBox}>
+                  <Text style={styles.detailBoxTitle}>Driver Phone</Text>
+                  <View style={styles.phoneNumberContainer}>
+                    <PhoneNumber
+                      phoneNumber={order.driver_number}
+                      showNumber={true}
+                    />
+                  </View>
+                </View>
+                )}
+                {order.driver_whatsapp && (
+                <View style={styles.detailBox}>
+                  <Text style={styles.detailBoxTitle}>Driver Whatsapp</Text>
+                  <View style={styles.phoneNumberContainer}>
+                    <WhatsAppElement showNumber={true}
+                      phoneNumber={order.driver_whatsapp}
+                    />
+                  </View>
+                </View>
+                )}
+            
                 {/* Box for Comment */}
                 <View style={styles.commentBox}>
                   <Text style={styles.detailBoxTitle}>Comments</Text>

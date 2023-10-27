@@ -16,7 +16,7 @@ import { NotificationUrl } from "../config/Api";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 
-const Notification = ({ updateIconColor }) => {
+const Notification = () => {
   const [notification, setNotification] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -43,7 +43,7 @@ const Notification = ({ updateIconColor }) => {
       navigation.isFocused() && fetchNotification();
     };
 
-    const intervalId = setInterval(reloadApp, 2000); // Reload every 2 seconds
+    const intervalId = setInterval(reloadApp, 10000); // Reload every 2 seconds
 
     return () => clearInterval(intervalId);
   }, []);
@@ -64,8 +64,13 @@ const Notification = ({ updateIconColor }) => {
   };
 
   const renderNotification = ({ item }) => {
+    const notificationContainer =
+      item.type === "New"
+        ? styles.newNotificationContainer
+        : styles.oldNotificationContainer;
+
     return (
-      <TouchableOpacity style={[styles.notificationContainer]}>
+      <TouchableOpacity style={notificationContainer}>
         <View style={{ flex: 1 }}>
           <Text style={styles.heading}>{item.title}</Text>
           <Text style={styles.text}>{item.body}</Text>
