@@ -171,7 +171,7 @@ const OrderList = ({ updateNotificationCount }) => {
               onPress={() => handleOrderChatStatus(item)}
             />
           )}
-          {(status === "Accepted" || status === "Complete") &&
+          {(item.status === "Accepted" || item.status === "Complete") &&
             item.driver_status === "Pending" && (
               <Icon
                 name="ios-car"
@@ -181,7 +181,7 @@ const OrderList = ({ updateNotificationCount }) => {
                 onPress={() => handleDriverOrderStatus(item)}
               />
             )}
-          {status !== "Complete" && (
+          {item.status !== "Complete" && (
             <Icon
               name="chatbubble-ellipses-outline"
               size={25}
@@ -191,7 +191,7 @@ const OrderList = ({ updateNotificationCount }) => {
             />
           )}
           <WhatsAppElement showNumber={false} phoneNumber={item.whatsapp} />
-          {status === "Accepted" && (
+          {item.status === "Accepted" && (
             <Icon
               name="md-hourglass"
               size={25}
@@ -200,7 +200,7 @@ const OrderList = ({ updateNotificationCount }) => {
               onPress={() => handleInprogressOrder(item)}
             />
           )}
-          {status === "Inprogress" && (
+          {item.status === "Inprogress" && (
             <Icon
               name="md-checkmark-circle"
               size={25}
@@ -209,7 +209,7 @@ const OrderList = ({ updateNotificationCount }) => {
               onPress={() => handleCompleteOrder(item)}
             />
           )}
-          {status === "Pending" && (
+          {item.status === "Pending" && (
             <Icon
               name="ellipsis-vertical"
               size={25}
@@ -218,7 +218,7 @@ const OrderList = ({ updateNotificationCount }) => {
               onPress={() => handleOrderActionPress(item)}
             />
           )}
-          {status == "Complete" && (
+          {item.status == "Complete" && (
             <Icon
               name="cash-outline"
               size={25}
