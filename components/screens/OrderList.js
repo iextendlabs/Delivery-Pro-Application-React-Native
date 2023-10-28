@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TouchableHighlight,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { OrderUrl } from "../config/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -47,6 +48,45 @@ const OrderList = ({ updateNotificationCount }) => {
   const [countComplete, setCountComplete] = useState(null);
   const navigation = useNavigation();
 
+  const orderStatusActions = {
+    "Accepted": "Inprogress",
+    "Pending": ["Accepted", "Rejected"],
+    "Inprogress": "Complete",
+  };
+
+  const handleOrderStatusAction = async (order, actions) => {
+    console.log('current' + order.status);
+    console.log(actions);
+    if (Array.isArray(actions)) {
+      const buttons = actions.map((action, index) => ({
+        text: action,
+        onPress: () => updateOrderStatus(order, action),
+      }));
+      Alert.alert(
+        `Select Action`,
+        `Please choose an action to update the status:`,
+        [...buttons, {
+          text: "Cancel",
+          style: "cancel",
+        }]
+      );
+    } else {
+      Alert.alert(
+        "Confirm",
+        "Are you sure to change order status to " + actions + "?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: actions,
+            onPress: () => updateOrderStatus(order, actions)
+          }
+        ]
+      );
+    }
+  };
   const setSuccess = (message) => {
     setSuccessMessage(message);
     setTimeout(() => {
@@ -92,7 +132,7 @@ const OrderList = ({ updateNotificationCount }) => {
   }, [orders]);
 
   useEffect(() => {
-    setLoading(true);
+    fetchOrders();
     const filteredOrder = displayOrder.filter(
       (order) => order.status === statusFilter
     );
@@ -123,16 +163,12 @@ const OrderList = ({ updateNotificationCount }) => {
       <TouchableOpacity style={styles.orderContainer}>
         <View style={{ flex: 1 }}>
           <Text style={styles.orderId}>
-            ID: {item.id} <Icon name="ios-calendar" size={15} color="black" />{" "}
-            {item.date}{" "}
+            #{item.id} {"  "}<Icon name="ios-calendar" size={20} color="black" />{item.time_slot_value}
           </Text>
-          <Text style={styles.orderDate}>{item.time_slot_value}</Text>
-          <Text style={styles.orderDate}>
+          <Text style={styles.orderDate}>{item.driver_name}
             <Icon name="ios-car" size={15} color="black" />
             {item.driver_status}
           </Text>
-          <Text style={styles.orderDate}>Order Status: {item.status}</Text>
-          <Text style={styles.orderId}>Driver: {item.driver_name}</Text>
         </View>
 
         <View style={styles.OrderLinks}>
@@ -184,28 +220,11 @@ const OrderList = ({ updateNotificationCount }) => {
               onPress={() => handleOrderCommentPress(item)}
             />
           )}
+
           <WhatsAppElement showNumber={false} phoneNumber={item.whatsapp} />
-          {item.status === "Accepted" && (
-            <Icon
-              name="md-hourglass"
-              size={25}
-              color="orange" // Change this to your desired color for 'Accepted' status.
-              style={styles.icons}
-              onPress={() => handleInprogressOrder(item)}
-            />
-          )}
-          {item.status === "Inprogress" && (
-            <Icon
-              name="md-checkmark-circle"
-              size={25}
-              color="green" // Change this to your desired color for 'Inprogress' status.
-              style={styles.icons}
-              onPress={() => handleCompleteOrder(item)}
-            />
-          )}
           {item.status === "Pending" && (
             <Icon
-              name="ellipsis-vertical"
+              name="ios-calendar"
               size={25}
               color="blue" // Change this to your desired color for 'Pending' status.
               style={styles.icons}
@@ -221,14 +240,31 @@ const OrderList = ({ updateNotificationCount }) => {
               onPress={() => handleOrderCashCollection(item)}
             />
           )}
+          {item.status !== "Complete" && (
+            <Icon
+              name="settings-outline"
+              size={25}
+              color={item.cashCollection_status ? "green" : "orange"}
+              style={styles.icons}
+              onPress={() => handleOrderStatusAction(item, orderStatusActions[item.status])}
+            />
+          )}
+
         </View>
+
+        <View style={styles.OrderLinks}>
+          <Text style={styles.orderId}>
+            {item.status}
+          </Text>
+        </View>
+
 
         {/* Other order fields */}
       </TouchableOpacity>
     );
   };
 
-  const handleInprogressOrder = async (order) => {
+  const updateOrderStatus = async (order, action) => {
     setLoading(true);
 
     try {
@@ -259,20 +295,21 @@ const OrderList = ({ updateNotificationCount }) => {
       const formData = new FormData();
 
       formData.append("order_id", order.id);
-      formData.append("status", "Complete");
+      formData.append("status", action);
+      console.log(action);
 
       const response = await axios.post(OrderStatusUpdateUrl, formData);
 
       if (response.status === 200) {
-        setSuccess("Order Complete successfully.");
-        fetchOrders("Inprogress");
+        setSuccess("Order Updated to " + action);
+        fetchOrders();
       } else {
-        throw new Error("Failed to Complete order.");
+        throw new Error("Failed to update order.");
       }
     } catch (error) {
-      setError("Failed to Complete order. Please try again.");
+      setError("Failed to Update. Please try again.");
+      console.log(error);
     }
-
     setLoading(false);
   };
 
@@ -305,7 +342,7 @@ const OrderList = ({ updateNotificationCount }) => {
     } else {
       setSelectedOrder(order);
       setCashCollectionModalVisible(true);
-    }
+    };
   };
 
   const closeModal = () => {
@@ -452,8 +489,6 @@ const OrderList = ({ updateNotificationCount }) => {
           </View>
         </TouchableHighlight>
       </View>
-      <Text style={styles.orderText}>Order Status: {status}</Text>
-      <Text style={styles.orderText}>Total Orders: {displayOrder.length}</Text>
       {successMessage !== "" && (
         <Text style={styles.successMessage}>{successMessage}</Text>
       )}
@@ -465,7 +500,7 @@ const OrderList = ({ updateNotificationCount }) => {
           <ActivityIndicator size="small" color="#0000ff" />
         </View>
       ) : displayOrder.length === 0 ? (
-        <Text style={styles.noItemsText}>No Order</Text>
+        <Text style={styles.noItemsText}>No Order Yet / Updating...</Text>
       ) : (
         <FlatList
           data={displayOrder}

@@ -199,22 +199,6 @@ const OrderActionModal = ({ visible, order, onClose }) => {
                   </TouchableOpacity>
                 </>
               )}
-              <TouchableOpacity
-                style={styles.acceptButton}
-                onPress={handleAcceptOrder}
-                disabled={isLoading}
-              >
-                <Text style={styles.buttonText}>
-                  {isLoading ? "Accepting..." : "Accept Order"}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.rejectButton}
-                onPress={handleRejectOrder}
-                disabled={isLoading}
-              >
-                <Text style={styles.buttonText}>Reject Order</Text>
-              </TouchableOpacity>
               {successMessage !== "" && (
                 <Text style={styles.successMessage}>{successMessage}</Text>
               )}
