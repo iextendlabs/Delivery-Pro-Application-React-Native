@@ -47,7 +47,7 @@ const OrderChatModal = ({ visible, order, onClose }) => {
     setUserId(await AsyncStorage.getItem("@user_id"));
     try {
       const response = await axios.get(
-        `${OrderChatUrl}order_id=${order}`
+        `${OrderChatUrl}order_id=${order.id}`
       );
       setChat(response.data);
       setLoading(false);
@@ -65,7 +65,7 @@ const OrderChatModal = ({ visible, order, onClose }) => {
     try {
       const formData = new FormData();
 
-      formData.append("order_id", order);
+      formData.append("order_id", order.id);
       formData.append("text", text);
       formData.append("user_id", userId);
 

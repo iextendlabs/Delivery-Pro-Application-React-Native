@@ -155,7 +155,7 @@ const OrderActionModal = ({ visible, order, onClose }) => {
 
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Order Details</Text>
+          <Text style={styles.modalTitle}>Update Order Schedule</Text>
             <View style={styles.commentContainer}>
               <Text style={styles.label}>Date:</Text>
               <Calendar
@@ -194,7 +194,7 @@ const OrderActionModal = ({ visible, order, onClose }) => {
                     disabled={isLoading}
                   >
                     <Text style={styles.buttonText}>
-                      {isLoading ? "Submitting..." : "Submit"}
+                      {isLoading ? "Submitting..." : "Save"}
                     </Text>
                   </TouchableOpacity>
                 </>

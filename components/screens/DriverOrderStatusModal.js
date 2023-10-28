@@ -28,7 +28,7 @@ const DriverOrderStatusModal = ({ visible, order , onClose }) => {
     try {
       const formData = new FormData();
   
-      formData.append("order_id", order);
+      formData.append("order_id", order.id);
       formData.append("text", text);
       formData.append("user_id", userId);
       formData.append("driver_status", "Pick me");

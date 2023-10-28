@@ -46,7 +46,7 @@ const Notification = () => {
     const reloadApp = () => {
       navigation.isFocused() && fetchNotification();
     };
-    const intervalId = setInterval(reloadApp, 10000); // Reload every 2 seconds
+    const intervalId = setInterval(reloadApp, 3000); // Reload every 2 seconds
     return () => clearInterval(intervalId);
   }, []);
 
@@ -61,7 +61,7 @@ const Notification = () => {
         console.error("Error fetching notification:", error);
       }
     } else {
-      navigation.navigate("Login");
+      navigation.navigate("Profile");
     }
   };
 

@@ -30,7 +30,7 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
     try {
       const formData = new FormData();
   
-      formData.append("order_id", order);
+      formData.append("order_id", order.id);
       formData.append("comment", commentText);
       formData.append("user_id", userId);
       
@@ -53,7 +53,7 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Order Details</Text>
+          <Text style={styles.modalTitle}>Add Order Comment</Text>
           <ScrollView>
             <View style={styles.commentContainer}>
               <Text style={styles.label}>Comment:</Text>
@@ -70,7 +70,7 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
                 disabled={isLoading}
               >
                 <Text style={styles.buttonText}>
-                  {isLoading ? "Submitting..." : "Submit"}
+                  {isLoading ? "Submitting..." : "Save"}
                 </Text>
               </TouchableOpacity>
               {successMessage !== "" && (

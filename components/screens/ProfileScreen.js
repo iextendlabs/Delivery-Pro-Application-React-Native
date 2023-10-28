@@ -12,12 +12,12 @@ import { LoginUrl } from "../config/Api";
 import axios from 'axios';
 import messaging from "@react-native-firebase/messaging";
 
-const LoginScreen = () => {
+const ProfileScreen = () => {
   const navigation = useNavigation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [fcmToken, setFcmToken] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [error, setError] = useState();
   
   useFocusEffect(
@@ -49,10 +49,9 @@ const LoginScreen = () => {
   const checkAuthentication = async () => {
     try {
       const userId = await AsyncStorage.getItem("@user_id");
-      if (userId) {
-        navigation.navigate("OrderList");
-      }
+      setIsAuthenticated(!!userId);
     } catch (error) {
+      setIsAuthenticated(false);
       console.log("Error retrieving user ID:", error);
     }
   };
@@ -87,27 +86,45 @@ const LoginScreen = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      // Remove the user_id from AsyncStorage
+      await AsyncStorage.removeItem('@user_id');
+      await AsyncStorage.removeItem('@access_token');
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.log('Error occurred during logout:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.error}>{error}</Text>
-      <Text style={styles.title}>Login</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+    <Text style={styles.error}>{error}</Text>
+    {isAuthenticated ? ( // Conditionally render the login form or logout button
+      <TouchableOpacity style={styles.button} onPress={handleLogout}>
+        <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
-    </View>
+    ) : (
+      <>
+        <TextInput
+          style={styles.input}
+          placeholder="Username"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+      </>
+    )}
+  </View>
   );
 };
 
@@ -150,4 +167,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default ProfileScreen;

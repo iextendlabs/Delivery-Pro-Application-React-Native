@@ -167,6 +167,7 @@ const OrderListStyle = {
   submitButton: {
     backgroundColor: "#24235D",
     padding: 10,
+    marginTop: 5,
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",

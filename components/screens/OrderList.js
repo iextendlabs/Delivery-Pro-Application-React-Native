@@ -4,7 +4,6 @@ import {
   Text,
   FlatList,
   ActivityIndicator,
-  TouchableOpacity,
   TouchableHighlight,
   StyleSheet,
   Alert,
@@ -18,12 +17,10 @@ import OrderActionModal from "./OrderActionModal";
 import DriverOrderStatusModal from "./DriverOrderStatusModal";
 import OrderChatModal from "./OrderChatModal";
 import OrderCashCollectionModal from "./OrderCashCollectionModal";
-import Icon from "react-native-vector-icons/Ionicons";
 import { OrderStatusUpdateUrl } from "../config/Api";
-import LocationElement from "../modules/LocationElement";
-import WhatsAppElement from "../modules/WhatsappElement";
 import axios from "axios";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import OrderListItem from "./components/OrderListItem";
 
 const OrderList = ({ updateNotificationCount }) => {
   const [statusFilter, setStatusFilter] = useState("");
@@ -48,13 +45,7 @@ const OrderList = ({ updateNotificationCount }) => {
   const [countComplete, setCountComplete] = useState(null);
   const navigation = useNavigation();
 
-  const orderStatusActions = {
-    "Accepted": "Inprogress",
-    "Pending": ["Accepted", "Rejected"],
-    "Inprogress": "Complete",
-  };
-
-  const handleOrderStatusAction = async (order, actions) => {
+  const handleOrderStatusAction = (order, actions) => {
     console.log('current' + order.status);
     console.log(actions);
     if (Array.isArray(actions)) {
@@ -103,9 +94,19 @@ const OrderList = ({ updateNotificationCount }) => {
 
   useFocusEffect(
     React.useCallback(() => {
+      console.log('Focus effect triggered');
       fetchOrders();
     }, [])
   );
+  useEffect(() => {
+    console.log('use effect might work here');
+    const reloadApp = () => {
+      navigation.isFocused() && fetchOrders();
+    };
+    const intervalId = setInterval(reloadApp, 3000); // Reload every 2 seconds
+    return () => clearInterval(intervalId);
+  }, []);
+
   useEffect(() => {
     if (statusFilter) {
       const apiFilter = orders.filter((order) => order.status === statusFilter);
@@ -154,141 +155,10 @@ const OrderList = ({ updateNotificationCount }) => {
         // console.error("Error fetching orders:", error);
       }
     } else {
-      navigation.navigate("Login");
+      navigation.navigate("Profile");
     }
   };
-
-  const renderOrder = ({ item }) => {
-    return (
-      <TouchableOpacity style={styles.orderContainer}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.orderId}>
-            #{item.id} {"  "}<Icon name="ios-calendar" size={20} color="black" />{item.time_slot_value}
-          </Text>
-          <Text style={styles.orderDate}>{item.driver_name}
-            <Icon name="ios-car" size={15} color="black" />
-            {item.driver_status}
-          </Text>
-        </View>
-
-        <View style={styles.OrderLinks}>
-          <LocationElement
-            latitude={item.latitude}
-            longitude={item.longitude}
-            address={
-              item.buildingName +
-              " " +
-              item.street +
-              "," +
-              item.area +
-              " " +
-              item.city
-            }
-          />
-          <Icon
-            name="eye"
-            size={25}
-            color="orange"
-            style={styles.icons}
-            onPress={() => handleOrderDetailPress(item)}
-          />
-          {item.driver_id && (
-            <Icon
-              name="chatbubble"
-              size={25}
-              color="blue" // Change this to your desired color for 'Pending' status.
-              style={styles.icons}
-              onPress={() => handleOrderChatStatus(item)}
-            />
-          )}
-          {(item.status === "Accepted" || item.status === "Complete") &&
-            item.driver_status === "Pending" && (
-              <Icon
-                name="ios-car"
-                size={25}
-                color="blue" // Change this to your desired color for 'Pending' status.
-                style={styles.icons}
-                onPress={() => handleDriverOrderStatus(item)}
-              />
-            )}
-          {item.status !== "Complete" && (
-            <Icon
-              name="chatbubble-ellipses-outline"
-              size={25}
-              color="black"
-              style={styles.icons}
-              onPress={() => handleOrderCommentPress(item)}
-            />
-          )}
-
-          <WhatsAppElement showNumber={false} phoneNumber={item.whatsapp} />
-          {item.status === "Pending" && (
-            <Icon
-              name="ios-calendar"
-              size={25}
-              color="blue" // Change this to your desired color for 'Pending' status.
-              style={styles.icons}
-              onPress={() => handleOrderActionPress(item)}
-            />
-          )}
-          {item.status == "Complete" && (
-            <Icon
-              name="cash-outline"
-              size={25}
-              color={item.cashCollection_status ? "green" : "orange"}
-              style={styles.icons}
-              onPress={() => handleOrderCashCollection(item)}
-            />
-          )}
-          {item.status !== "Complete" && (
-            <Icon
-              name="settings-outline"
-              size={25}
-              color={item.cashCollection_status ? "green" : "orange"}
-              style={styles.icons}
-              onPress={() => handleOrderStatusAction(item, orderStatusActions[item.status])}
-            />
-          )}
-
-        </View>
-
-        <View style={styles.OrderLinks}>
-          <Text style={styles.orderId}>
-            {item.status}
-          </Text>
-        </View>
-
-
-        {/* Other order fields */}
-      </TouchableOpacity>
-    );
-  };
-
-  const updateOrderStatus = async (order, action) => {
-    setLoading(true);
-
-    try {
-      const formData = new FormData();
-
-      formData.append("order_id", order.id);
-      formData.append("status", "Inprogress");
-
-      const response = await axios.post(OrderStatusUpdateUrl, formData);
-
-      if (response.status === 200) {
-        setSuccess("Order Inprogress successfully.");
-        fetchOrders("Accepted");
-      } else {
-        throw new Error("Failed to Inprogress order.");
-      }
-    } catch (error) {
-      setError("Failed to Inprogress order. Please try again.");
-    }
-
-    setLoading(false);
-  };
-
-  const handleCompleteOrder = async (order) => {
+  const updateOrderStatus = async (order) => {
     setLoading(true);
 
     try {
@@ -313,38 +183,6 @@ const OrderList = ({ updateNotificationCount }) => {
     setLoading(false);
   };
 
-  const handleOrderDetailPress = (order) => {
-    setSelectedOrder(order);
-    setDetailsModalVisible(true);
-  };
-
-  const handleOrderChatStatus = (order) => {
-    setSelectedOrder(order.id);
-    setOrderChatModalVisible(true);
-  };
-  const handleDriverOrderStatus = (order) => {
-    setSelectedOrder(order.id);
-    setDriverModalVisible(true);
-  };
-  const handleOrderCommentPress = (order) => {
-    setSelectedOrder(order.id);
-    setCommentModalVisible(true);
-  };
-
-  const handleOrderActionPress = (order) => {
-    setSelectedOrder(order);
-    setActionModalVisible(true);
-  };
-
-  const handleOrderCashCollection = (order) => {
-    if (order.cashCollection_status) {
-      setCashCollectionModalVisible(false);
-    } else {
-      setSelectedOrder(order);
-      setCashCollectionModalVisible(true);
-    };
-  };
-
   const closeModal = () => {
     setDetailsModalVisible(false);
     setDriverModalVisible(false);
@@ -353,6 +191,35 @@ const OrderList = ({ updateNotificationCount }) => {
     setActionModalVisible(false);
     setCashCollectionModalVisible(false);
     fetchOrders();
+  };
+  const handleIconPress = (action, item, additionalData = null) => {
+    setSelectedOrder(item);
+    switch (action) {
+      case "detail":
+      setDetailsModalVisible(true);
+      break;
+    case "chat":
+      setOrderChatModalVisible(true);
+      break;
+    case "driver":
+      setDriverModalVisible(true);
+      break;
+    case "comment":
+      setCommentModalVisible(true);
+      break;
+      case "cash":
+        setCashCollectionModalVisible(true);
+        break;
+      case "schedule" :
+        setActionModalVisible(true)
+      break;
+      case "status":
+        handleOrderStatusAction(item, additionalData);
+        break;
+      // Handle other actions or provide a default behavior
+      default:
+        // Handle default behavior
+    }
   };
 
   return (
@@ -504,7 +371,9 @@ const OrderList = ({ updateNotificationCount }) => {
       ) : (
         <FlatList
           data={displayOrder}
-          renderItem={renderOrder}
+          renderItem={({ item }) => (
+            <OrderListItem item={item} handleIconPress={handleIconPress} />
+          )}
           keyExtractor={(item) => item.id.toString()}
         />
       )}
