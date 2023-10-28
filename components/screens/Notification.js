@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import OrderListStyle from "../styles/OrderListStyle";
 import Icon from "react-native-vector-icons/Ionicons";
 import { NotificationUrl } from "../config/Api";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import axios from "axios";
 
 const Notification = () => {
@@ -36,15 +36,17 @@ const Notification = () => {
     }, 2000);
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchNotification();
+    }, [])
+  );
   useEffect(() => {
     setLoading(true);
-    fetchNotification();
     const reloadApp = () => {
       navigation.isFocused() && fetchNotification();
     };
-
     const intervalId = setInterval(reloadApp, 10000); // Reload every 2 seconds
-
     return () => clearInterval(intervalId);
   }, []);
 

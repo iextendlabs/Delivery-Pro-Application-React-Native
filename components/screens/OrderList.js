@@ -22,7 +22,7 @@ import { OrderStatusUpdateUrl } from "../config/Api";
 import LocationElement from "../modules/LocationElement";
 import WhatsAppElement from "../modules/WhatsappElement";
 import axios from "axios";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const OrderList = ({ updateNotificationCount }) => {
   const [statusFilter, setStatusFilter] = useState("");
@@ -61,17 +61,11 @@ const OrderList = ({ updateNotificationCount }) => {
     }, 2000);
   };
 
-  useEffect(() => {
-    setLoading(true);
-    fetchOrders();
-
-    const reloadApp = () => {
-      !orderChatModalVisible && fetchOrders();
-    };
-    const intervalId = setInterval(reloadApp, 3000); // Reload every 60 seconds
-    return () => clearInterval(intervalId);
-  }, [orderChatModalVisible]);
-
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchOrders();
+    }, [])
+  );
   useEffect(() => {
     if (statusFilter) {
       const apiFilter = orders.filter((order) => order.status === statusFilter);
