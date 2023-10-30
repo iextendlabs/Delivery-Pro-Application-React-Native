@@ -16,8 +16,20 @@ const orderStatusActions = {
     "Inprogress": "Complete",
   };
 const OrderListItem = ({ item, handleIconPress }) => {
+    let container;
+    switch (item.status) {
+        case "Pending":
+            container = styles.orderContainerOrange
+            break;
+        case "Accepted":
+            container = styles.orderContainerGreen
+            break;
+        default:
+            container = styles.orderContainer;
+            break;
+    }
     return (
-      <TouchableOpacity style={styles.orderContainer}>
+      <TouchableOpacity style={container}>
         <View style={{ flex: 1 }}>
           <Text style={styles.orderId}>
             #{item.id} {"  "}<Icon name="ios-calendar" size={20} color="black" />{item.time_slot_value}
@@ -97,7 +109,7 @@ const OrderListItem = ({ item, handleIconPress }) => {
               onPress={() =>item.cashCollection_status === "orange" && handleIconPress("cash", item)}
             />
           )}
-          {item.status !== "Complete" && (
+          {item.status in orderStatusActions && (
             <Icon
               name="settings-outline"
               size={25}

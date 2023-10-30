@@ -43,7 +43,7 @@ const ProfileScreen = () => {
         setFcmToken(fcmToken);
       });
   } catch (error) {
-
+    
   }
 
   const checkAuthentication = async () => {

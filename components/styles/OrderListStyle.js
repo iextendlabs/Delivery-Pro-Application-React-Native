@@ -24,6 +24,20 @@ const OrderListStyle = {
     marginBottom: 10,
     flexDirection: 'column'
   },
+  orderContainerOrange: {
+    padding: 10,
+    backgroundColor: "#fff3b4",
+    marginBottom: 10,
+    flexDirection: 'column'
+   },
+   
+  orderContainerGreen: {
+    padding: 10,
+    backgroundColor: "#c7ffcb",
+    marginBottom: 10,
+    flexDirection: 'column'
+   },
+   //
   orderId: {
     fontSize: 16,
     fontWeight: "bold",

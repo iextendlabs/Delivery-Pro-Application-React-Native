@@ -74,7 +74,6 @@ const App = () => {
             Alert.alert(`${title}`, `${body}`);
           });
         } catch (error) {}
-        console.log('fcm code ran first time');
       }
     } catch (error) {
       console.log("Error retrieving user ID:", error);

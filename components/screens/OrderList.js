@@ -45,13 +45,11 @@ const OrderList = ({ updateNotificationCount }) => {
   const [countComplete, setCountComplete] = useState(null);
   const navigation = useNavigation();
 
-  const handleOrderStatusAction = (order, actions) => {
-    console.log('current' + order.status);
-    console.log(actions);
+  const handleOrderStatusAction = (actions) => {
     if (Array.isArray(actions)) {
       const buttons = actions.map((action, index) => ({
         text: action,
-        onPress: () => updateOrderStatus(order, action),
+        onPress: () => updateOrderStatus(action)
       }));
       Alert.alert(
         `Select Action`,
@@ -72,7 +70,7 @@ const OrderList = ({ updateNotificationCount }) => {
           },
           {
             text: actions,
-            onPress: () => updateOrderStatus(order, actions)
+            onPress: () => updateOrderStatus(actions)
           }
         ]
       );
@@ -158,12 +156,11 @@ const OrderList = ({ updateNotificationCount }) => {
       navigation.navigate("Profile");
     }
   };
-  const updateOrderStatus = async (order) => {
+  const updateOrderStatus = async (action) => {
+    const order=selectedOrder;
     setLoading(true);
-
     try {
       const formData = new FormData();
-
       formData.append("order_id", order.id);
       formData.append("status", action);
       console.log(action);
@@ -177,7 +174,7 @@ const OrderList = ({ updateNotificationCount }) => {
         throw new Error("Failed to update order.");
       }
     } catch (error) {
-      setError("Failed to Update. Please try again.");
+      setError("Failed to Update status. Please try again." + error + order.id + action);
       console.log(error);
     }
     setLoading(false);
@@ -194,6 +191,7 @@ const OrderList = ({ updateNotificationCount }) => {
   };
   const handleIconPress = (action, item, additionalData = null) => {
     setSelectedOrder(item);
+    console.log(item.id);
     switch (action) {
       case "detail":
       setDetailsModalVisible(true);
@@ -214,7 +212,7 @@ const OrderList = ({ updateNotificationCount }) => {
         setActionModalVisible(true)
       break;
       case "status":
-        handleOrderStatusAction(item, additionalData);
+        handleOrderStatusAction(additionalData);
         break;
       // Handle other actions or provide a default behavior
       default:
