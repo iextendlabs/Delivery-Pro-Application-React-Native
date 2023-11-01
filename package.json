@@ -46,7 +46,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "node update-version.js && git add appconfig.js"
+      "pre-commit": "node update-version.js && git add ./components/config/GeneralConfig.js"
     }
   },
   "private": true
