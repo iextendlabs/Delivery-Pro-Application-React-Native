@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Saloon Staff",
-    "slug": "staff",
+    "slug": "staff-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -41,8 +41,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "a2f9b70a-2f25-49d7-9145-d3d10d7d2a57"
+        "projectId": "53863d01-914d-4300-b2e1-ccd28d89ff6e"
       }
-    }
+    },
+    "owner": "saqibashraf"
   }
 }

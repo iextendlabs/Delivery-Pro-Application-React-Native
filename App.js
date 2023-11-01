@@ -9,6 +9,7 @@ import messaging from "@react-native-firebase/messaging";
 import Icon from "react-native-vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Notification from "./components/screens/Notification";
+import NetInfo from '@react-native-community/netinfo';
 
 const Drawer = createDrawerNavigator();
 const App = () => {
@@ -22,6 +23,34 @@ const App = () => {
       console.log("Authorization status:", authStatus);
     }
   };
+
+  const [isConnected, setIsConnected] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const showConnectionAlert = () => {
+    Alert.alert(
+      'No Internet Connection',
+      'Please check your internet connection and try again.',
+      [{ text: 'OK' }],
+      { cancelable: false }
+    );
+  };
+
+  useEffect(() => {
+    if (!isConnected) {
+      showConnectionAlert();
+    }
+  }, [isConnected]);
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   useEffect(() => {
     checkAuthentication();

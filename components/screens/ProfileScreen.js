@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoginUrl } from "../config/Api";
 import axios from 'axios';
 import messaging from "@react-native-firebase/messaging";
+import version from "../config/GeneralConfig";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -124,6 +125,8 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </>
     )}
+        <Text>App Version: {version}</Text>
+
   </View>
   );
 };
