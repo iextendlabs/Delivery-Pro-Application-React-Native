@@ -88,6 +88,17 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 </View>
                 )}
             
+                <View style={styles.commentBox}>
+                  <Text style={styles.detailBoxTitle}>Comments</Text>
+                    {'services' in order && order.services.map((service, index) => (
+                      <Text key={index} style={styles.commentText}>
+                        {service}
+                      </Text>
+                    ))}
+                    
+                </View>
+
+
                 {/* Box for Comment */}
                 <View style={styles.commentBox}>
                   <Text style={styles.detailBoxTitle}>Comments</Text>
