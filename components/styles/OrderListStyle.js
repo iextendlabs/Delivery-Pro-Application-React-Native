@@ -6,6 +6,12 @@ const OrderListStyle = {
     paddingTop: 12,
     justifyContent: 'center'
   },
+  button: {
+    backgroundColor: '#0d6efd',
+    padding: 10,
+    borderRadius: 5,
+    margin: 5,
+  },
   icons:{
     paddingRight:15
   },

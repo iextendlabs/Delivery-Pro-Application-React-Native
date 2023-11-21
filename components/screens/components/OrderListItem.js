@@ -110,14 +110,16 @@ const OrderListItem = ({ item, handleIconPress }) => {
             />
           )}
           {item.status in orderStatusActions && (
-            <Icon
-              name="settings-outline"
-              size={25}
-              color={item.cashCollection_status ? "green" : "orange"}
-              style={styles.icons}
+            <TouchableOpacity
+              style={styles.button}
               onPress={() => handleIconPress("status", item, orderStatusActions[item.status])}
-            />
+
+            >
+              <Text style={styles.buttonText}>Update</Text>
+            </TouchableOpacity>
           )}
+
+
 
         </View>
 

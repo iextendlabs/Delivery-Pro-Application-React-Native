@@ -45,11 +45,11 @@ const OrderList = ({ updateNotificationCount }) => {
   const [countComplete, setCountComplete] = useState(null);
   const navigation = useNavigation();
 
-  const handleOrderStatusAction = (actions) => {
+  const handleOrderStatusAction = (id, actions) => {
     if (Array.isArray(actions)) {
       const buttons = actions.map((action, index) => ({
         text: action,
-        onPress: () => updateOrderStatus(action)
+        onPress: () => updateOrderStatus(id, action)
       }));
       Alert.alert(
         `Select Action`,
@@ -70,7 +70,7 @@ const OrderList = ({ updateNotificationCount }) => {
           },
           {
             text: actions,
-            onPress: () => updateOrderStatus(actions)
+            onPress: () => updateOrderStatus(id, actions)
           }
         ]
       );
@@ -156,15 +156,14 @@ const OrderList = ({ updateNotificationCount }) => {
       navigation.navigate("Profile");
     }
   };
-  const updateOrderStatus = async (action) => {
-    const order=selectedOrder;
+  const updateOrderStatus = async (id, action) => {
     setLoading(true);
     try {
+      const userId = await AsyncStorage.getItem("@user_id");
       const formData = new FormData();
-      formData.append("order_id", order.id);
+      formData.append("order_id", id);
+      formData.append("user_id", userId);
       formData.append("status", action);
-      console.log(action);
-
       const response = await axios.post(OrderStatusUpdateUrl, formData);
 
       if (response.status === 200) {
@@ -191,7 +190,6 @@ const OrderList = ({ updateNotificationCount }) => {
   };
   const handleIconPress = (action, item, additionalData = null) => {
     setSelectedOrder(item);
-    console.log(item.id);
     switch (action) {
       case "detail":
       setDetailsModalVisible(true);
@@ -212,7 +210,7 @@ const OrderList = ({ updateNotificationCount }) => {
         setActionModalVisible(true)
       break;
       case "status":
-        handleOrderStatusAction(additionalData);
+        handleOrderStatusAction(item.id, additionalData);
         break;
       // Handle other actions or provide a default behavior
       default:
