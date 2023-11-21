@@ -89,7 +89,7 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                 )}
             
                 <View style={styles.commentBox}>
-                  <Text style={styles.detailBoxTitle}>Comments</Text>
+                  <Text style={styles.detailBoxTitle}>Services</Text>
                     {'services' in order && order.services.map((service, index) => (
                       <Text key={index} style={styles.commentText}>
                         {service}
