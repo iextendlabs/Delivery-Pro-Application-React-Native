@@ -63,13 +63,12 @@ const OrderChatModal = ({ visible, order, onClose }) => {
     }
     setIsLoading(true);
     try {
-      const formData = new FormData();
 
-      formData.append("order_id", order.id);
-      formData.append("text", text);
-      formData.append("user_id", userId);
-
-      const response = await axios.post(AddOrderChatUrl, formData);
+      const response = await axios.post(AddOrderChatUrl, {
+        order_id: order.id,
+        text: text,
+        user_id: userId,
+      });
 
       if (response.status === 200) {
         setSuccessMessage("Chat Update successfully.");

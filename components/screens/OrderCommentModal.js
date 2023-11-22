@@ -28,13 +28,12 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
     setIsLoading(true);
     const userId = await AsyncStorage.getItem("@user_id");
     try {
-      const formData = new FormData();
-  
-      formData.append("order_id", order.id);
-      formData.append("comment", commentText);
-      formData.append("user_id", userId);
       
-      const response = await axios.post(OrderCommentUrl,formData);
+      const response = await axios.post(OrderCommentUrl,{
+        order_id: order.id,
+        comment: commentText,
+        user_id: userId,
+      });
 
       if (response.status === 200) {
         setSuccessMessage("Comment posted successfully.");

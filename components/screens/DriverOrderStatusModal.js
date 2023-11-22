@@ -26,14 +26,13 @@ const DriverOrderStatusModal = ({ visible, order , onClose }) => {
     setIsLoading(true);
     const userId = await AsyncStorage.getItem("@user_id");
     try {
-      const formData = new FormData();
-  
-      formData.append("order_id", order.id);
-      formData.append("text", text);
-      formData.append("user_id", userId);
-      formData.append("driver_status", "Pick me");
       
-      const response = await axios.post(DriverOrderStatusUpdateUrl,formData);
+      const response = await axios.post(DriverOrderStatusUpdateUrl,{
+        order_id: order.id,
+        text: text,
+        user_id: userId,
+        driver_status: "Pick me",
+      });
 
       if (response.status === 200) {
         setSuccessMessage("Status Update successfully.");

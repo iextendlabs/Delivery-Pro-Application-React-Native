@@ -80,13 +80,12 @@ const OrderActionModal = ({ visible, order, onClose }) => {
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-  
-      formData.append("order_id", order.id);
-      formData.append("time_slot_id", selectedTimeSlotsId);
-      formData.append("date", selectedDate);
       
-      const response = await axios.post(RescheduleUrl,formData);
+      const response = await axios.post(RescheduleUrl,{
+        order_id: order.id,
+        time_slot_id: selectedTimeSlotsId,
+        date: selectedDate,
+      });
 
       if (response.status === 200) {
         setSuccessMessage("Time Slots update successfully.");
@@ -105,12 +104,11 @@ const OrderActionModal = ({ visible, order, onClose }) => {
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-  
-      formData.append("order_id", order.id);
-      formData.append("status", 'Accepted');
       
-      const response = await axios.post(OrderStatusUpdateUrl,formData);
+      const response = await axios.post(OrderStatusUpdateUrl,{
+        order_id: order.id,
+        status: "Accepted",
+      });
 
       if (response.status === 200) {
         setSuccessMessage("Order Accepted successfully.");
@@ -129,12 +127,11 @@ const OrderActionModal = ({ visible, order, onClose }) => {
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-  
-      formData.append("order_id", order.id);
-      formData.append("status", 'Rejected');
       
-      const response = await axios.post(OrderStatusUpdateUrl,formData);
+      const response = await axios.post(OrderStatusUpdateUrl,{
+        order_id: order.id,
+        status: "Rejected",
+      });
 
       if (response.status === 200) {
         setSuccessMessage("Order Rejected successfully.");

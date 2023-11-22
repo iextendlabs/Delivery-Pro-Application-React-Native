@@ -54,21 +54,23 @@ const OrderCashCollectionModal = ({ visible, order, onClose }) => {
     setIsLoading(true);
     const userId = await AsyncStorage.getItem("@user_id");
     try {
-      const formData = new FormData();
+
+      let image_obj = null;
       if (image) {
-        formData.append("image", {
+        image_obj =  {
           uri: image.assets["0"].uri,
           type: "image/jpeg", // or whatever file type the image is
           name: "image.jpg",
-        });
+        }
       }
       
-      formData.append("order_id", order.id);
-      formData.append("description", description);
-      formData.append("amount", amount);
-      formData.append("user_id", userId);
-
-      const response = await axios.post(OrderCashCollectionUrl, formData);
+      const response = await axios.post(OrderCashCollectionUrl, {
+        order_id: order.id,
+        description: description,
+        amount: amount,
+        user_id: userId,
+        image: image_obj,
+      });
 
       if (response.status === 200) {
         setSuccessMessage("Request submitted. Awaiting admin approval!");
