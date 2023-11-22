@@ -92,12 +92,12 @@ const OrderList = ({ updateNotificationCount }) => {
 
   useFocusEffect(
     React.useCallback(() => {
-      console.log('Focus effect triggered');
+      //console.log('Focus effect triggered');
       fetchOrders();
     }, [])
   );
   useEffect(() => {
-    console.log('use effect might work here');
+    //console.log('use effect might work here');
     const reloadApp = () => {
       navigation.isFocused() && fetchOrders();
     };
@@ -159,13 +159,10 @@ const OrderList = ({ updateNotificationCount }) => {
   const updateOrderStatus = async (id, action) => {
     setLoading(true);
     try {
-      const userId = await AsyncStorage.getItem("@user_id");
-      const formData = new FormData();
-      formData.append("order_id", id);
-      formData.append("user_id", userId);
-      formData.append("status", action);
-      const response = await axios.post(OrderStatusUpdateUrl, formData);
-
+      const response = await axios.post(OrderStatusUpdateUrl, {
+        order_id : id,
+        status: action
+      });
       if (response.status === 200) {
         setSuccess("Order Updated to " + action);
         fetchOrders();
@@ -173,8 +170,8 @@ const OrderList = ({ updateNotificationCount }) => {
         throw new Error("Failed to update order.");
       }
     } catch (error) {
-      setError("Failed to Update status. Please try again." + error + order.id + action);
-      console.log(error);
+      setError("Failed to Update status. Please try again." + error + id + action);
+      //console.log(error);
     }
     setLoading(false);
   };
