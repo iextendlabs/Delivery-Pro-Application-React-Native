@@ -25,7 +25,11 @@
       },
       "package": "com.iextendlabs.saloon",
       "permissions": [
-        "android.permission.RECORD_AUDIO"
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_WIFI_STATE",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE" ,       
+        "android.permission.WRITE_EXTERNAL_STORAGE"        
       ]
     },
     "web": {
@@ -36,6 +40,14 @@
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
         }
       ]
     ],
