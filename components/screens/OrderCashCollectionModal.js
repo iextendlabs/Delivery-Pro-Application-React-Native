@@ -27,6 +27,8 @@ const OrderCashCollectionModal = ({ visible, order, onClose }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleModalClose = () => {
+    setErrorMessage("");
+    setSuccessMessage("");
     onClose();
   };
 

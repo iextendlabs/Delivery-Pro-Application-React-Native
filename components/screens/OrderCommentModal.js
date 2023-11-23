@@ -15,6 +15,9 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleModalClose = () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    setCommentText("");
     onClose();
   };
 
@@ -37,7 +40,7 @@ const OrderCommentModal = ({ visible, order, onClose }) => {
 
       if (response.status === 200) {
         setSuccessMessage("Comment posted successfully.");
-        onClose();
+        setCommentText("");
       } else {
         throw new Error("Failed to post comment.");
       }

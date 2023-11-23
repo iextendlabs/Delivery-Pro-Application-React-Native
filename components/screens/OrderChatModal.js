@@ -24,6 +24,8 @@ const OrderChatModal = ({ visible, order, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
   const handleModalClose = () => {
+    setErrorMessage("");
+    setSuccessMessage("");
       onClose();
   };
 

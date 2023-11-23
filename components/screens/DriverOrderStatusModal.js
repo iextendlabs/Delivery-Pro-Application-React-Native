@@ -14,6 +14,9 @@ const DriverOrderStatusModal = ({ visible, order , onClose }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleModalClose = () => {
+    setErrorMessage("");
+    setSuccessMessage("");
+    setText("");
     onClose();
   };
 

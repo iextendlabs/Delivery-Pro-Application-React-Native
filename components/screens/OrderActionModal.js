@@ -25,7 +25,7 @@ const OrderActionModal = ({ visible, order, onClose }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
-  const [selectedTimeSlotsId, setSelectedTimeSlotsId] = useState();
+  const [selectedTimeSlotsId, setSelectedTimeSlotsId] = useState(null);
 
   useEffect(() => {
     if (visible) {
@@ -175,9 +175,8 @@ const OrderActionModal = ({ visible, order, onClose }) => {
                     style={styles.picker}
                     selectedValue={timeSlot}
                     onValueChange={(itemValue, itemIndex) => {
-                      setTimeSlot(selectedTimeSlots[itemIndex]?.value ?? null);
-                      setSelectedTimeSlotsId(selectedTimeSlots[itemIndex]?.id ?? null);
-
+                      setTimeSlot(selectedTimeSlots[itemIndex]?.value ?? '');
+                      setSelectedTimeSlotsId(selectedTimeSlots[itemIndex]?.id ?? '');
                     }}
                   >
                     {selectedTimeSlots.map((slot) => (
