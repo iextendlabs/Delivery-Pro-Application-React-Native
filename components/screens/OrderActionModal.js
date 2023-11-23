@@ -68,6 +68,8 @@ const OrderActionModal = ({ visible, order, onClose }) => {
   };
 
   const handleModalClose = () => {
+    setErrorMessage("");
+    setSuccessMessage("");
     onClose();
   };
 
@@ -173,8 +175,9 @@ const OrderActionModal = ({ visible, order, onClose }) => {
                     style={styles.picker}
                     selectedValue={timeSlot}
                     onValueChange={(itemValue, itemIndex) => {
-                      setTimeSlot(selectedTimeSlots[itemIndex].value);
-                      setSelectedTimeSlotsId(selectedTimeSlots[itemIndex].id);
+                      setTimeSlot(selectedTimeSlots[itemIndex]?.value ?? null);
+                      setSelectedTimeSlotsId(selectedTimeSlots[itemIndex]?.id ?? null);
+
                     }}
                   >
                     {selectedTimeSlots.map((slot) => (

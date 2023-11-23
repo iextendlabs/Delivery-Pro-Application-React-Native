@@ -183,6 +183,8 @@ const OrderList = ({ updateNotificationCount }) => {
     setCommentModalVisible(false);
     setActionModalVisible(false);
     setCashCollectionModalVisible(false);
+    setSuccessMessage("");
+    setErrorMessage("");
     fetchOrders();
   };
   const handleIconPress = (action, item, additionalData = null) => {
@@ -355,11 +357,12 @@ const OrderList = ({ updateNotificationCount }) => {
       {errorMessage !== "" && (
         <Text style={styles.errorMessage}>{errorMessage}</Text>
       )}
-      {loading ? (
+      {loading && (
         <View style={styles.loaderContainer}>
           <ActivityIndicator size="small" color="#0000ff" />
         </View>
-      ) : displayOrder.length === 0 ? (
+        )}
+      {displayOrder.length === 0 ? (
         <Text style={styles.noItemsText}>No Order Yet / Updating...</Text>
       ) : (
         <FlatList

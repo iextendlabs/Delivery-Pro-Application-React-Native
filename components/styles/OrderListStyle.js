@@ -43,6 +43,13 @@ const OrderListStyle = {
     marginBottom: 10,
     flexDirection: 'column'
    },
+
+   orderContainerBlue: {
+    padding: 10,
+    backgroundColor: "#d7e6fb",
+    marginBottom: 10,
+    flexDirection: 'column'
+   },
    //
   orderId: {
     fontSize: 16,

@@ -24,6 +24,9 @@ const OrderListItem = ({ item, handleIconPress }) => {
         case "Accepted":
             container = styles.orderContainerGreen
             break;
+        case "Inprogress":
+            container = styles.orderContainerBlue
+            break;
         default:
             container = styles.orderContainer;
             break;
@@ -106,7 +109,7 @@ const OrderListItem = ({ item, handleIconPress }) => {
               size={25}
               color={item.cashCollection_status ? "green" : "orange"}
               style={styles.icons}
-              onPress={() =>item.cashCollection_status === "orange" && handleIconPress("cash", item)}
+              onPress={() =>item.cashCollection_status === false && handleIconPress("cash", item)}
             />
           )}
           {item.status in orderStatusActions && (
