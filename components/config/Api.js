@@ -11,7 +11,8 @@ const TimeSlotsUrl = BaseUrl+'timeSlots?';
 const OrderChatUrl = BaseUrl+'orderChat?';
 const AddOrderChatUrl = BaseUrl+'addOrderChat';
 const NotificationUrl = BaseUrl+'notification?';
+const ShortHolidayURL = BaseUrl+'addShortHoliday';
 
 export {
-    OrderUrl, LoginUrl, OrderCommentUrl, RescheduleUrl, OrderStatusUpdateUrl, BaseUrl,TimeSlotsUrl,OrderCashCollectionUrl,DriverOrderStatusUpdateUrl,OrderChatUrl,AddOrderChatUrl,NotificationUrl
+    OrderUrl, LoginUrl, OrderCommentUrl, RescheduleUrl, OrderStatusUpdateUrl, BaseUrl,TimeSlotsUrl,OrderCashCollectionUrl,DriverOrderStatusUpdateUrl,OrderChatUrl,AddOrderChatUrl,NotificationUrl, ShortHolidayURL
 }

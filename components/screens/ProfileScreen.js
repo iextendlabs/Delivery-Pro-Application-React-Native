@@ -12,6 +12,7 @@ import { LoginUrl } from "../config/Api";
 import axios from 'axios';
 import messaging from "@react-native-firebase/messaging";
 import version from "../config/GeneralConfig";
+import HolidayModal from "./HolidayModal";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -20,7 +21,8 @@ const ProfileScreen = () => {
   const [fcmToken, setFcmToken] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [error, setError] = useState();
-  
+  const [holidayModalVisible, setHolidayModalVisible] = useState(false);
+
   useFocusEffect(
     React.useCallback(() => {
       checkAuthentication();
@@ -44,7 +46,7 @@ const ProfileScreen = () => {
         setFcmToken(fcmToken);
       });
   } catch (error) {
-    
+
   }
 
   const checkAuthentication = async () => {
@@ -98,36 +100,51 @@ const ProfileScreen = () => {
     }
   };
 
+  const closeModal = () => {
+    setHolidayModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
-    <Text style={styles.error}>{error}</Text>
-    {isAuthenticated ? ( // Conditionally render the login form or logout button
-      <TouchableOpacity style={styles.button} onPress={handleLogout}>
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
-    ) : (
-      <>
-        <TextInput
-          style={styles.input}
-          placeholder="Username"
-          value={username}
-          onChangeText={setUsername}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-      </>
-    )}
-        <Text>App Version: {version}</Text>
+      <Text style={styles.error}>{error}</Text>
+      {isAuthenticated ? ( // Conditionally render the login form or logout button
+        <View style={{flexDirection:"row"}}>
+          <TouchableOpacity style={styles.button} onPress={()=>{
+            setHolidayModalVisible(true);
+          }}>
+            <Text style={styles.buttonText}>Apply For Holiday</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleLogout}>
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
 
-  </View>
+      ) : (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Username"
+            value={username}
+            onChangeText={setUsername}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Login</Text>
+          </TouchableOpacity>
+        </>
+      )}
+      <Text>App Version: {version}</Text>
+      <HolidayModal
+        visible={holidayModalVisible}
+        onClose={closeModal}
+      />
+    </View>
   );
 };
 
@@ -162,6 +179,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 5,
+    margin:10
   },
   buttonText: {
     color: "#fff",

@@ -39,7 +39,7 @@ const OrderList = ({ updateNotificationCount }) => {
     useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [countAll, setCountAll] = useState(0);
-  const [countPending, setCountPending] = useState(null);
+  const [countConfirm, setCountConfirm] = useState(null);
   const [countAccepted, setCountAccepted] = useState(null);
   const [countInprogress, setCountInprogress] = useState(null);
   const [countComplete, setCountComplete] = useState(null);
@@ -119,8 +119,8 @@ const OrderList = ({ updateNotificationCount }) => {
     setCountComplete(
       orders.filter((order) => order.status === "Complete").length
     );
-    setCountPending(
-      orders.filter((order) => order.status === "Pending").length
+    setCountConfirm(
+      orders.filter((order) => order.status === "Confirm").length
     );
     setCountInprogress(
       orders.filter((order) => order.status === "Inprogress").length
@@ -247,28 +247,28 @@ const OrderList = ({ updateNotificationCount }) => {
           </View>
         </TouchableHighlight>
         <TouchableHighlight
-          style={[styles.tab, status == "Pending" && styles.selectedTab]}
+          style={[styles.tab, status == "Confirm" && styles.selectedTab]}
           onPress={() => {
-            setStatusFilter("Pending");
-            setStatus("Pending");
+            setStatusFilter("Confirm");
+            setStatus("Confirm");
           }}
         >
           <View>
             <Text
               style={[
                 styles.tabText,
-                status == "Pending" && styles.selectedTabText,
+                status == "Confirm" && styles.selectedTabText,
               ]}
             >
-              Pending
+              Confirm
             </Text>
             <Text
               style={[
                 styles.tabText,
-                status == "Pending" && styles.selectedTabText,
+                status == "Confirm" && styles.selectedTabText,
               ]}
             >
-              {countPending}
+              {countConfirm}
             </Text>
           </View>
         </TouchableHighlight>

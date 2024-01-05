@@ -12,13 +12,13 @@ import { StyleSheet } from "react-native-web";
 const styles = StyleSheet.create(OrderListStyle);
 const orderStatusActions = {
     "Accepted": "Inprogress",
-    "Pending": ["Accepted", "Rejected"],
+    "Confirm": ["Accepted", "Rejected"],
     "Inprogress": "Complete",
   };
 const OrderListItem = ({ item, handleIconPress }) => {
     let container;
     switch (item.status) {
-        case "Pending":
+        case "Confirm":
             container = styles.orderContainerOrange
             break;
         case "Accepted":
@@ -94,11 +94,11 @@ const OrderListItem = ({ item, handleIconPress }) => {
           )}
 
           <WhatsAppElement showNumber={false} phoneNumber={item.whatsapp} />
-          {item.status === "Pending" && (
+          {item.status === "Confirm" && (
             <Icon
               name="ios-calendar"
               size={25}
-              color="blue" // Change this to your desired color for 'Pending' status.
+              color="blue" // Change this to your desired color for 'Confirm' status.
               style={styles.icons}
               onPress={() => handleIconPress("schedule", item)}
             />
