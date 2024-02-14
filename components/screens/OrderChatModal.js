@@ -8,12 +8,15 @@ import {
   TextInput,
   FlatList,
   ActivityIndicator,
+  Linking
 } from "react-native";
 import OrderListStyle from "../styles/OrderListStyle";
 import { OrderChatUrl } from "../config/Api";
 import { AddOrderChatUrl } from "../config/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import Icon from 'react-native-vector-icons/Ionicons';
+import * as Location from 'expo-location';
 
 const OrderChatModal = ({ visible, order, onClose }) => {
   const [text, setText] = useState("");
@@ -23,14 +26,38 @@ const OrderChatModal = ({ visible, order, onClose }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+
+  useEffect(() => {
+    const fetchLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setErrorMessage("Permission to access location was denied");
+          return;
+        }
+
+        const location = await Location.getCurrentPositionAsync({});
+        setLatitude(location.coords.latitude);
+        setLongitude(location.coords.longitude);
+      } catch (error) {
+        console.log("Error fetching location");
+      }
+    };
+
+    fetchLocation();
+  }, []);
+
   const handleModalClose = () => {
     setErrorMessage("");
     setSuccessMessage("");
-      onClose();
+    setText("");
+    onClose();
   };
 
   useEffect(() => {
-      visible &&  setChat('') && fetchChat();
+    visible && setChat('') && fetchChat();
   }, [visible]);
 
   useEffect(() => {
@@ -58,19 +85,33 @@ const OrderChatModal = ({ visible, order, onClose }) => {
     }
   };
 
-  const handleSubmitChat = async () => {
-    if (text.trim() === "") {
-      setErrorMessage("Please enter a Text.");
+  const handleSubmitChat = async (type) => {
+    if(type === "Location"){
+      if (latitude === "" && longitude === "") {
+        setErrorMessage("Error fetching location.");
+        return;
+      }
+    }else if (text.trim() === "") {
+      setErrorMessage("Please enter a text.");
       return;
     }
     setIsLoading(true);
     try {
 
-      const response = await axios.post(AddOrderChatUrl, {
+      const requestData = {
         order_id: order.id,
-        text: text,
         user_id: userId,
-      });
+      };
+
+      if (type === "Location") {
+        requestData.text = latitude+","+longitude;
+        requestData.type = type;
+      } else{
+        requestData.text = text;
+        requestData.type = "";
+      }
+
+      const response = await axios.post(AddOrderChatUrl, requestData);
 
       if (response.status === 200) {
         setSuccessMessage("Chat Update successfully.");
@@ -86,16 +127,44 @@ const OrderChatModal = ({ visible, order, onClose }) => {
     setIsLoading(false);
   };
 
+  const handleLocation = async (location) => {
+    const [latitude, longitude] = location.split(',');
+    try {
+      const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+
+      const canOpen = await Linking.canOpenURL(url);
+
+      if (canOpen) {
+        await Linking.openURL(url);
+      } else {
+        console.error('Cannot open Google Maps URL');
+      }
+    } catch (error) {
+      console.error('Error opening Google Maps:', error);
+    }
+  };
+
   const renderChat = ({ item }) => {
     const chatStyle =
       userId === item.user_id
         ? styles.otherMessageContainer
         : styles.userMessageContainer;
-
+    const body =
+      item.type === "Location"
+        ? <TouchableOpacity
+          style={[styles.submitButton, { width: 40 }]}
+          onPress={() => handleLocation(item.text)}
+          disabled={isLoading}
+        >
+          <Text style={styles.buttonText}>
+            <Icon name="location-sharp" size={20} color="#fff" />
+          </Text>
+        </TouchableOpacity>
+        : <Text style={styles.messageText}>{item.text}</Text>;
     return (
       <View style={chatStyle}>
         <View style={styles.messageBubble}>
-          <Text style={styles.messageText}>{item.text}</Text>
+          {body}
           <Text style={styles.messageRole}>{item.role} {item.time}</Text>
         </View>
       </View>
@@ -131,15 +200,28 @@ const OrderChatModal = ({ visible, order, onClose }) => {
               placeholder="Enter your Text"
               multiline
             />
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleSubmitChat}
-              disabled={isLoading}
-            >
-              <Text style={styles.buttonText}>
-                {isLoading ? "Submitting..." : "Submit"}
-              </Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: "column", alignContent: "center", alignItems: "center" }}>
+
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={() => handleSubmitChat("Comment")}
+                disabled={isLoading}
+              >
+                <Text style={styles.buttonText}>
+                  Send Message
+                </Text>
+              </TouchableOpacity>
+              <Text>Or</Text>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={() => handleSubmitChat("Location")}
+                disabled={isLoading}
+              >
+                <Text style={styles.buttonText}>
+                  Current Location
+                </Text>
+              </TouchableOpacity>
+            </View>
             {successMessage !== "" && (
               <Text style={styles.successMessage}>{successMessage}</Text>
             )}

@@ -33,13 +33,17 @@ const OrderListItem = ({ item, handleIconPress }) => {
     }
     return (
       <TouchableOpacity style={container}>
-        <View style={{ flex: 1 }}>
+        <View>
           <Text style={styles.orderId}>
             #{item.id} {"  "}<Icon name="ios-calendar" size={20} color="black" />{item.time_slot_value}
           </Text>
           <Text style={styles.orderDate}>{item.driver_name}
             <Icon name="ios-car" size={15} color="black" />
             {item.driver_status}
+          </Text>
+          <Text style={styles.orderDate}>
+            <Icon name="location-sharp" size={15} color="black" />
+            {item.buildingName} {item.flatVilla} {item.street} {item.district} {item.city}
           </Text>
         </View>
 

@@ -11,8 +11,6 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
     return null;
   }
   const handleModalClose = () => {
-    setErrorMessage("");
-    setSuccessMessage("");
     onClose();
   };
   return (
