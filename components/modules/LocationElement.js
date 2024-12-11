@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const openGoogleMap = async (latitude, longitude, address) => {
   try {
-    const url = latitude.toString().length && longitude.toString().length
+    const url = latitude != null && longitude != null && latitude.toString().length && longitude.toString().length
       ? `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
       : `https://www.google.com/maps/search/?api=1&query=${address}`;
 
