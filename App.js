@@ -1,101 +1,207 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { NavigationContainer, useNavigation } from '@react-navigation/native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import Icon from 'react-native-vector-icons/Ionicons';
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Alert, ImageBackground } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import OrderList from "./components/screens/OrderList";
+import messaging from "@react-native-firebase/messaging";
+import Login from "./components/screens/Login";
+import Notification from "./components/screens/Notification";
+import NetInfo from "@react-native-community/netinfo";
+import Home from "./components/screens/Home";
+import Transactions from "./components/screens/Transactions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { NotificationUrl } from "./components/config/Api";
+import axios from "axios";
+import Holidays from "./components/screens/Holidays";
+import HolidayModal from "./components/screens/HolidayModal";
+import Orders from "./components/screens/Orders";
+import Splash from "./components/screens/Splash";
 
-const Drawer = createDrawerNavigator();
-
-const HomeScreen = () => {
-  return (
-    <View style={styles.screenContainer}>
-      <Text style={styles.screenText}>Home Screen</Text>
-    </View>
-  );
-};
-
-const ServicesScreen = () => {
-  return (
-    <View style={styles.screenContainer}>
-      <Text style={styles.screenText}>Services Screen</Text>
-    </View>
-  );
-};
-
-const SettingsScreen = () => {
-  return (
-    <View style={styles.screenContainer}>
-      <Text style={styles.screenText}>Settings Screen</Text>
-    </View>
-  );
-};
-
-const Footer = () => {
-  const navigation = useNavigation();
-
-  return (
-    <View style={styles.footerContainer}>
-      <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Home')}>
-        <Icon name="home" size={24} color="#FFFFFF" />
-        <Text style={styles.footerLinkText}>Home</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Services')}>
-        <Icon name="person" size={24} color="#FFFFFF" />
-        <Text style={styles.footerLinkText}>Services</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.footerLink} onPress={() => navigation.navigate('Settings')}>
-        <Icon name="settings" size={24} color="#FFFFFF" />
-        <Text style={styles.footerLinkText}>Settings</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
+const Stack = createStackNavigator();
 
 const App = () => {
+  const [isConnected, setIsConnected] = useState(true);
+  const [initialRoute, setInitialRoute] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    const requestUserPermission = async () => {
+      const authStatus = await messaging().requestPermission();
+      const enabled =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (enabled) {
+        console.log("Authorization status:", authStatus);
+      }
+    };
+
+    if (requestUserPermission()) {
+      messaging()
+        .getToken()
+        .then((token) => {
+          console.log(token);
+        });
+    } else {
+      console.log("Failed token status", authStatus);
+    }
+    messaging()
+      .getInitialNotification()
+      .then(async (remoteMessage) => {
+        if (remoteMessage) {
+          console.log(
+            "Notification caused app to open from quit state:",
+            remoteMessage.notification
+          );
+        }
+      });
+
+    messaging().onNotificationOpenedApp(async (remoteMessage) => {
+      console.log(
+        "Notification caused app to open from background state:",
+        remoteMessage.notification
+      );
+      getNotification();
+    });
+
+    messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+      console.log("Message handled in the background!", remoteMessage);
+      getNotification();
+    });
+
+    messaging().onMessage(async (remoteMessage) => {
+      const { body, title } = remoteMessage.notification;
+      Alert.alert(`${title}`, `${body}`);
+      getNotification();
+    });
+  }, []);
+
+  useEffect(() => {
+    checkUserLoggedIn();
+    getNotification();
+  }, []);
+
+  const showConnectionAlert = () => {
+    Alert.alert(
+      "No Internet Connection",
+      "Please check your internet connection and try again.",
+      [{ text: "OK" }],
+      { cancelable: false }
+    );
+  };
+
+  useEffect(() => {
+    if (!isConnected) {
+      showConnectionAlert();
+    }
+  }, [isConnected]);
+
+  const checkUserLoggedIn = async () => {
+    try {
+      const userId = await AsyncStorage.getItem("@user_id");
+      if (userId) {
+        setInitialRoute("Home");
+      } else {
+        setInitialRoute("Login");
+      }
+    } catch (error) {
+      console.error("Error checking user login status:", error);
+      setInitialRoute("Login");
+    }
+  };
+
+  const getNotification = async () => {
+    const user = await AsyncStorage.getItem("@user_id");
+    try {
+      const response = await axios.get(`${NotificationUrl}user_id=${user}`);
+      if (response.status === 200) {
+        let data = response.data.notifications;
+        await AsyncStorage.setItem("@notifications", JSON.stringify(data));
+      } else {
+        setError("Please try again.");
+      }
+    } catch (error) {}
+  };
+
+  if (initialRoute === null) {
+    return <Splash />;
+  }
+
   return (
     <NavigationContainer>
-      <View style={styles.container}>
-        <Drawer.Navigator>
-          <Drawer.Screen name="Home" component={HomeScreen} />
-          <Drawer.Screen name="Services" component={ServicesScreen} />
-          <Drawer.Screen name="Settings" component={SettingsScreen} />
-        </Drawer.Navigator>
-      </View>
-      <Footer />
+      <Stack.Navigator
+        initialRouteName={initialRoute}
+        screenOptions={{
+          headerBackground: () => (
+            <ImageBackground
+              source={require("./components/images/rotated_logo.png")}
+              style={{
+                position: "absolute",
+                top: 1,
+                left: 0,
+                width: 150,
+                height: 100,
+                zIndex: 1,
+              }}
+            />
+          ),
+          headerTintColor: "#000",
+        }}
+      >
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="Login"
+          component={Login}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="Notification"
+          component={Notification}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="Home"
+          component={Home}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="Transactions"
+          component={Transactions}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="OrderList"
+          component={OrderList}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="Orders"
+          component={Orders}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="Holidays"
+          component={Holidays}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="HolidayModal"
+          component={HolidayModal}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  screenContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  screenText: {
-    fontSize: 20,
-  },
-  footerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    backgroundColor: '#213141',
-  },
-  footerLink: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  footerLinkText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#228866',
-    marginTop: 5,
-  },
-});
+const styles = StyleSheet.create({});
 
 export default App;

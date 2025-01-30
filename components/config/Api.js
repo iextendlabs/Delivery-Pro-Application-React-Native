@@ -1,0 +1,38 @@
+const BaseUrl = "https://lipslay.com/";
+
+const IndexUrl = BaseUrl + "api/index?";
+const OrderUrl = BaseUrl + "api/ordersV2?";
+const LoginUrl = BaseUrl + "api/login";
+const OrderCommentUrl = BaseUrl + "api/addOrderComment";
+const OrderCashCollectionUrl = BaseUrl + "api/cashCollection";
+const OrderStatusUpdateUrl = BaseUrl + "api/orderStatusUpdate";
+const DriverOrderStatusUpdateUrl = BaseUrl + "api/driverOrderStatusUpdate";
+const RescheduleUrl = BaseUrl + "api/rescheduleOrder";
+const TimeSlotsUrl = BaseUrl + "api/timeSlots?";
+const OrderChatUrl = BaseUrl + "api/orderChat?";
+const AddOrderChatUrl = BaseUrl + "api/addOrderChat";
+const NotificationUrl = BaseUrl + "api/notification?";
+const ShortHolidayURL = BaseUrl + "api/addShortHoliday";
+const GetTransactionsUrl = BaseUrl + "api/getTransactions?";
+const GetHolidaysUrl = BaseUrl + "api/getHolidays?";
+const GetStaffOrdersUrl = BaseUrl + "api/getStaffOrders?";
+
+export {
+  OrderUrl,
+  LoginUrl,
+  OrderCommentUrl,
+  RescheduleUrl,
+  OrderStatusUpdateUrl,
+  BaseUrl,
+  TimeSlotsUrl,
+  OrderCashCollectionUrl,
+  DriverOrderStatusUpdateUrl,
+  OrderChatUrl,
+  AddOrderChatUrl,
+  NotificationUrl,
+  ShortHolidayURL,
+  IndexUrl,
+  GetTransactionsUrl,
+  GetHolidaysUrl,
+  GetStaffOrdersUrl
+};
