@@ -19,6 +19,7 @@ import Splash from "./components/screens/Splash";
 import * as Notifications from 'expo-notifications';
 import WithdrawModal from "./components/screens/WithdrawModal";
 import Withdraws from "./components/screens/Withdraws";
+import EditProfile from "./components/screens/EditProfile";
 
 const Stack = createStackNavigator();
 
@@ -238,6 +239,11 @@ const App = () => {
           options={{ headerShown: false }}
           name="Withdraws"
           component={Withdraws}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="EditProfile"
+          component={EditProfile}
         />
       </Stack.Navigator>
     </NavigationContainer>

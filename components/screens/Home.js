@@ -55,6 +55,10 @@ const Home = ({ navigation }) => {
     }
   };
 
+  const handleEdit = async () => {
+    navigation.navigate("EditProfile");
+  };
+
   if (loading) {
     return <Splash />;
   }
@@ -85,6 +89,17 @@ const Home = ({ navigation }) => {
           <TouchableOpacity onPress={handleLogout} style={styles.logoutIcon}>
             <Image
               source={require("../images/logout.png")} // Your icon image here
+              style={{
+                width: 24,
+                height: 24,
+                tintColor: "#333", // Adjust color as per requirement
+              }}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={handleEdit} style={styles.editIcon}>
+            <Image
+              source={require("../images/edit.png")} // Your icon image here
               style={{
                 width: 24,
                 height: 24,
@@ -267,13 +282,12 @@ const Home = ({ navigation }) => {
           </View>
         )}
         <View style={{ marginBottom: 70 }}>
-          
-        <CommonButton
-          title={"Apply Short Holiday"}
-          bgColor={"#fd245f"}
-          textColor={"#fff"}
-          onPress={() => navigation.navigate("HolidayModal")}
-        />
+          <CommonButton
+            title={"Apply Short Holiday"}
+            bgColor={"#fd245f"}
+            textColor={"#fff"}
+            onPress={() => navigation.navigate("HolidayModal")}
+          />
         </View>
       </ScrollView>
       <Footer />
@@ -306,6 +320,18 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     right: 10,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  editIcon: {
+    position: "absolute",
+    top: 10,
+    right: 50, // Adjust the distance to position the Edit button next to the Logout button
     padding: 10,
     backgroundColor: "#fff",
     borderRadius: 20,
