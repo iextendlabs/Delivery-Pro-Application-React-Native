@@ -17,6 +17,8 @@ import HolidayModal from "./components/screens/HolidayModal";
 import Orders from "./components/screens/Orders";
 import Splash from "./components/screens/Splash";
 import * as Notifications from 'expo-notifications';
+import WithdrawModal from "./components/screens/WithdrawModal";
+import Withdraws from "./components/screens/Withdraws";
 
 const Stack = createStackNavigator();
 
@@ -226,6 +228,16 @@ const App = () => {
           options={{ headerShown: false }}
           name="HolidayModal"
           component={HolidayModal}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="WithdrawModal"
+          component={WithdrawModal}
+        />
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="Withdraws"
+          component={Withdraws}
         />
       </Stack.Navigator>
     </NavigationContainer>

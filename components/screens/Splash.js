@@ -16,7 +16,7 @@ const Splash = () => {
         }}
       />
       <Text style={{ fontWeight: "800", marginTop: 20, fontSize: 24, color: "#000" }}>
-        LipsLay Staff
+        Lipslay Staff
       </Text>
     </View>
   );

@@ -174,10 +174,25 @@ const Home = ({ navigation }) => {
           <View style={styles.menuItem}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("Holidays");
+                navigation.navigate("Withdraws");
               }}
             >
               <View style={styles.menu}>
+                <Image
+                  source={require("../images/withdraw.png")}
+                  style={styles.iconImage}
+                />
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.iconLabel}>Withdraws</Text>
+          </View>
+          <View style={styles.menuItem}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("Holidays");
+              }}
+            >
+              <View style={[styles.menu, { backgroundColor: "#a0c7ff" }]}>
                 <Image
                   source={require("../images/holidays.png")}
                   style={styles.iconImage}
@@ -411,8 +426,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menu: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     borderRadius: 45,
     backgroundColor: "#fff",
     borderWidth: 1,
@@ -422,12 +437,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   iconImage: {
-    width: 40,
-    height: 40,
+    width: 30,
+    height: 30,
     resizeMode: "contain",
   },
   iconLabel: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "bold",
     color: "#333",
   },

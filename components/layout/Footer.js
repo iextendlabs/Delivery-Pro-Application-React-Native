@@ -28,7 +28,7 @@ export default function Footer() {
       >
         <TouchableOpacity
           style={{
-            width: "25%",
+            width: "20%",
             height: "100%",
             justifyContent: "center",
             alignItems: "center",
@@ -48,7 +48,7 @@ export default function Footer() {
         </TouchableOpacity>
         <TouchableOpacity
           style={{
-            width: "25%",
+            width: "20%",
             height: "100%",
             justifyContent: "center",
             alignItems: "center",
@@ -66,10 +66,29 @@ export default function Footer() {
             }}
           />
         </TouchableOpacity>
-
         <TouchableOpacity
           style={{
-            width: "25%",
+            width: "20%",
+            height: "100%",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          onPress={() => {
+            navigation.navigate("Withdraws");
+          }}
+        >
+          <Image
+            source={require("../images/withdraw.png")}
+            style={{
+              width: 24,
+              height: 24,
+              tintColor: route.name == "Withdraws" ? "#000" : "#8e8e8e",
+            }}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            width: "20%",
             height: "100%",
             justifyContent: "center",
             alignItems: "center",
@@ -89,7 +108,7 @@ export default function Footer() {
         </TouchableOpacity>
         <TouchableOpacity
           style={{
-            width: "25%",
+            width: "20%",
             height: "100%",
             justifyContent: "center",
             alignItems: "center",
