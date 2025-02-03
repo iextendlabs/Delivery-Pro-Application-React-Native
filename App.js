@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Alert, ImageBackground } from "react-native";
+import { StyleSheet, Alert, ImageBackground, Linking } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import OrderList from "./components/screens/OrderList";
@@ -16,6 +16,7 @@ import Holidays from "./components/screens/Holidays";
 import HolidayModal from "./components/screens/HolidayModal";
 import Orders from "./components/screens/Orders";
 import Splash from "./components/screens/Splash";
+import * as Notifications from 'expo-notifications';
 
 const Stack = createStackNavigator();
 
@@ -88,8 +89,37 @@ const App = () => {
   useEffect(() => {
     checkUserLoggedIn();
     getNotification();
+    checkNotificationPermission();
   }, []);
 
+  const checkNotificationPermission = async () => {
+    try {
+      const { status } = await Notifications.getPermissionsAsync();
+
+      if (status !== 'granted') {
+        const { status: newStatus } = await Notifications.requestPermissionsAsync();
+
+        if (newStatus !== 'granted') {
+          console.log('Notification permission denied');
+          Alert.alert(
+            'Notification Permission Required',
+            'To receive notifications, please enable notification permissions in your device settings.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  Linking.openSettings();
+                },
+              },
+            ]
+          );
+        }
+      }
+    } catch (error) { 
+      console.error('Error checking notification permission:', error);
+    }
+  };
+  
   const showConnectionAlert = () => {
     Alert.alert(
       "No Internet Connection",
