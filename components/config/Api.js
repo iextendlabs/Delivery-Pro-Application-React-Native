@@ -16,6 +16,10 @@ const ShortHolidayURL = BaseUrl + "api/addShortHoliday";
 const GetTransactionsUrl = BaseUrl + "api/getTransactions?";
 const GetHolidaysUrl = BaseUrl + "api/getHolidays?";
 const GetStaffOrdersUrl = BaseUrl + "api/getStaffOrders?";
+const GetWithdrawPaymentMethodsUrl = BaseUrl + "api/getWithdrawPaymentMethods?";
+const WithdrawUrl = BaseUrl + "api/withdraw";
+const GetWithdrawsUrl = BaseUrl + "api/getWithdraws?";
+const updateProfileUrl = BaseUrl + "api/updateProfile";
 
 export {
   OrderUrl,
@@ -34,5 +38,9 @@ export {
   IndexUrl,
   GetTransactionsUrl,
   GetHolidaysUrl,
-  GetStaffOrdersUrl
+  GetStaffOrdersUrl,
+  GetWithdrawPaymentMethodsUrl,
+  WithdrawUrl,
+  GetWithdrawsUrl,
+  updateProfileUrl
 };
