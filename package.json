@@ -1,5 +1,5 @@
 {
-  "name": "staff-app",
+  "name": "lipsaly-partner",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "@react-navigation/stack": "^7.1.1",
     "axios": "^1.7.9",
     "date-fns": "^4.1.0",
-    "expo": "~52.0.28",
+    "expo": "~52.0.29",
     "expo-dev-client": "~5.0.11",
     "expo-image-picker": "~16.0.5",
     "expo-location": "^18.0.5",

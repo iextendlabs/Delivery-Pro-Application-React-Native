@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Lipslay Staff App",
+    "name": "Lipslay Partner",
     "slug": "lipslay-staff",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -17,6 +17,7 @@
       "jsEngine": "hermes"
     },
     "android": {
+      "versionCode": 1,
       "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
