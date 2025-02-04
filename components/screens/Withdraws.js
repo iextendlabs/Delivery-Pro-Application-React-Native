@@ -117,7 +117,7 @@ const Withdraws = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Header title={"withdraws"} />
+      <Header title={"Withdraws"} />
 
       {/* Date Filter Section */}
       <View style={styles.filterContainer}>
