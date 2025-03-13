@@ -10,15 +10,17 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { BaseUrl, IndexUrl } from "../config/Api";
+import { BaseUrl, IndexUrl, onlineOfflineUrl } from "../config/Api";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import Splash from "./Splash";
 import CommonButton from "../common/CommonButton";
 
 const Home = ({ navigation }) => {
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isToggled, setIsToggled] = useState(false);
+  const [supervisors, setSupervisors] = useState([]);
 
   useEffect(() => {
     fetchData();
@@ -29,7 +31,13 @@ const Home = ({ navigation }) => {
     if (userId) {
       try {
         const response = await axios.get(`${IndexUrl}user_id=${userId}`);
-        setUserData(response.data);
+        if (response.status == 201) {
+          handleLogout();
+        } else {
+          setUserData(response.data);
+          setSupervisors(response.data.supervisors);
+          console.log(response.data.supervisors);
+        }
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -52,6 +60,36 @@ const Home = ({ navigation }) => {
       });
     } catch (error) {
       console.log("Error occurred during logout:", error);
+    }
+  };
+
+  const handleToggle = async () => {
+    setLoading(true);
+
+    const newToggleState = !isToggled;
+    setIsToggled(newToggleState);
+
+    try {
+      const userId = await AsyncStorage.getItem("@user_id");
+      if (userId) {
+        const response = await axios.post(`${onlineOfflineUrl}`, {
+          user_id: userId,
+          online: newToggleState ? 1 : 0,
+        });
+
+        if (response.status === 200) {
+          fetchData();
+          setUserData((prev) => ({ ...prev, online: newToggleState }));
+        } else if (response.status === 201) {
+          setError("User not found.");
+          navigation.navigate("Login");
+        }
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setError("Failed to update profile. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,6 +123,19 @@ const Home = ({ navigation }) => {
             style={styles.userImage}
           />
 
+          <TouchableOpacity onPress={handleToggle} style={styles.toggleIcon}>
+            <Image
+              source={
+                userData.online == 1
+                  ? require("../images/on.png") // Add your on image
+                  : require("../images/off.png") // Add your toggle-off image
+              }
+              style={{
+                width: 40,
+                height: 40,
+              }}
+            />
+          </TouchableOpacity>
           {/* Logout Icon */}
           <TouchableOpacity onPress={handleLogout} style={styles.logoutIcon}>
             <Image
@@ -149,6 +200,18 @@ const Home = ({ navigation }) => {
                 {userData.nationality ?? "N/A"}
               </Text>
             </View>
+            {/* Supervisors Section */}
+            {supervisors.length > 0 && (
+              <View style={styles.supervisorSection}>
+                <Text style={styles.supervisorHeading}>Supervisors</Text>
+                {supervisors.map((supervisor, index) => (
+                  <View key={index} style={styles.supervisorBox}>
+                    <Text style={styles.infoText}>{supervisor.name}</Text>
+                    <Text style={styles.infoText}>{supervisor.email}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
           </View>
         </View>
 
@@ -339,6 +402,35 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+  },
+  toggleIcon: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+    padding: 10,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  supervisorSection: {
+    marginTop: 20,
+  },
+  supervisorHeading: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  supervisorBox: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    paddingVertical: 8,
   },
   userInfo: {
     alignItems: "center",
