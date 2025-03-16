@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import CountryPicker from "react-native-country-picker-modal";
 
 const CustomTextInput = ({
   value,
   onChangeText,
   placeholder,
   icon,
-  type
+  type,
+  onSelectCountry,
+  selectedCountry,
+  isNumber,
+  keyboardType
 }) => {
+  const [countryModalVisible, setCountryModalVisible] = useState(false);
+
   return (
     <View style={{ marginTop: 10 }}>
       <View
@@ -23,8 +30,27 @@ const CustomTextInput = ({
           paddingRight: 20,
         }}
       >
+        {isNumber && (
+          <TouchableOpacity onPress={() => setCountryModalVisible(true)}>
+            <CountryPicker
+              withFlag
+              withFilter
+              withCallingCode
+              withFlagButton
+              onSelect={(country) => {
+                onSelectCountry(country);
+                setCountryModalVisible(false);
+              }}
+              countryCode={selectedCountry}
+              visible={countryModalVisible}
+            />
+          </TouchableOpacity>
+        )}
         {icon && (
-          <Image source={icon} style={{ width: 24, height: 24, marginLeft: 10 }} />
+          <Image
+            source={icon}
+            style={{ width: 24, height: 24, marginLeft: 10 }}
+          />
         )}
         <TextInput
           clearButtonMode={"always"}
@@ -35,6 +61,7 @@ const CustomTextInput = ({
           placeholder={placeholder}
           secureTextEntry={type ? true : false}
           style={{ marginLeft: 10, width: 200 }}
+          keyboardType={keyboardType ? keyboardType : "default"}
         />
       </View>
     </View>

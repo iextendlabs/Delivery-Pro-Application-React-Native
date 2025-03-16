@@ -6,12 +6,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Image
+  Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LoginUrl } from "../config/Api";
-import axios from 'axios';
+import axios from "axios";
 import messaging from "@react-native-firebase/messaging";
 import Splash from "./Splash";
 import CommonButton from "../common/CommonButton";
@@ -28,22 +28,22 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    typeof unsubscribeOnTokenRefreshed === 'function' && unsubscribeOnTokenRefreshed();
+    typeof unsubscribeOnTokenRefreshed === "function" &&
+      unsubscribeOnTokenRefreshed();
   }, []);
   try {
-
-    const unsubscribeOnTokenRefreshed = messaging().onTokenRefresh((fcmToken) => {
-      console.log('FCM Token:', fcmToken);
-    });
+    const unsubscribeOnTokenRefreshed = messaging().onTokenRefresh(
+      (fcmToken) => {
+        console.log("FCM Token:", fcmToken);
+      }
+    );
 
     messaging()
       .getToken()
-      .then(fcmToken => {
+      .then((fcmToken) => {
         setFcmToken(fcmToken);
       });
-  } catch (error) {
-
-  }
+  } catch (error) {}
 
   const handleLogin = async () => {
     setLoading(true);
@@ -73,16 +73,19 @@ const Login = () => {
         password: password,
         fcmToken: fcmToken,
       });
-      
+
       if (response.status === 200) {
         const userId = response.data.user.id;
         const accessToken = response.data.access_token;
         const notifications = response.data.notifications;
 
         // Store access token in AsyncStorage
-        await AsyncStorage.setItem('@access_token', accessToken);
-        await AsyncStorage.setItem('@user_id', String(userId));
-        await AsyncStorage.setItem("@notifications", JSON.stringify(notifications));
+        await AsyncStorage.setItem("@access_token", accessToken);
+        await AsyncStorage.setItem("@user_id", String(userId));
+        await AsyncStorage.setItem(
+          "@notifications",
+          JSON.stringify(notifications)
+        );
 
         const headers = {
           Authorization: `Bearer ${accessToken}`,
@@ -98,7 +101,6 @@ const Login = () => {
       setError("These credentials do not match our records.");
     }
     setLoading(false);
-
   };
 
   if (loading) {
@@ -169,10 +171,23 @@ const Login = () => {
             handleLogin();
           }}
         />
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: "600",
+            alignSelf: "center",
+            marginTop: 20,
+            textDecorationLine: "underline",
+          }}
+          onPress={() => {
+            navigation.navigate("Signup");
+          }}
+        >
+          Create New Account?
+        </Text>
       </View>
     </ScrollView>
   );
 };
-
 
 export default Login;

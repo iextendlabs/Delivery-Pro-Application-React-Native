@@ -190,8 +190,7 @@ const OrdersList = () => {
 
   return (
     <View style={styles.container}>
-      <Header title="Orders" />
-      <Text style={styles.heading}>Today's Orders</Text>
+      <Header title="Today's Orders" />
       <View style={styles.statusContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {statusTabs.map((s) => (

@@ -16,10 +16,17 @@ import Holidays from "./components/screens/Holidays";
 import HolidayModal from "./components/screens/HolidayModal";
 import Orders from "./components/screens/Orders";
 import Splash from "./components/screens/Splash";
-import * as Notifications from 'expo-notifications';
+import * as Notifications from "expo-notifications";
 import WithdrawModal from "./components/screens/WithdrawModal";
 import Withdraws from "./components/screens/Withdraws";
 import EditProfile from "./components/screens/EditProfile";
+import DepositModal from "./components/screens/DepositModal";
+import { StripeProvider } from "@stripe/stripe-react-native";
+import { stripe_publishable_key } from "./components/config/Api";
+import TermsCondition from "./components/common/TermsCondition";
+import Signup from "./components/screens/Signup";
+import PrivacyPolicy from "./components/common/PrivacyPolicy";
+import MembershipPlans from "./components/screens/MembershipPlans";
 
 const Stack = createStackNavigator();
 
@@ -99,17 +106,18 @@ const App = () => {
     try {
       const { status } = await Notifications.getPermissionsAsync();
 
-      if (status !== 'granted') {
-        const { status: newStatus } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        const { status: newStatus } =
+          await Notifications.requestPermissionsAsync();
 
-        if (newStatus !== 'granted') {
-          console.log('Notification permission denied');
+        if (newStatus !== "granted") {
+          console.log("Notification permission denied");
           Alert.alert(
-            'Notification Permission Required',
-            'To receive notifications, please enable notification permissions in your device settings.',
+            "Notification Permission Required",
+            "To receive notifications, please enable notification permissions in your device settings.",
             [
               {
-                text: 'OK',
+                text: "OK",
                 onPress: () => {
                   Linking.openSettings();
                 },
@@ -118,11 +126,11 @@ const App = () => {
           );
         }
       }
-    } catch (error) { 
-      console.error('Error checking notification permission:', error);
+    } catch (error) {
+      console.error("Error checking notification permission:", error);
     }
   };
-  
+
   const showConnectionAlert = () => {
     Alert.alert(
       "No Internet Connection",
@@ -170,83 +178,110 @@ const App = () => {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={initialRoute}
-        screenOptions={{
-          headerBackground: () => (
-            <ImageBackground
-              source={require("./components/images/rotated_logo.png")}
-              style={{
-                position: "absolute",
-                top: 1,
-                left: 0,
-                width: 150,
-                height: 100,
-                zIndex: 1,
-              }}
-            />
-          ),
-          headerTintColor: "#000",
-        }}
-      >
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="Login"
-          component={Login}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="Notification"
-          component={Notification}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="Home"
-          component={Home}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="Transactions"
-          component={Transactions}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="OrderList"
-          component={OrderList}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="Orders"
-          component={Orders}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="Holidays"
-          component={Holidays}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="HolidayModal"
-          component={HolidayModal}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="WithdrawModal"
-          component={WithdrawModal}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="Withdraws"
-          component={Withdraws}
-        />
-        <Stack.Screen
-          options={{ headerShown: false }}
-          name="EditProfile"
-          component={EditProfile}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <StripeProvider publishableKey={stripe_publishable_key}>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName={initialRoute}
+          screenOptions={{
+            headerBackground: () => (
+              <ImageBackground
+                source={require("./components/images/rotated_logo.png")}
+                style={{
+                  position: "absolute",
+                  top: 1,
+                  left: 0,
+                  width: 150,
+                  height: 100,
+                  zIndex: 1,
+                }}
+              />
+            ),
+            headerTintColor: "#000",
+          }}
+        >
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Login"
+            component={Login}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Signup"
+            component={Signup}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Notification"
+            component={Notification}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Home"
+            component={Home}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Transactions"
+            component={Transactions}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="OrderList"
+            component={OrderList}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Orders"
+            component={Orders}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Holidays"
+            component={Holidays}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="HolidayModal"
+            component={HolidayModal}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="WithdrawModal"
+            component={WithdrawModal}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="Withdraws"
+            component={Withdraws}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="EditProfile"
+            component={EditProfile}
+          />
+          <Stack.Screen
+            options={{ title: "Deposit" }}
+            name="DepositModal"
+            component={DepositModal}
+          />
+          <Stack.Screen
+            options={{ title: "Terms & Condition" }}
+            name="TermsCondition"
+            component={TermsCondition}
+          />
+          <Stack.Screen
+            options={{ title: "Privacy Policy" }}
+            name="PrivacyPolicy"
+            component={PrivacyPolicy}
+          />
+          <Stack.Screen
+            options={{ title: "Membership Plans" }}
+            name="MembershipPlans"
+            component={MembershipPlans}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </StripeProvider>
   );
 };
 
