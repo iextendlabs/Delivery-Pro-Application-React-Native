@@ -27,6 +27,9 @@ import TermsCondition from "./components/common/TermsCondition";
 import Signup from "./components/screens/Signup";
 import PrivacyPolicy from "./components/common/PrivacyPolicy";
 import MembershipPlans from "./components/screens/MembershipPlans";
+import QuoteListScreen from "./components/screens/QuoteListScreen";
+import ViewQuoteScreen from "./components/screens/ViewQuoteScreen";
+import BidsScreen from "./components/screens/BidsScreen";
 
 const Stack = createStackNavigator();
 
@@ -278,6 +281,21 @@ const App = () => {
             options={{ title: "Membership Plans" }}
             name="MembershipPlans"
             component={MembershipPlans}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="QuoteListScreen"
+            component={QuoteListScreen}
+          />
+          <Stack.Screen
+            options={{ title: "Quote" }}
+            name="ViewQuote"
+            component={ViewQuoteScreen}
+          />
+          <Stack.Screen
+            options={{ title: "Bid" }}
+            name="BidsScreen"
+            component={BidsScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>

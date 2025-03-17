@@ -97,7 +97,7 @@ export default function Footer() {
             alignItems: "center",
           }}
           onPress={() => {
-            navigation.navigate("Holidays");
+            navigation.navigate("QuoteListScreen");
           }}
         >
           <Image
@@ -105,7 +105,7 @@ export default function Footer() {
             style={{
               width: 24,
               height: 24,
-              tintColor: route.name == "Holidays" ? "#000" : "#8e8e8e",
+              tintColor: route.name == "QuoteListScreen" ? "#000" : "#8e8e8e",
             }}
           />
         </TouchableOpacity>
