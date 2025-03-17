@@ -236,15 +236,30 @@ const BidsScreen = () => {
       fetchChat(bidId);
     } catch (error) {
       console.error("Error sending message:", error);
-      Alert.alert("Error", "Failed to send message.");
     }
 
     setIsSubmit(false);
   };
 
-  const handleSaveBid = () => {
-    console.log("Updated Bid Amount:", updatedBidAmount);
+  const handleSaveBid = async () => {
+    if (!updatedBidAmount) return;
+    setLoading(true);
+    try {
+      const response = await axios.post(`${BaseUrl}api/bid/${bidId}/update`, {
+        user_id: userId,
+        bid_amount: updatedBidAmount,
+      });
+      if (response.status === 200) {
+        setUpdatedBidAmount("");
+        fetchQuoteAndBid();
+      } else {
+        throw new Error("Failed to Accepted order.");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
     setIsUpdatingBid(false);
+    setLoading(false);
   };
   if (loading) return <Splash />;
 
@@ -286,6 +301,7 @@ const BidsScreen = () => {
                   <CustomTextInput
                     placeholder={"Enter new bid amount"}
                     value={updatedBidAmount}
+                    keyboardType="numeric"
                     onChangeText={(txt) => {
                       setUpdatedBidAmount(txt);
                     }}
@@ -302,9 +318,12 @@ const BidsScreen = () => {
                   <CommonButton
                     disabled={loading}
                     title="Close"
-                    bgColor="#fd245f"
+                    bgColor="#000"
                     textColor="#fff"
-                    onPress={() => setIsUpdatingBid(false)}
+                    onPress={() => {
+                      setIsUpdatingBid(false);
+                      setUpdatedBidAmount("");
+                    }}
                   />
                 </View>
               ) : (

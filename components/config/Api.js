@@ -1,4 +1,4 @@
-const BaseUrl = "https://lipslay.com/";
+const BaseUrl = "https://test.lipslay.com/";
 
 const IndexUrl = BaseUrl + "api/index?";
 const OrderUrl = BaseUrl + "api/ordersV2?";
