@@ -11,7 +11,8 @@ import {
   Modal,
   Pressable,
   Linking,
-  FlatList, // Import Linking
+  FlatList,
+  ActivityIndicator, // Import Linking
 } from "react-native";
 import axios from "axios";
 import { BaseUrl } from "../config/Api";
@@ -23,6 +24,8 @@ import Splash from "./Splash";
 import BidStyle from "../styles/BidStyle";
 import CustomTextInput from "../common/CustomTextInput";
 import CommonButton from "../common/CommonButton";
+import LocationElement from "../modules/LocationElement";
+import * as Location from "expo-location";
 
 const BidsScreen = () => {
   const route = useRoute();
@@ -41,7 +44,7 @@ const BidsScreen = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [isSubmit, setIsSubmit] = useState(false);
-  const [showBidContainer, setShowBidContainer] = useState(true);
+  const [showBidContainer, setShowBidContainer] = useState(false);
   const [isUpdatingBid, setIsUpdatingBid] = useState(false);
   const [updatedBidAmount, setUpdatedBidAmount] = useState("");
 
@@ -206,12 +209,32 @@ const BidsScreen = () => {
     });
 
     if (!result.cancelled) {
-      sendMessage(result.assets[0].uri);
+      sendMessage(result.assets[0].uri, null);
     }
   };
 
-  const sendMessage = async (imageUri = null) => {
-    if (!message.trim() && !imageUri) return;
+  const handleLocation = async () => {
+    setIsSubmit(true);
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      const locationString = `${latitude},${longitude}`;
+
+      sendMessage(null, locationString);
+    } catch (error) {
+      setIsSubmit(false);
+      console.error("Error getting location:", error);
+    }
+  };
+
+  const sendMessage = async (imageUri = null, location = null) => {
+    if (!message.trim() && !imageUri && !location) return;
     setIsSubmit(true);
     const formData = new FormData();
     formData.append("sender_id", userId);
@@ -222,6 +245,9 @@ const BidsScreen = () => {
         name: `photo.${fileType}`,
         type: `image/${fileType}`,
       });
+    } else if (location) {
+      formData.append("message", location);
+      formData.append("location", true);
     } else {
       formData.append("message", message);
     }
@@ -396,8 +422,21 @@ const BidsScreen = () => {
                         View File
                       </Text>
                     </Text>
+                  ) : msg.location == 1 ? ( // <-- Fixed nested ternary here
+                    (() => {
+                      // Split the message into latitude and longitude
+                      const [latitude, longitude] = msg.message.split(",");
+                      return (
+                        <LocationElement
+                          latitude={latitude.trim()} // Trim to remove spaces
+                          longitude={longitude.trim()}
+                          address={""}
+                          showAddress={false}
+                        />
+                      );
+                    })()
                   ) : (
-                    msg.message
+                    <Text>{msg.message}</Text> // <-- Wrapped text in <Text> to avoid errors
                   )}
                 </Text>
               </View>
@@ -408,9 +447,19 @@ const BidsScreen = () => {
             <TouchableOpacity
               style={styles.attachmentButton}
               onPress={pickImage}
+              disabled={isSubmit}
             >
-              <Ionicons name="attach" size={20} color="#28a745" />
+              <Ionicons name="attach" size={20} color={isSubmit ? "#ccc" : "#28a745"} />
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.attachmentButton}
+              onPress={handleLocation}
+              disabled={isSubmit}
+            >
+              <Ionicons name="location" size={20} color={isSubmit ? "#ccc" : "#28a745"} />
+            </TouchableOpacity>
+
             <TextInput
               style={styles.chatInput}
               placeholder="Type a message..."
@@ -422,7 +471,11 @@ const BidsScreen = () => {
               onPress={() => sendMessage()}
               disabled={isSubmit}
             >
-              <Ionicons name="send" size={20} color="#fff" />
+              {isSubmit ? (
+                <ActivityIndicator size="small" color="#fff" /> // Show loader when submitting
+              ) : (
+                <Ionicons name="send" size={20} color="#fff" />
+              )}
             </TouchableOpacity>
           </View>
         </>

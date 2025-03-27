@@ -102,6 +102,7 @@ const BidStyle = {
     flex: 1,
     paddingLeft: 16,
     paddingRight: 16,
+    marginTop:16
   },
   messageContainer: {
     padding: 10,
@@ -183,6 +184,7 @@ const BidStyle = {
     backgroundColor: "#fff",
     padding: 16,
     margin: 16,
+    marginBottom: 0,
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

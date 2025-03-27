@@ -151,7 +151,7 @@ const QuoteListStyle = {
     color: "#666",
   },
   optionsContainer: {
-    marginTop: 8,
+    margin: 8,
   },
   optionText: {
     fontSize: 14,
@@ -201,6 +201,25 @@ const QuoteListStyle = {
     height: 1,
     backgroundColor: "#FFCACC",
     marginVertical: 16,
+  },
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  bullet: {
+    fontSize: 16,
+    marginRight: 5,
+  },
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  locationText: {
+    marginLeft: 3,
+    fontSize: 14,
+    color: "#333",
   },
 };
 

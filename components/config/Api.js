@@ -1,4 +1,4 @@
-const BaseUrl = "https://test.lipslay.com/";
+const BaseUrl = "https://lipslay.com/";
 
 const IndexUrl = BaseUrl + "api/index?";
 const OrderUrl = BaseUrl + "api/ordersV2?";
@@ -27,9 +27,9 @@ const SignupUrl = BaseUrl + "api/staffSignup";
 const getQuotesUrl = BaseUrl + "api/getStaffQuotes?";
 const quoteStatusUpdateUrl = BaseUrl + "api/quotes/update-status";
 
-const stripe_publishable_key = "pk_test_51OrKDSLOkaB2VOci1EiX49C8YbaO8tNF1EUx8BEtdQkBDOKuHM7pvpKhs1mipwX2igoyLhwCq65xz7SHkZAfmW5B00XcTqrdg6";
+// const stripe_publishable_key = "pk_test_51OrKDSLOkaB2VOci1EiX49C8YbaO8tNF1EUx8BEtdQkBDOKuHM7pvpKhs1mipwX2igoyLhwCq65xz7SHkZAfmW5B00XcTqrdg6";
 
-// const stripe_publishable_key = "pk_live_51OrKDSLOkaB2VOcifspcDKluVndJMmPogfgJZnpQY49Ejb0iykwEdjYygo7WVDjPUvma4y84a8xveeg9dnG6nEG300b0vXwIsR";
+const stripe_publishable_key = "pk_live_51OrKDSLOkaB2VOcifspcDKluVndJMmPogfgJZnpQY49Ejb0iykwEdjYygo7WVDjPUvma4y84a8xveeg9dnG6nEG300b0vXwIsR";
 export {
   OrderUrl,
   LoginUrl,

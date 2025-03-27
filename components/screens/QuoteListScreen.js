@@ -17,6 +17,7 @@ import Splash from "./Splash";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import QuoteListStyle from "../styles/QuoteListStyle";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const QuoteListScreen = ({ navigation }) => {
   const [quotes, setQuotes] = useState([]);
@@ -71,7 +72,10 @@ const QuoteListScreen = ({ navigation }) => {
 
   // Handle Accept button click
   const handleAccept = async (quote, status) => {
-    const { quote_amount, quote_commission } = quote.staffs[0].pivot;
+    const pivot = quote.staffs[0]?.pivot || {};
+    const quote_amount = pivot.quote_amount ?? 0;
+    const quote_commission = pivot.quote_commission ?? 0;
+
 
     const message =
       status === "Accepted"
@@ -114,7 +118,17 @@ const QuoteListScreen = ({ navigation }) => {
   };
 
   const renderQuoteItem = ({ item }) => {
-    const { bid, staffs, service, user, sourcing_quantity, created_at } = item;
+    const {
+      id,
+      bid,
+      staffs,
+      service,
+      user,
+      sourcing_quantity,
+      created_at,
+      show_quote_detail,
+      location,
+    } = item;
     const { status, quote_amount, quote_commission } = staffs[0].pivot;
 
     return (
@@ -136,6 +150,9 @@ const QuoteListScreen = ({ navigation }) => {
           </View>
         </View>
         <Text style={styles.senderText}>
+          <Text style={styles.boldText}>Id #:</Text> {id}
+        </Text>
+        <Text style={styles.senderText}>
           <Text style={styles.boldText}>Send by:</Text>{" "}
           {user?.name || "Unknown"}
         </Text>
@@ -143,16 +160,20 @@ const QuoteListScreen = ({ navigation }) => {
           <Text style={styles.boldText}>Status:</Text> {status}
         </Text>
         <Text style={styles.statusText}>
-          <Text style={styles.boldText}>Quote Amount:</Text> {quote_amount}AED
+          <Text style={styles.boldText}>Quote Amount:</Text> AED {quote_amount ?? 0}
         </Text>
         <Text style={styles.statusText}>
-          <Text style={styles.boldText}>Commission:</Text> {quote_commission}%
+          <Text style={styles.boldText}>Commission:</Text> {quote_commission ?? 0}%
         </Text>
         <Text style={styles.dateText}>
           <Text style={styles.boldText}>Date Added:</Text>{" "}
           {formatDate(created_at)}
         </Text>
-
+        {show_quote_detail == "1" && status == "Accepted" && (
+          <Text style={styles.statusText}>
+            <Text style={styles.boldText}>Location:</Text> {location}
+          </Text>
+        )}
         {bid && (
           <View style={styles.centeredContainer}>
             <View
@@ -180,12 +201,22 @@ const QuoteListScreen = ({ navigation }) => {
           {(bid === null || (bid && bid.staff_id === userId)) &&
             status === "Accepted" && (
               <TouchableOpacity
-                style={styles.actionButton}
+                style={[
+                  styles.actionButton,
+                  item.bid_status === true && { backgroundColor: "#ffbf0b" },
+                ]}
                 onPress={() =>
                   navigation.navigate("BidsScreen", { quoteId: item.id })
                 }
               >
-                <Text style={styles.actionButtonText}>Bids</Text>
+                {item.bid_status == true ? (
+                  <Text style={styles.actionButtonText}>
+                    <Icon name="comments" size={24} color="#fff" />
+                    Chat
+                  </Text>
+                ) : (
+                  <Text style={styles.actionButtonText}>Bids</Text>
+                )}
               </TouchableOpacity>
             )}
         </View>

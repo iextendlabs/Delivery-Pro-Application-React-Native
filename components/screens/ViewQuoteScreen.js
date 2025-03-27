@@ -101,6 +101,7 @@ const ViewQuoteScreen = () => {
                     latitude={null}
                     longitude={null}
                     address={quote.location}
+                    showAddress={true}
                   />
                 )}
               </>
@@ -131,15 +132,18 @@ const ViewQuoteScreen = () => {
             </View>
           </View>
 
-          {quote.serviceOption && (
+          <ScrollView>
             <View style={styles.optionsContainer}>
-              {quote.serviceOption.map((option, index) => (
-                <Text key={index} style={styles.optionText}>
-                  {option.option_name} - ${option.option_price}
-                </Text>
+              {quote.service_option.map((option, index) => (
+                <View key={index} style={styles.listItem}>
+                  <Text style={styles.bullet}>•</Text>
+                  <Text style={styles.optionText}>
+                    {option.option_name} - ${option.option_price}
+                  </Text>
+                </View>
               ))}
             </View>
-          )}
+          </ScrollView>
         </View>
 
         <View style={styles.divider} />
