@@ -18,6 +18,9 @@ import CommonButton from "../common/CommonButton";
 import HomeStyle from "../styles/HomeStyle";
 import ProfileCard from "./components/ProfileCard";
 import HomeMenu from "./components/HomeMenu";
+import VersionCheck from "react-native-version-check";
+import UpdateModal from "../common/UpdateModal";
+import Constants from "expo-constants";
 
 const Home = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
@@ -27,10 +30,35 @@ const Home = ({ navigation }) => {
   const [user, setUser] = useState(false);
   const [userMessage, setUserMessage] = useState("");
   const [planExpire, setPlanExpire] = useState(false);
+  const [updateModalVisible, setUpdateModalVisible] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(true);
+  const [version, setVersion] = useState("");
 
   useEffect(() => {
     fetchData();
+    checkForUpdate();
   }, []);
+
+  const checkForUpdate = async () => {
+    try {
+      const latestVersion = await VersionCheck.getLatestVersion({
+        provider: "playStore",
+        packageName: "com.forexleo.lipslaystaff",
+      });
+
+      const currentVersion = Constants.expoConfig.version;
+      setVersion(currentVersion);
+      if (latestVersion !== currentVersion) {
+        setUpdateModalVisible(true);
+        setIsUpdate(true);
+      } else {
+        setIsUpdate(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   const fetchData = async () => {
     const userId = await AsyncStorage.getItem("@user_id");
@@ -185,6 +213,7 @@ const Home = ({ navigation }) => {
           handleLogout={handleLogout}
           handleEdit={handleEdit}
           supervisors={supervisors}
+          version={version}
         />
 
         {/* Round Icons Section */}
@@ -262,6 +291,11 @@ const Home = ({ navigation }) => {
           />
         </View>
       </ScrollView>
+      <UpdateModal
+        visible={updateModalVisible}
+        setUpdateModalVisible={setUpdateModalVisible}
+        setIsUpdate={setIsUpdate}
+      />
       <Footer />
     </View>
   );

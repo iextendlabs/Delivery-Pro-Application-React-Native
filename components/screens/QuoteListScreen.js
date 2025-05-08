@@ -6,9 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ScrollView,
   RefreshControl,
-  Alert, // Add Alert
+  Alert,
+  Modal,
+  Platform,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,15 +19,25 @@ import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import QuoteListStyle from "../styles/QuoteListStyle";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { formatDistanceToNow, isToday, parseISO, format } from "date-fns";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const QuoteListScreen = ({ navigation }) => {
   const [quotes, setQuotes] = useState([]);
+  const [filteredQuotes, setFilteredQuotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    status: "All",
+    dateFrom: null,
+    dateTo: null,
+    todayOnly: false,
+  });
+  const [showDatePicker, setShowDatePicker] = useState(null);
 
-  // Fetch quotes
   const fetchQuotes = async () => {
     setLoading(true);
     setError("");
@@ -38,6 +49,7 @@ const QuoteListScreen = ({ navigation }) => {
 
       if (response.status === 200) {
         setQuotes(response.data.quotes);
+        setFilteredQuotes(response.data.quotes);
       } else {
         setError("Failed to fetch quotes. Please try again.");
       }
@@ -50,39 +62,87 @@ const QuoteListScreen = ({ navigation }) => {
     }
   };
 
+  const applyFilters = () => {
+    let result = [...quotes];
+  
+    if (filters.status !== "All") {
+      result = result.filter(
+        (quote) => quote.staffs[0].pivot.status === filters.status
+      );
+    }
+  
+    if (filters.todayOnly) {
+      result = result.filter((quote) =>
+        isToday(parseISO(quote.created_at))
+      );
+    }
+  
+    if (filters.dateFrom && filters.dateTo) {
+      result = result.filter((quote) => {
+        const quoteDate = new Date(quote.created_at);
+        const startDate = new Date(filters.dateFrom);
+        const endDate = new Date(filters.dateTo);
+        
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+        quoteDate.setHours(12, 0, 0, 0);
+        
+        return quoteDate >= startDate && quoteDate <= endDate;
+      });
+    }
+  
+    setFilteredQuotes(result);
+  };
+
   useEffect(() => {
     fetchQuotes();
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [filters, quotes]);
 
   const onRefresh = () => {
     setRefreshing(true);
     fetchQuotes();
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
+  const handleDateChange = (event, selectedDate) => {
+    setShowDatePicker(null);
+    if (selectedDate) {
+      setFilters({
+        ...filters,
+        [showDatePicker === "from" ? "dateFrom" : "dateTo"]: selectedDate,
+        todayOnly: false, // Disable today filter when selecting custom dates
+      });
+    }
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      status: "All",
+      dateFrom: null,
+      dateTo: null,
+      todayOnly: false,
     });
   };
 
-  // Handle Accept button click
+  const formatDateDisplay = (date) => {
+    if (!date) return "Select date";
+    return format(date, "MMM dd, yyyy");
+  };
+
   const handleAccept = async (quote, status) => {
     const pivot = quote.staffs[0]?.pivot || {};
     const quote_amount = pivot.quote_amount ?? 0;
     const quote_commission = pivot.quote_commission ?? 0;
 
-
     const message =
       status === "Accepted"
-        ? `Are you sure you want to accept this quote? Upon acceptance, your balance will be adjusted by ${quote_amount} AED. If you win the bid, ${quote_commission}% of your bid value will be deducted from your balance.`
-        : "Are you sure you want to reject this quote?";
+        ? `Accept this quote? Your balance will be adjusted by ${quote_amount} AED. If you win, ${quote_commission}% will be deducted.`
+        : "Reject this quote?";
 
-    Alert.alert("Confirm Acceptance", message, [
+    Alert.alert("Confirm", message, [
       {
         text: "Cancel",
         style: "cancel",
@@ -94,21 +154,18 @@ const QuoteListScreen = ({ navigation }) => {
           try {
             const response = await axios.post(quoteStatusUpdateUrl, {
               id: quote.id,
-              user_id: userId, // Ensure userId is correctly defined in your component state
+              user_id: userId,
               status: status,
             });
 
             if (response.status === 200) {
               Alert.alert("Success", response.data.message);
-              fetchQuotes(); // Refresh data after successful update
+              fetchQuotes();
             } else if (response.status === 201) {
               Alert.alert("Error", response.data.error);
             }
           } catch (error) {
-            Alert.alert(
-              "Error",
-              "An error occurred while updating the quote status."
-            );
+            Alert.alert("Error", "Failed to update quote status.");
             console.error("Error updating quote:", error);
           }
           setLoading(false);
@@ -132,111 +189,118 @@ const QuoteListScreen = ({ navigation }) => {
     const { status, quote_amount, quote_commission } = staffs[0].pivot;
 
     return (
-      <View style={styles.quoteItem}>
-        <View style={styles.serviceContainer}>
+      <View style={styles.quoteCard}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ViewQuote", { quote: item })}
+          style={styles.quoteContent}
+        >
           {service.image && (
             <Image
               source={{ uri: `${BaseUrl}service-images/${service.image}` }}
-              style={styles.serviceImage}
+              style={styles.quoteServiceImage}
             />
           )}
-          <View style={styles.serviceDetails}>
-            <Text style={styles.serviceName}>{item.service_name}</Text>
-            {sourcing_quantity && (
-              <Text style={styles.quantityText}>
-                {sourcing_quantity} Quantity
+
+          <View style={styles.quoteMain}>
+            <View style={styles.quoteHeader}>
+              <Text style={styles.quoteServiceName} numberOfLines={1}>
+                {item.service_name}
               </Text>
-            )}
-          </View>
-        </View>
-        <Text style={styles.senderText}>
-          <Text style={styles.boldText}>Id #:</Text> {id}
-        </Text>
-        <Text style={styles.senderText}>
-          <Text style={styles.boldText}>Send by:</Text>{" "}
-          {user?.name || "Unknown"}
-        </Text>
-        <Text style={styles.statusText}>
-          <Text style={styles.boldText}>Status:</Text> {status}
-        </Text>
-        <Text style={styles.statusText}>
-          <Text style={styles.boldText}>Quote Amount:</Text> AED {quote_amount ?? 0}
-        </Text>
-        <Text style={styles.statusText}>
-          <Text style={styles.boldText}>Commission:</Text> {quote_commission ?? 0}%
-        </Text>
-        <Text style={styles.dateText}>
-          <Text style={styles.boldText}>Date Added:</Text>{" "}
-          {formatDate(created_at)}
-        </Text>
-        {show_quote_detail == "1" && status == "Accepted" && (
-          <Text style={styles.statusText}>
-            <Text style={styles.boldText}>Location:</Text> {location}
-          </Text>
-        )}
-        {bid && (
-          <View style={styles.centeredContainer}>
-            <View
-              style={[
-                styles.badge,
-                bid.staff_id === userId ? styles.success : styles.danger,
-              ]}
-            >
-              <Text style={styles.badgeText}>
-                {bid.staff_id === userId
-                  ? "You have won the bid"
-                  : "Another staff member has won the bid"}
+              <Text style={styles.timeText}>
+                {formatDistanceToNow(new Date(created_at), { addSuffix: true })}
               </Text>
             </View>
-          </View>
-        )}
 
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => navigation.navigate("ViewQuote", { quote: item })}
-          >
-            <Text style={styles.actionButtonText}>View Detail</Text>
-          </TouchableOpacity>
+            <View style={styles.quoteMeta}>
+              {show_quote_detail == "1" &&
+                status == "Accepted" && (
+                  <Text style={styles.metaText} numberOfLines={1}>
+                    <Text style={styles.boldText}>From:</Text>{" "}
+                    {user?.name || "Unknown"}
+                  </Text>
+                )}
+
+              {sourcing_quantity && (
+                <Text style={styles.metaText}>
+                  <Text style={styles.boldText}>Qty:</Text> {sourcing_quantity}
+                </Text>
+              )}
+            </View>
+
+            <View style={styles.statusContainer}>
+              <View
+                style={[
+                  styles.statusBadge,
+                  status === "Accepted" && styles.statusAccepted,
+                  status === "Rejected" && styles.statusRejected,
+                  status === "Pending" && styles.statusPending,
+                ]}
+              >
+                <Text style={styles.quoteStatusText}>{status}</Text>
+              </View>
+
+              {bid && (
+                <View
+                  style={[
+                    styles.bidBadge,
+                    bid.staff_id === userId ? styles.bidWon : styles.bidLost,
+                  ]}
+                >
+                  <Text style={styles.bidText}>
+                    {bid.staff_id === userId ? "You won" : "Bid lost"}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </TouchableOpacity>
+
+        {/* Action Buttons */}
+        <View style={styles.actionContainer}>
           {(bid === null || (bid && bid.staff_id === userId)) &&
             status === "Accepted" && (
               <TouchableOpacity
                 style={[
-                  styles.actionButton,
-                  item.bid_status === true && { backgroundColor: "#ffbf0b" },
+                  styles.actionBtn,
+                  item.bid_status === true && styles.chatBtn,
                 ]}
                 onPress={() =>
                   navigation.navigate("BidsScreen", { quoteId: item.id })
                 }
               >
                 {item.bid_status == true ? (
-                  <Text style={styles.actionButtonText}>
-                    <Icon name="comments" size={24} color="#fff" />
-                    Chat
-                  </Text>
+                  <View style={styles.chatBtnContent}>
+                    <Icon
+                      name="comments"
+                      size={16}
+                      color="#fff"
+                      style={styles.chatIcon}
+                    />
+                    <Text style={styles.actionBtnText}>Chat</Text>
+                  </View>
                 ) : (
-                  <Text style={styles.actionButtonText}>Bids</Text>
+                  <Text style={styles.actionBtnText}>Place Bid</Text>
                 )}
               </TouchableOpacity>
             )}
-        </View>
 
-        {bid === null && status === "Pending" && (
-          <View style={styles.statusButtons}>
-            <TouchableOpacity
-              style={[styles.statusButton, styles.success]}
-              onPress={() => handleAccept(item, "Accepted")}
-            >
-              <Text style={styles.actionButtonText}>Accept</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.statusButton, styles.danger]}
-              onPress={() => handleAccept(item, "Rejected")}
-            >
-              <Text style={styles.actionButtonText}>Reject</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          {bid === null && status === "Pending" && (
+            <View style={styles.statusActions}>
+              <TouchableOpacity
+                style={[styles.statusBtn, styles.acceptBtn]}
+                onPress={() => handleAccept(item, "Accepted")}
+              >
+                <Text style={styles.statusBtnText}>Accept</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.statusBtn, styles.rejectBtn]}
+                onPress={() => handleAccept(item, "Rejected")}
+              >
+                <Text style={styles.statusBtnText}>Reject</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
       </View>
     );
   };
@@ -251,27 +315,161 @@ const QuoteListScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Header title="Home" />
-      <ScrollView
+      <Header title="Quotes" />
+
+      {/* Filter Button */}
+      <TouchableOpacity
+        style={styles.filterButton}
+        onPress={() => setShowFilters(true)}
+      >
+        <Icon name="filter" size={18} color="#fff" />
+        <Text style={styles.filterButtonText}>Filters</Text>
+      </TouchableOpacity>
+
+      <FlatList
+        data={filteredQuotes}
+        renderItem={renderQuoteItem}
+        keyExtractor={(item) => item.id.toString()}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[styles.listContent, { paddingBottom: 55 }]}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyText}>No quotes match your filters</Text>
+            <TouchableOpacity onPress={resetFilters}>
+              <Text style={styles.resetFilterText}>Reset filters</Text>
+            </TouchableOpacity>
+          </View>
+        }
+        ListHeaderComponent={
+          filteredQuotes.length > 0 && (
+            <Text style={styles.filterResultsText}>
+              Showing {filteredQuotes.length} of {quotes.length} quotes
+            </Text>
+          )
+        }
+      />
+
+      {/* Filter Modal */}
+      <Modal
+        visible={showFilters}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowFilters(false)}
       >
-        <View style={{ paddingHorizontal: 16, marginBottom: 40 }}>
-          {quotes.length > 0 ? (
-            <FlatList
-              data={quotes}
-              renderItem={renderQuoteItem}
-              keyExtractor={(item) => item.id.toString()}
-              scrollEnabled={false}
-              showsVerticalScrollIndicator={false}
-            />
-          ) : (
-            <Text style={styles.noQuotesText}>There are no quotes.</Text>
-          )}
+        <View style={styles.modalOverlay}>
+          <View style={styles.filterModal}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Filter Quotes</Text>
+              <TouchableOpacity onPress={() => setShowFilters(false)}>
+                <Icon name="times" size={20} color="#666" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Status Filter */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterLabel}>Status</Text>
+              <View style={styles.statusFilterOptions}>
+                {["All", "Accepted", "Rejected", "Pending"].map((status) => (
+                  <TouchableOpacity
+                    key={status}
+                    style={[
+                      styles.statusOption,
+                      filters.status === status && styles.statusOptionSelected,
+                    ]}
+                    onPress={() => setFilters({ ...filters, status })}
+                  >
+                    <Text
+                      style={[
+                        styles.statusOptionText,
+                        filters.status === status &&
+                          styles.statusOptionTextSelected,
+                      ]}
+                    >
+                      {status}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* Date Range Filter */}
+            <View style={styles.filterSection}>
+              <Text style={styles.filterLabel}>Date Range</Text>
+              <View style={styles.dateRangeContainer}>
+                <TouchableOpacity
+                  style={styles.dateInput}
+                  onPress={() => setShowDatePicker("from")}
+                >
+                  <Text>{formatDateDisplay(filters.dateFrom)}</Text>
+                  <Icon name="calendar" size={16} color="#666" />
+                </TouchableOpacity>
+                <Text style={styles.dateRangeSeparator}>to</Text>
+                <TouchableOpacity
+                  style={styles.dateInput}
+                  onPress={() => setShowDatePicker("to")}
+                >
+                  <Text>{formatDateDisplay(filters.dateTo)}</Text>
+                  <Icon name="calendar" size={16} color="#666" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Today Filter */}
+            <View style={styles.filterSection}>
+              <TouchableOpacity
+                style={styles.todayFilter}
+                onPress={() =>
+                  setFilters({
+                    ...filters,
+                    todayOnly: !filters.todayOnly,
+                    dateFrom: null,
+                    dateTo: null,
+                  })
+                }
+              >
+                <View style={styles.checkbox}>
+                  {filters.todayOnly && (
+                    <Icon name="check" size={14} color="#fff" />
+                  )}
+                </View>
+                <Text style={styles.todayFilterText}>Today's quotes only</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Action Buttons */}
+            <View style={styles.filterActions}>
+              <TouchableOpacity
+                style={[styles.filterActionButton, styles.resetButton]}
+                onPress={resetFilters}
+              >
+                <Text style={styles.resetButtonText}>Reset</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.filterActionButton, styles.applyButton]}
+                onPress={() => setShowFilters(false)}
+              >
+                <Text style={styles.applyButtonText}>Apply</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
-      </ScrollView>
+      </Modal>
+
+      {/* Date Picker */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={
+            filters[showDatePicker === "from" ? "dateFrom" : "dateTo"] ||
+            new Date()
+          }
+          mode="date"
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={handleDateChange}
+        />
+      )}
+
       <Footer />
     </View>
   );

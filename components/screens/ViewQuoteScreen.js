@@ -84,12 +84,12 @@ const ViewQuoteScreen = () => {
 
         {/* User Info */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            Send by {quote.user?.name || "N/A"}
-          </Text>
           {quote.show_quote_detail == "1" &&
             quote.staffs[0].pivot.status == "Accepted" && (
               <>
+                <Text style={styles.sectionTitle}>
+                  Send by {quote.user?.name || "N/A"}
+                </Text>
                 <PhoneNumber phoneNumber={quote.phone} showNumber={true} />
                 <WhatsAppElement
                   showNumber={true}

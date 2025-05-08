@@ -9,6 +9,7 @@ const ProfileCard = ({
   handleLogout,
   handleEdit,
   supervisors,
+  version
 }) => {
   return (
     <View style={styles.card}>
@@ -34,7 +35,22 @@ const ProfileCard = ({
           }}
         />
       </TouchableOpacity>
-
+      <Text
+        style={{
+          position: "absolute",
+          top: 10,
+          left: 10,
+          padding: 10,
+          backgroundColor: "#fff",
+          borderRadius: 20,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+        }}
+      >
+        {version && "v"+version}
+      </Text>
       <TouchableOpacity onPress={handleLogout} style={styles.logoutIcon}>
         <Image
           source={require("../../images/logout.png")}
