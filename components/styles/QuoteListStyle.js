@@ -156,7 +156,7 @@ const QuoteListStyle = {
     paddingVertical: 8,
   },
   quoteCard: {
-    backgroundColor: '#e4fbfb',
+    backgroundColor: '#78e2e2',
     marginHorizontal: 16,
     marginVertical: 6,
     borderRadius: 12,
