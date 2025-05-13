@@ -10,6 +10,7 @@ import {
   Alert,
   Modal,
   Platform,
+  ScrollView,
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -38,6 +39,8 @@ const QuoteListScreen = ({ navigation }) => {
   });
   const [showDatePicker, setShowDatePicker] = useState(null);
 
+  const statusTabs = ["All", "Pending", "Accepted", "Inprogress", "Rejected"];
+
   const fetchQuotes = async () => {
     setLoading(true);
     setError("");
@@ -64,33 +67,31 @@ const QuoteListScreen = ({ navigation }) => {
 
   const applyFilters = () => {
     let result = [...quotes];
-  
+
     if (filters.status !== "All") {
       result = result.filter(
         (quote) => quote.staffs[0].pivot.status === filters.status
       );
     }
-  
+
     if (filters.todayOnly) {
-      result = result.filter((quote) =>
-        isToday(parseISO(quote.created_at))
-      );
+      result = result.filter((quote) => isToday(parseISO(quote.created_at)));
     }
-  
+
     if (filters.dateFrom && filters.dateTo) {
       result = result.filter((quote) => {
         const quoteDate = new Date(quote.created_at);
         const startDate = new Date(filters.dateFrom);
         const endDate = new Date(filters.dateTo);
-        
+
         startDate.setHours(0, 0, 0, 0);
         endDate.setHours(23, 59, 59, 999);
         quoteDate.setHours(12, 0, 0, 0);
-        
+
         return quoteDate >= startDate && quoteDate <= endDate;
       });
     }
-  
+
     setFilteredQuotes(result);
   };
 
@@ -212,13 +213,12 @@ const QuoteListScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.quoteMeta}>
-              {show_quote_detail == "1" &&
-                status == "Accepted" && (
-                  <Text style={styles.metaText} numberOfLines={1}>
-                    <Text style={styles.boldText}>From:</Text>{" "}
-                    {user?.name || "Unknown"}
-                  </Text>
-                )}
+              {show_quote_detail == "1" && (status === "Accepted" || status === "Inprogress") && (
+                <Text style={styles.metaText} numberOfLines={1}>
+                  <Text style={styles.boldText}>From:</Text>{" "}
+                  {user?.name || "Unknown"}
+                </Text>
+              )}
 
               {sourcing_quantity && (
                 <Text style={styles.metaText}>
@@ -234,6 +234,7 @@ const QuoteListScreen = ({ navigation }) => {
                   status === "Accepted" && styles.statusAccepted,
                   status === "Rejected" && styles.statusRejected,
                   status === "Pending" && styles.statusPending,
+                  status === "Inprogress" && styles.statusInprogress,
                 ]}
               >
                 <Text style={styles.quoteStatusText}>{status}</Text>
@@ -258,7 +259,7 @@ const QuoteListScreen = ({ navigation }) => {
         {/* Action Buttons */}
         <View style={styles.actionContainer}>
           {(bid === null || (bid && bid.staff_id === userId)) &&
-            status === "Accepted" && (
+            (status === "Accepted" || status === "Inprogress") && (
               <TouchableOpacity
                 style={[
                   styles.actionBtn,
@@ -317,15 +318,56 @@ const QuoteListScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Header title="Quotes" />
 
-      {/* Filter Button */}
-      <TouchableOpacity
-        style={styles.filterButton}
-        onPress={() => setShowFilters(true)}
-      >
-        <Icon name="filter" size={18} color="#fff" />
-        <Text style={styles.filterButtonText}>Filters</Text>
-      </TouchableOpacity>
+      <View style={styles.statusTabsContainer}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {statusTabs.map((status) => (
+            <TouchableOpacity
+              key={status}
+              style={[
+                styles.statusTab,
+                filters.status === status && styles.statusTabActive,
+              ]}
+              onPress={() => setFilters({ ...filters, status })}
+            >
+              <Text
+                style={[
+                  styles.statusTabText,
+                  filters.status === status && styles.statusTabTextActive,
+                ]}
+              >
+                {status}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
 
+      {/* Filter Button */}
+      <View style={styles.filterContent}>
+        <TouchableOpacity
+          style={styles.todayFilter}
+          onPress={() =>
+            setFilters({
+              ...filters,
+              todayOnly: !filters.todayOnly,
+              dateFrom: null,
+              dateTo: null,
+            })
+          }
+        >
+          <View style={styles.checkbox}>
+            {filters.todayOnly && <Icon name="check" size={14} color="#fff" />}
+          </View>
+          <Text style={styles.todayFilterText}>Today's quotes only</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => setShowFilters(true)}
+        >
+          <Icon name="filter" size={18} color="#fff" />
+          <Text style={styles.filterButtonText}>Filter By date</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={filteredQuotes}
         renderItem={renderQuoteItem}
@@ -367,33 +409,6 @@ const QuoteListScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {/* Status Filter */}
-            <View style={styles.filterSection}>
-              <Text style={styles.filterLabel}>Status</Text>
-              <View style={styles.statusFilterOptions}>
-                {["All", "Accepted", "Rejected", "Pending"].map((status) => (
-                  <TouchableOpacity
-                    key={status}
-                    style={[
-                      styles.statusOption,
-                      filters.status === status && styles.statusOptionSelected,
-                    ]}
-                    onPress={() => setFilters({ ...filters, status })}
-                  >
-                    <Text
-                      style={[
-                        styles.statusOptionText,
-                        filters.status === status &&
-                          styles.statusOptionTextSelected,
-                      ]}
-                    >
-                      {status}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
             {/* Date Range Filter */}
             <View style={styles.filterSection}>
               <Text style={styles.filterLabel}>Date Range</Text>
@@ -417,26 +432,6 @@ const QuoteListScreen = ({ navigation }) => {
             </View>
 
             {/* Today Filter */}
-            <View style={styles.filterSection}>
-              <TouchableOpacity
-                style={styles.todayFilter}
-                onPress={() =>
-                  setFilters({
-                    ...filters,
-                    todayOnly: !filters.todayOnly,
-                    dateFrom: null,
-                    dateTo: null,
-                  })
-                }
-              >
-                <View style={styles.checkbox}>
-                  {filters.todayOnly && (
-                    <Icon name="check" size={14} color="#fff" />
-                  )}
-                </View>
-                <Text style={styles.todayFilterText}>Today's quotes only</Text>
-              </TouchableOpacity>
-            </View>
 
             {/* Action Buttons */}
             <View style={styles.filterActions}>

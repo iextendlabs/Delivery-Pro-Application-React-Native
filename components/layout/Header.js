@@ -25,16 +25,16 @@ export default function Header({ title, notification }) {
         console.error("Error fetching notifications:", error);
       }
     };
-  
+
     // Initial fetch
     fetchNotifications();
-  
+
     // Update notifications every 3 seconds
     const intervalId = setInterval(fetchNotifications, 3000);
-  
+
     // Add a focus listener to refresh notifications
     const unsubscribe = navigation.addListener("focus", fetchNotifications);
-  
+
     return () => {
       clearInterval(intervalId);
       unsubscribe();
@@ -58,8 +58,8 @@ export default function Header({ title, notification }) {
           position: "absolute",
           top: 0,
           left: 0,
-          width: 150,
-          height: 150,
+          width: 100,
+          height: 100,
           zIndex: 1,
         }}
       />

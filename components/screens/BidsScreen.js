@@ -12,13 +12,14 @@ import {
   Pressable,
   Linking,
   FlatList,
-  ActivityIndicator, // Import Linking
+  ActivityIndicator,
+  BackHandler, // Import Linking
 } from "react-native";
 import axios from "axios";
 import { BaseUrl } from "../config/Api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import Splash from "./Splash";
 import BidStyle from "../styles/BidStyle";
@@ -28,6 +29,7 @@ import LocationElement from "../modules/LocationElement";
 import * as Location from "expo-location";
 
 const BidsScreen = () => {
+  const navigation = useNavigation();
   const route = useRoute();
   const { quoteId } = route.params;
 
@@ -47,6 +49,20 @@ const BidsScreen = () => {
   const [showBidContainer, setShowBidContainer] = useState(false);
   const [isUpdatingBid, setIsUpdatingBid] = useState(false);
   const [updatedBidAmount, setUpdatedBidAmount] = useState("");
+
+  useEffect(() => {
+    const backAction = () => {
+      navigation.navigate("QuoteListScreen");
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [navigation]);
 
   const scrollViewRef = useRef();
 
@@ -449,7 +465,11 @@ const BidsScreen = () => {
               onPress={pickImage}
               disabled={isSubmit}
             >
-              <Ionicons name="attach" size={20} color={isSubmit ? "#ccc" : "#28a745"} />
+              <Ionicons
+                name="attach"
+                size={20}
+                color={isSubmit ? "#ccc" : "#28a745"}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -457,7 +477,11 @@ const BidsScreen = () => {
               onPress={handleLocation}
               disabled={isSubmit}
             >
-              <Ionicons name="location" size={20} color={isSubmit ? "#ccc" : "#28a745"} />
+              <Ionicons
+                name="location"
+                size={20}
+                color={isSubmit ? "#ccc" : "#28a745"}
+              />
             </TouchableOpacity>
 
             <TextInput

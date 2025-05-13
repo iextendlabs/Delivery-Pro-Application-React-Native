@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Alert, ImageBackground, Linking } from "react-native";
+import {
+  StyleSheet,
+  Alert,
+  ImageBackground,
+  Linking,
+  TouchableOpacity,
+} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import OrderList from "./components/screens/OrderList";
@@ -30,6 +36,7 @@ import MembershipPlans from "./components/screens/MembershipPlans";
 import QuoteListScreen from "./components/screens/QuoteListScreen";
 import ViewQuoteScreen from "./components/screens/ViewQuoteScreen";
 import BidsScreen from "./components/screens/BidsScreen";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const Stack = createStackNavigator();
 
@@ -293,9 +300,21 @@ const App = () => {
             component={ViewQuoteScreen}
           />
           <Stack.Screen
-            options={{ title: "Bid" }}
             name="BidsScreen"
             component={BidsScreen}
+            options={({ navigation }) => ({
+              title: "Bid",
+              headerLeft: () => (
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("QuoteListScreen");
+                  }}
+                  style={{ marginLeft: 15 }}
+                >
+                  <Icon name="arrow-back" size={24} color="#000" />
+                </TouchableOpacity>
+              ),
+            })}
           />
         </Stack.Navigator>
       </NavigationContainer>
