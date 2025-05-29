@@ -17,6 +17,7 @@ import Splash from "./Splash";
 import CommonButton from "../common/CommonButton";
 import CustomTextInput from "../common/CustomTextInput";
 import appJson from "../../app.json";
+import { fetchProfile } from "../Database/apiService";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -91,6 +92,12 @@ const Login = () => {
         const headers = {
           Authorization: `Bearer ${accessToken}`,
         };
+        console.log("[INIT] Step 4: Loading Profile data...");
+        const profileResult = await fetchProfile(userId);
+        if (!profileResult.success) {
+          throw new Error("Failed to load Profile data");
+        }
+        console.log("[INIT] Profile load succeeded");
         navigation.reset({
           index: 0,
           routes: [{ name: "Home" }],
@@ -111,7 +118,7 @@ const Login = () => {
     <ScrollView style={{ flex: 1, backgroundColor: "#e4fbfb" }}>
       <View style={{ flex: 1 }}>
         <Image
-          source={require("../images/icon.png")}
+          source={require("../images/icon.jpeg")}
           style={{
             width: 60,
             height: 60,
@@ -186,7 +193,14 @@ const Login = () => {
         >
           Create New Account?
         </Text>
-        <Text style={{ textAlign: "center", color: "#666", fontSize: 12, marginTop: 20 }}>
+        <Text
+          style={{
+            textAlign: "center",
+            color: "#666",
+            fontSize: 12,
+            marginTop: 20,
+          }}
+        >
           v{appJson.expo.version}
         </Text>
       </View>

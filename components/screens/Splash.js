@@ -8,14 +8,21 @@ const Splash = () => {
       <Animatable.Image
         animation="fadeIn" // You can use other animations like 'fadeIn', 'slideInUp', etc.
         iterationCount="infinite"
-        source={require("../images/icon.png")}
+        source={require("../images/icon.jpeg")}
         style={{
           width: 100,
           height: 100,
           resizeMode: "center",
         }}
       />
-      <Text style={{ fontWeight: "800", marginTop: 20, fontSize: 24, color: "#000" }}>
+      <Text
+        style={{
+          fontWeight: "800",
+          marginTop: 20,
+          fontSize: 24,
+          color: "#000",
+        }}
+      >
         Lipslay Partner
       </Text>
     </View>

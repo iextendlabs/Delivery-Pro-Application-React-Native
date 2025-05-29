@@ -37,12 +37,118 @@ import QuoteListScreen from "./components/screens/QuoteListScreen";
 import ViewQuoteScreen from "./components/screens/ViewQuoteScreen";
 import BidsScreen from "./components/screens/BidsScreen";
 import Icon from "react-native-vector-icons/Ionicons";
+import UpdateProfile from "./components/screens/profile/UpdateProfile";
+import { getDatabase } from "./components/Database/database";
+import {
+  clearDatabase,
+  setLastFetchDate,
+  shouldFetchToday,
+} from "./components/Database/servicesRepository";
+import { loadAndRefreshData } from "./components/Database/dataService";
+import { loadAndRefreshSubTitleData } from "./components/Database/dataSubTitles";
+import { loadAndRefreshCategoryData } from "./components/Database/dataCategories";
+import { loadAndRefreshGroupZoneData } from "./components/Database/groupData";
 
 const Stack = createStackNavigator();
 
 const App = () => {
   const [isConnected, setIsConnected] = useState(true);
   const [initialRoute, setInitialRoute] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const initializeApp = async () => {
+    setLoading(true);
+    try {
+      console.log("=== APP INITIALIZATION STARTED ===");
+
+      // 1. Database Initialization
+      console.log("[INIT] Step 1: Initializing database...");
+      await getDatabase(); // This now handles initialization
+      console.log("[INIT] Database initialized successfully");
+
+      // 2. Data Sync Check
+      console.log("[INIT] Step 2: Checking if data needs to be fetched...");
+      const shouldFetch = await shouldFetchToday();
+
+      if (!shouldFetch) {
+        console.log("[INIT] No need to fetch data today");
+        return;
+      }
+
+      // 3. Clear existing data first
+      console.log("[INIT] Step 3: Clearing existing data...");
+      await clearDatabase();
+
+      // 4. Data Loading
+      console.log("[INIT] Step 4: Loading services data...");
+      const serviceResult = await loadAndRefreshData();
+      if (!serviceResult.success) {
+        throw new Error("Failed to load services data");
+      }
+      console.log("[INIT] Services load succeeded");
+
+      // 5. Category Loading
+      console.log("[INIT] Step 5: Loading categories data...");
+      const categoryResult = await loadAndRefreshCategoryData();
+      if (!categoryResult.success) {
+        throw new Error("Failed to load categories data");
+      }
+      console.log("[INIT] Categories load succeeded");
+
+      // 6. Subtitle Loading
+      console.log("[INIT] Step 6: Loading subtitles data...");
+      const subTitleResult = await loadAndRefreshSubTitleData();
+      if (!subTitleResult.success) {
+        throw new Error("Failed to load subtitles data");
+      }
+      console.log("[INIT] Subtitles load succeeded");
+
+      // 7. Data Loading
+      console.log("[INIT] Step 4: Loading GroupZone data...");
+      const groupZoneResult = await loadAndRefreshGroupZoneData();
+      if (!groupZoneResult.success) {
+        throw new Error("Failed to load GroupZone data");
+      }
+      console.log("[INIT] GroupZone load succeeded");
+
+      // 8. Update Sync Time
+      console.log("[INIT] Step 7: Updating last fetch time...");
+      await setLastFetchDate();
+      console.log("[INIT] Last fetch time updated");
+
+      console.log("=== APP INITIALIZATION COMPLETED ===");
+    } catch (error) {
+      setLoading(false);
+      console.error("[INIT ERROR] Initialization failed:", error);
+      throw error; // Re-throw to allow calling code to handle
+    }
+    setLoading(false);
+  };
+
+  // Usage in component
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        // Check if we need a clean install
+        const needsReset = await AsyncStorage.getItem("needsCleanInstall");
+        console.log("Clean install needed:", needsReset);
+
+        if (needsReset === "true" || needsReset === null) {
+          console.log("Performing clean database reset...");
+          await clearDatabase();
+          await AsyncStorage.setItem("needsCleanInstall", "false");
+        }
+
+        // Initialize the app
+        await initializeApp();
+      } catch (error) {
+        console.error("Initialization failed:", error);
+        // Optionally show error to user or retry
+      }
+    };
+
+    initialize();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
@@ -183,7 +289,7 @@ const App = () => {
     } catch (error) {}
   };
 
-  if (initialRoute === null) {
+  if (initialRoute === null || loading) {
     return <Splash />;
   }
 
@@ -218,6 +324,11 @@ const App = () => {
             options={{ headerShown: false }}
             name="Signup"
             component={Signup}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="UpdateProfile"
+            component={UpdateProfile}
           />
           <Stack.Screen
             options={{ headerShown: false }}

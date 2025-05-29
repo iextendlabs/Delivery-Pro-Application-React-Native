@@ -59,7 +59,6 @@ const Home = ({ navigation }) => {
     }
   };
 
-
   const fetchData = async () => {
     const userId = await AsyncStorage.getItem("@user_id");
     if (userId) {
@@ -67,7 +66,7 @@ const Home = ({ navigation }) => {
         const response = await axios.get(`${IndexUrl}user_id=${userId}`);
         if (response.status == 202) {
           setUserMessage(
-            "Your account has been created successfully and is currently under review. The admin will review your profile and approve your request. You will receive a notification once it's approved."
+            "Your account has been created successfully and is currently under review. The admin will review your profile and approve your request. You will receive a notification once it's approved. In the meantime, please complete your profile to help speed up the approval process."
           );
           setUser(true);
         } else if (response.status == 203) {
@@ -83,6 +82,12 @@ const Home = ({ navigation }) => {
           setUserMessage("");
           setPlanExpire(false);
           setUserData(response.data);
+          if (response.data.whatsapp_number) {
+            await AsyncStorage.setItem(
+              "@whatsapp",
+              response.data.whatsapp_number
+            );
+          }
           setSupervisors(response.data.supervisors);
         }
       } catch (error) {
@@ -101,6 +106,7 @@ const Home = ({ navigation }) => {
       await AsyncStorage.removeItem("@user_id");
       await AsyncStorage.removeItem("@access_token");
       await AsyncStorage.removeItem("@notifications");
+      await AsyncStorage.removeItem("@signup_step");
       navigation.reset({
         index: 0,
         routes: [{ name: "Login" }],
@@ -141,7 +147,7 @@ const Home = ({ navigation }) => {
   };
 
   const handleEdit = async () => {
-    navigation.navigate("EditProfile");
+    navigation.navigate("UpdateProfile");
   };
 
   if (loading) {
@@ -172,22 +178,34 @@ const Home = ({ navigation }) => {
                 textAlign: "center",
                 fontSize: 16,
                 color: "#333",
+                marginBottom: 20,
               }}
             >
               {userMessage}
             </Text>
+
+            <CommonButton
+              title="Complete Your Profile"
+              bgColor="#4CAF50"
+              textColor="#fff"
+              onPress={() => navigation.navigate("UpdateProfile")}
+            />
+
             <CommonButton
               title="Logout"
               bgColor="#000"
               textColor="#fff"
               onPress={handleLogout}
+              style={{ marginTop: 10 }}
             />
+
             {planExpire && (
               <CommonButton
-                title={"Upgrade your plan"}
-                bgColor={"#fd245f"}
-                textColor={"#fff"}
+                title="Upgrade your plan"
+                bgColor="#fd245f"
+                textColor="#fff"
                 onPress={() => navigation.navigate("MembershipPlans")}
+                style={{ marginTop: 10 }}
               />
             )}
           </View>
@@ -206,7 +224,6 @@ const Home = ({ navigation }) => {
           <RefreshControl refreshing={loading} onRefresh={fetchData} />
         }
       >
-        {/* Profile Card */}
         <ProfileCard
           userData={userData}
           handleToggle={handleToggle}
@@ -216,10 +233,8 @@ const Home = ({ navigation }) => {
           version={version}
         />
 
-        {/* Round Icons Section */}
         <HomeMenu navigation={navigation} />
 
-        {/* Financial Summary */}
         <View style={styles.financialSummaryContainer}>
           <Text style={styles.financialSummaryTitle}>Financial Summary</Text>
           <View style={styles.financialSummary}>

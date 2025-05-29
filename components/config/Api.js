@@ -1,5 +1,6 @@
 const BaseUrl = "https://lipslay.com/";
 
+const getStaffProfileUrl = BaseUrl + "api/getStaffProfile?";
 const IndexUrl = BaseUrl + "api/index?";
 const OrderUrl = BaseUrl + "api/ordersV2?";
 const LoginUrl = BaseUrl + "api/login";
@@ -20,6 +21,7 @@ const GetWithdrawPaymentMethodsUrl = BaseUrl + "api/getWithdrawPaymentMethods?";
 const WithdrawUrl = BaseUrl + "api/withdraw";
 const GetWithdrawsUrl = BaseUrl + "api/getWithdraws?";
 const updateProfileUrl = BaseUrl + "api/updateProfile";
+const updateUserUrl = BaseUrl + "api/updateUser";
 const onlineOfflineUrl = BaseUrl + "api/onlineOffline";
 const createPaymentIntent = BaseUrl + "api/create-payment-intent";
 const getPlansUrl = BaseUrl + "api/getPlans?";
@@ -58,5 +60,7 @@ export {
   getPlansUrl,
   SignupUrl,
   getQuotesUrl,
-  quoteStatusUpdateUrl
+  quoteStatusUpdateUrl,
+  getStaffProfileUrl,
+  updateUserUrl
 };

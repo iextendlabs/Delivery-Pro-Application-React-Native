@@ -8,9 +8,11 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UpdateModal = ({ visible, setUpdateModalVisible, setIsUpdate }) => {
   const handleUpdate = async () => {
+    await AsyncStorage.setItem("needsCleanInstall", "true");
     Linking.openURL("market://details?id=com.forexleo.lipslaystaff");
     setUpdateModalVisible(false);
     setIsUpdate(false);

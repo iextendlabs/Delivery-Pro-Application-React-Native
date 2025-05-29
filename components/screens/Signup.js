@@ -9,18 +9,18 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Splash from "./Splash";
 import messaging from "@react-native-firebase/messaging";
+import { fetchProfile } from "../Database/apiService";
 
 const Signup = () => {
   const navigation = useNavigation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    sub_title: "",
     password: "",
     confirmPassword: "",
     affiliate: "",
-    number: "",
-    whatsapp: "",
+    number: "+971",
+    whatsapp: "+971",
     membership_plan_id: "", // Add membership_plan_id to store the selected plan's ID
   });
   const [errors, setErrors] = useState({});
@@ -29,9 +29,9 @@ const Signup = () => {
   const [fcmToken, setFcmToken] = useState("");
   const [plans, setPlans] = useState([]);
   const [selectedCountryForNumber, setSelectedCountryForNumber] =
-    useState(null);
+    useState("AE");
   const [selectedCountryForWhatsapp, setSelectedCountryForWhatsapp] =
-    useState(null);
+    useState("AE");
 
   const handleSelectCountryForNumber = (country) => {
     setSelectedCountryForNumber(country.cca2);
@@ -89,8 +89,6 @@ const Signup = () => {
     const newErrors = {};
     if (!formData.name) newErrors.name = "Please Enter Name";
     if (!formData.membership_plan_id) newErrors.plan = "Please Select a Plan";
-    if (!formData.sub_title)
-      newErrors.sub_title = "Please Enter Sub Title / Designation";
     if (!formData.email) newErrors.email = "Please Enter Email";
     else if (!isValidEmail(formData.email))
       newErrors.email = "Enter a valid email address.";
@@ -143,7 +141,11 @@ const Signup = () => {
           "@selectedCountryForWhatsapp",
           selectedCountryForWhatsapp
         );
-
+        const profileResult = await fetchProfile(userId);
+        if (!profileResult.success) {
+          throw new Error("Failed to load Profile data");
+        }
+        console.log("[INIT] Profile load succeeded");
         navigation.reset({
           index: 0,
           routes: [{ name: "Home" }],
@@ -172,7 +174,7 @@ const Signup = () => {
     <ScrollView style={{ flex: 1, backgroundColor: "#e4fbfb" }}>
       <View style={{ flex: 1 }}>
         <Image
-          source={require("../images/icon.png")}
+          source={require("../images/icon.jpeg")}
           style={{ width: 60, height: 60, alignSelf: "center", marginTop: 40 }}
         />
         <Text
@@ -237,16 +239,6 @@ const Signup = () => {
         {errors.confirmPassword && (
           <Text style={{ marginTop: 10, marginLeft: 40, color: "red" }}>
             {errors.confirmPassword}
-          </Text>
-        )}
-        <CustomTextInput
-          placeholder="Enter Sub Title / Designation"
-          value={formData.sub_title}
-          onChangeText={(txt) => setFormData({ ...formData, sub_title: txt })}
-        />
-        {errors.sub_title && (
-          <Text style={{ marginTop: 10, marginLeft: 40, color: "red" }}>
-            {errors.sub_title}
           </Text>
         )}
         <View

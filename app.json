@@ -4,11 +4,11 @@
     "slug": "lipslay-staff",
     "version": "7.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/icon.jpeg",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-screen.png",
+      "image": "./assets/splash-screen.jpeg",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
@@ -21,7 +21,7 @@
       "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-icon.jpeg",
         "backgroundColor": "#ffffff"
       },
       "package": "com.forexleo.lipslaystaff",
@@ -41,6 +41,9 @@
       "eas": {
         "projectId": "08367252-55ea-4a19-bda6-f86e56473996"
       }
-    }
+    },
+    "plugins": [
+      "expo-sqlite"
+    ]
   }
 }
