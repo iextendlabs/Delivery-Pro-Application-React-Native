@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lipslay Partner",
     "slug": "lipslay-staff",
-    "version": "7.0.0",
+    "version": "8.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.jpeg",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
       "jsEngine": "hermes"
     },
     "android": {
-      "versionCode": 7,
+      "versionCode": 8,
       "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
