@@ -31,6 +31,7 @@ const Services = ({
   const [visibleServicesCount, setVisibleServicesCount] =
     useState(ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -52,7 +53,7 @@ const Services = ({
 
   const fetchData = async () => {
     if (!mounted || !formData) return;
-    setIsLoading(true);
+    setIsDataLoading(true);
     try {
       const services = await loadAndRefreshData();
       if (!services?.data || !Array.isArray(services.data)) {
@@ -60,11 +61,13 @@ const Services = ({
       }
       setServices(services.data);
     } catch (error) {
-      console.error("[Services ERROR]", error);
-      setError("Failed to load Services.");
-      Alert.alert("Error", "Failed to load Services data");
+      Alert.alert(
+        "Something went wrong",
+        "Please uninstall the app\nand install the latest version to continue.", // Message with line break
+        [{ text: "OK" }]
+      );
     }
-    setIsLoading(false);
+    setIsDataLoading(false);
   };
 
   const handleNextPress = async () => {
@@ -134,7 +137,7 @@ const Services = ({
     </TouchableOpacity>
   );
 
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return <Splash />;
   }
 

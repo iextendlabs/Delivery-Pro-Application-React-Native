@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Splash from "./Splash";
 import messaging from "@react-native-firebase/messaging";
 import { fetchProfile } from "../Database/apiService";
+import { clearUserData } from "../Database/servicesRepository";
 
 const Signup = () => {
   const navigation = useNavigation();
@@ -141,6 +142,7 @@ const Signup = () => {
           "@selectedCountryForWhatsapp",
           selectedCountryForWhatsapp
         );
+        await clearUserData();
         const profileResult = await fetchProfile(userId);
         if (!profileResult.success) {
           throw new Error("Failed to load Profile data");

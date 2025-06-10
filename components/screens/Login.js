@@ -18,6 +18,7 @@ import CommonButton from "../common/CommonButton";
 import CustomTextInput from "../common/CustomTextInput";
 import appJson from "../../app.json";
 import { fetchProfile } from "../Database/apiService";
+import { clearUserData } from "../Database/servicesRepository";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -93,6 +94,7 @@ const Login = () => {
           Authorization: `Bearer ${accessToken}`,
         };
         console.log("[INIT] Step 4: Loading Profile data...");
+        await clearUserData();
         const profileResult = await fetchProfile(userId);
         if (!profileResult.success) {
           throw new Error("Failed to load Profile data");

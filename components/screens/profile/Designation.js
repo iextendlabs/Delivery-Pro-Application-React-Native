@@ -27,6 +27,7 @@ const Designation = ({
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -41,7 +42,7 @@ const Designation = ({
   }, [formData]);
 
   const fetchData = async () => {
-    setIsLoading(true);
+    setIsDataLoading(true);
     try {
       const subtitleData = await loadAndRefreshSubTitleData();
       if (!subtitleData?.data || !Array.isArray(subtitleData.data)) {
@@ -49,11 +50,13 @@ const Designation = ({
       }
       setDesignations(subtitleData.data);
     } catch (error) {
-      console.error("[SUBTITLES ERROR]", error);
-      setError("Failed to load designations.");
-      Alert.alert("Error", "Failed to load Subtitles data");
+      Alert.alert(
+        "Something went wrong", // Title (optional)
+        "Please uninstall the app\nand install the latest version to continue.", // Message with line break
+        [{ text: "OK" }] // Button
+      );
     }
-    setIsLoading(false);
+    setIsDataLoading(false);
   };
 
   const toggleDesignation = (id) => {
@@ -128,7 +131,7 @@ const Designation = ({
     </TouchableOpacity>
   );
 
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return <Splash />;
   }
 

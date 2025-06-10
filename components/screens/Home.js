@@ -21,6 +21,10 @@ import HomeMenu from "./components/HomeMenu";
 import VersionCheck from "react-native-version-check";
 import UpdateModal from "../common/UpdateModal";
 import Constants from "expo-constants";
+import { loadAndRefreshData } from "../Database/dataService";
+import { loadAndRefreshCategoryData } from "../Database/dataCategories";
+import { loadAndRefreshSubTitleData } from "../Database/dataSubTitles";
+import { loadAndRefreshGroupZoneData } from "../Database/groupData";
 
 const Home = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
@@ -33,6 +37,60 @@ const Home = ({ navigation }) => {
   const [updateModalVisible, setUpdateModalVisible] = useState(false);
   const [isUpdate, setIsUpdate] = useState(true);
   const [version, setVersion] = useState("");
+
+  const initializeApp = async () => {
+    try {
+      await AsyncStorage.setItem("@loading", "1");
+      console.log("[INIT] Step 4: Loading services data...");
+      const serviceResult = await loadAndRefreshData();
+      if (!serviceResult.success) {
+        throw new Error("Failed to load services data");
+      }
+      console.log("[INIT] Services load succeeded");
+
+      console.log("[INIT] Step 5: Loading categories data...");
+      const categoryResult = await loadAndRefreshCategoryData();
+      if (!categoryResult.success) {
+        throw new Error("Failed to load categories data");
+      }
+      console.log("[INIT] Categories load succeeded");
+
+      console.log("[INIT] Step 6: Loading subtitles data...");
+      const subTitleResult = await loadAndRefreshSubTitleData();
+      if (!subTitleResult.success) {
+        throw new Error("Failed to load subtitles data");
+      }
+      console.log("[INIT] Subtitles load succeeded");
+
+      console.log("[INIT] Step 4: Loading GroupZone data...");
+      const groupZoneResult = await loadAndRefreshGroupZoneData();
+      if (!groupZoneResult.success) {
+        throw new Error("Failed to load GroupZone data");
+      }
+      console.log("[INIT] GroupZone load succeeded");
+      await AsyncStorage.setItem("@loading", "0");
+
+    } catch (error) {
+      await AsyncStorage.setItem("@loading", "0");
+      console.error("[INIT ERROR] Initialization failed:", error);
+      throw error; // Re-throw to allow calling code to handle
+    }
+  };
+
+  // Usage in component
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        // Initialize the app
+        await initializeApp();
+      } catch (error) {
+        console.error("Initialization failed:", error);
+        // Optionally show error to user or retry
+      }
+    };
+
+    initialize();
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -147,7 +205,12 @@ const Home = ({ navigation }) => {
   };
 
   const handleEdit = async () => {
-    navigation.navigate("UpdateProfile");
+    const loading = await AsyncStorage.getItem("@loading");
+    if( loading === "1") {
+      alert("Please wait, data is being loaded. Try again in a few seconds.");
+    }else{
+      navigation.navigate("UpdateProfile");
+    }
   };
 
   if (loading) {
@@ -188,7 +251,7 @@ const Home = ({ navigation }) => {
               title="Complete Your Profile"
               bgColor="#4CAF50"
               textColor="#fff"
-              onPress={() => navigation.navigate("UpdateProfile")}
+              onPress={handleEdit}
             />
 
             <CommonButton

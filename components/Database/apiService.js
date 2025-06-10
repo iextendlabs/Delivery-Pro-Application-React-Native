@@ -6,6 +6,7 @@ import {
   saveAllServices,
   saveAllSubTitle,
   saveProfile,
+  setLastFetchDate,
   shouldFetchToday,
 } from "./servicesRepository";
 import { BaseUrl, getStaffProfileUrl } from "../config/Api";
@@ -13,7 +14,7 @@ import { BaseUrl, getStaffProfileUrl } from "../config/Api";
 const fetchServices = async () => {
   console.log("[API] Fetching services from server...");
   try {
-    const shouldFetch = await shouldFetchToday();
+    const shouldFetch = await shouldFetchToday("last_fetch_date_services");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -39,6 +40,7 @@ const fetchServices = async () => {
     }));
 
     await saveAllServices(services);
+    await setLastFetchDate("last_fetch_date_services");
 
     return services;
   } catch (error) {
@@ -50,7 +52,7 @@ const fetchServices = async () => {
 const fetchCategories = async () => {
   console.log("[API] Fetching categories from server...");
   try {
-    const shouldFetch = await shouldFetchToday();
+    const shouldFetch = await shouldFetchToday("last_fetch_date_categories");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -70,6 +72,7 @@ const fetchCategories = async () => {
       } categories`
     );
     await saveAllCategories(response.data.categories);
+    await setLastFetchDate("last_fetch_date_categories");
 
     return response.data.categories;
   } catch (error) {
@@ -81,7 +84,7 @@ const fetchCategories = async () => {
 const fetchSubTitles = async () => {
   console.log("[API] Fetching subtitles from server...");
   try {
-    const shouldFetch = await shouldFetchToday();
+    const shouldFetch = await shouldFetchToday("last_fetch_date_subtitles");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -101,6 +104,7 @@ const fetchSubTitles = async () => {
       } subtitles`
     );
     await saveAllSubTitle(response.data.subTitles);
+    await setLastFetchDate("last_fetch_date_subtitles");
 
     return response.data.subTitles;
   } catch (error) {
@@ -112,7 +116,7 @@ const fetchSubTitles = async () => {
 const fetchGroupZone = async () => {
   console.log("[API] Fetching groupData from server...");
   try {
-    const shouldFetch = await shouldFetchToday();
+    const shouldFetch = await shouldFetchToday("last_fetch_date_group_data");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -139,6 +143,7 @@ const fetchGroupZone = async () => {
     }));
 
     await saveAllGroupData(groupData);
+    await setLastFetchDate("last_fetch_date_group_data");
 
     return groupData;
   } catch (error) {

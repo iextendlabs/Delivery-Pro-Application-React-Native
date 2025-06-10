@@ -41,8 +41,7 @@ import UpdateProfile from "./components/screens/profile/UpdateProfile";
 import { getDatabase } from "./components/Database/database";
 import {
   clearDatabase,
-  setLastFetchDate,
-  shouldFetchToday,
+  clearUserData,
 } from "./components/Database/servicesRepository";
 import { loadAndRefreshData } from "./components/Database/dataService";
 import { loadAndRefreshSubTitleData } from "./components/Database/dataSubTitles";
@@ -66,55 +65,6 @@ const App = () => {
       await getDatabase(); // This now handles initialization
       console.log("[INIT] Database initialized successfully");
 
-      // 2. Data Sync Check
-      console.log("[INIT] Step 2: Checking if data needs to be fetched...");
-      const shouldFetch = await shouldFetchToday();
-
-      if (!shouldFetch) {
-        console.log("[INIT] No need to fetch data today");
-        return;
-      }
-
-      // 3. Clear existing data first
-      console.log("[INIT] Step 3: Clearing existing data...");
-      await clearDatabase();
-
-      // 4. Data Loading
-      console.log("[INIT] Step 4: Loading services data...");
-      const serviceResult = await loadAndRefreshData();
-      if (!serviceResult.success) {
-        throw new Error("Failed to load services data");
-      }
-      console.log("[INIT] Services load succeeded");
-
-      // 5. Category Loading
-      console.log("[INIT] Step 5: Loading categories data...");
-      const categoryResult = await loadAndRefreshCategoryData();
-      if (!categoryResult.success) {
-        throw new Error("Failed to load categories data");
-      }
-      console.log("[INIT] Categories load succeeded");
-
-      // 6. Subtitle Loading
-      console.log("[INIT] Step 6: Loading subtitles data...");
-      const subTitleResult = await loadAndRefreshSubTitleData();
-      if (!subTitleResult.success) {
-        throw new Error("Failed to load subtitles data");
-      }
-      console.log("[INIT] Subtitles load succeeded");
-
-      // 7. Data Loading
-      console.log("[INIT] Step 4: Loading GroupZone data...");
-      const groupZoneResult = await loadAndRefreshGroupZoneData();
-      if (!groupZoneResult.success) {
-        throw new Error("Failed to load GroupZone data");
-      }
-      console.log("[INIT] GroupZone load succeeded");
-
-      // 8. Update Sync Time
-      console.log("[INIT] Step 7: Updating last fetch time...");
-      await setLastFetchDate();
-      console.log("[INIT] Last fetch time updated");
 
       console.log("=== APP INITIALIZATION COMPLETED ===");
     } catch (error) {
@@ -136,6 +86,7 @@ const App = () => {
         if (needsReset === "true" || needsReset === null) {
           console.log("Performing clean database reset...");
           await clearDatabase();
+          await clearUserData();
           await AsyncStorage.setItem("needsCleanInstall", "false");
         }
 

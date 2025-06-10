@@ -10,6 +10,19 @@ const clearDatabase = async () => {
       DELETE FROM sub_titles;
       DELETE FROM sync_metadata;
       DELETE FROM group_zone_data;
+    `);
+    console.log("[DATABASE] Cleanup completed successfully");
+  } catch (error) {
+    console.error("[DATABASE ERROR] Cleanup failed:", error);
+    throw error;
+  }
+};
+
+const clearUserData = async () => {
+  console.log("[DATABASE] Starting database cleanup...");
+  try {
+    const db = await getDatabase();
+    await db.execAsync(`
       DELETE FROM users;
       DELETE FROM images;
       DELETE FROM youtube_videos;
@@ -292,7 +305,7 @@ const saveProfile = async (data) => {
   }
 };
 
-const setLastFetchDate = async () => {
+const setLastFetchDate = async ($key) => {
   const now = new Date().toISOString();
   console.log("[SYNC] Setting last fetch date to:", now);
 
@@ -300,7 +313,7 @@ const setLastFetchDate = async () => {
     const db = await getDatabase();
     await db.runAsync(
       "INSERT OR REPLACE INTO sync_metadata (key, value) VALUES (?, ?)",
-      ["last_fetch_date", now]
+      [$key, now]
     );
     console.log("[SYNC] Last fetch date set successfully");
   } catch (error) {
@@ -309,12 +322,12 @@ const setLastFetchDate = async () => {
   }
 };
 
-const shouldFetchToday = async () => {
+const shouldFetchToday = async ($key) => {
   try {
     const db = await getDatabase();
     const result = await db.getFirstAsync(
       "SELECT value FROM sync_metadata WHERE key = ?",
-      ["last_fetch_date"]
+      [$key]
     );
 
     if (!result) {
@@ -348,4 +361,5 @@ export {
   clearDatabase,
   saveAllCategories,
   saveProfile,
+  clearUserData,
 };

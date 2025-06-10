@@ -5,6 +5,7 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import StepIndicator from "react-native-step-indicator";
@@ -108,8 +109,11 @@ const UpdateProfile = ({ navigation }) => {
           other: profileData.document[0]?.other || null,
         });
       } catch (error) {
-        console.error("[PROFILE ERROR] Failed to load profile:", error);
-        Alert.alert("Error", "Failed to load profile data");
+        Alert.alert(
+          "Issue to Load Data",
+          "Failed to load profile data,\n Please log out and log back in.",
+          [{ text: "OK" }]
+        );
       } finally {
         setLoading(false);
       }
@@ -230,12 +234,10 @@ const UpdateProfile = ({ navigation }) => {
       } else if (response.status === 201) {
         setSuccess(false);
         setError(true);
-        setTimeout(() => {
-          setError(false);
-        }, 5000);
       }
     } catch (error) {
-      console.error("Error:", error.response?.data || error.message);
+      setSuccess(false);
+      setError(true);
       setLoading(false);
     }
     setLoading(false);

@@ -503,8 +503,8 @@ const BasicInfo = ({
           <Text style={styles.subSectionTitle}>Location & Nationality</Text>
 
           <CustomTextInput
-            label="Location"
-            placeholder="Location"
+            label="Location You Want to Work In"
+            placeholder="Location You Want to Work In"
             value={location}
             onChangeText={setLocation}
           />

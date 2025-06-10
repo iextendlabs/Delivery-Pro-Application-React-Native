@@ -31,6 +31,7 @@ const Categories = ({
   const [visibleCategoriesCount, setVisibleCategoriesCount] =
     useState(ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -52,7 +53,7 @@ const Categories = ({
 
   const fetchData = async () => {
     if (!mounted || !formData) return;
-    setIsLoading(true);
+    setIsDataLoading(true);
     try {
       const categories = await loadAndRefreshCategoryData();
       if (!categories?.data || !Array.isArray(categories.data)) {
@@ -60,11 +61,13 @@ const Categories = ({
       }
       setCategories(categories.data);
     } catch (error) {
-      console.error("[Categories ERROR]", error);
-      setError("Failed to load categories.");
-      Alert.alert("Error", "Failed to load Categories data");
+      Alert.alert(
+        "Something went wrong", // Title (optional)
+        "Please uninstall the app\nand install the latest version to continue.", // Message with line break
+        [{ text: "OK" }] // Button
+      );
     }
-    setIsLoading(false);
+    setIsDataLoading(false);
   };
 
   const handleNextPress = async () => {
@@ -134,7 +137,7 @@ const Categories = ({
     </TouchableOpacity>
   );
 
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return <Splash />;
   }
 

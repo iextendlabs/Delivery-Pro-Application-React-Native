@@ -27,6 +27,7 @@ const GroupZones = ({
   const [selectedGroupZones, setSelectedGroupZones] = useState([]);
   const [mounted, setMounted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   useEffect(() => {
     return () => setMounted(false);
@@ -44,7 +45,7 @@ const GroupZones = ({
 
   const fetchData = async () => {
     if (!mounted || !formData) return;
-    setIsLoading(true);
+    setIsDataLoading(true);
     try {
       const groups = await loadAndRefreshGroupZoneData();
       if (!groups?.data || !Array.isArray(groups.data)) {
@@ -52,10 +53,13 @@ const GroupZones = ({
       }
       setGroupZones(groups.data);
     } catch (error) {
-      console.error("[GroupZone ERROR]", error);
-      Alert.alert("Error", "Failed to load groupZone data");
+      Alert.alert(
+        "Something went wrong", // Title (optional)
+        "Please uninstall the app\nand install the latest version to continue.", // Message with line break
+        [{ text: "OK" }] // Button
+      );
     }
-    setIsLoading(false);
+    setIsDataLoading(false);
   };
 
   const handleNextPress = async () => {
@@ -93,7 +97,7 @@ const GroupZones = ({
     setIsLoading(false);
   };
 
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return <Splash />;
   }
 
