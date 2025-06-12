@@ -59,7 +59,10 @@ const Categories = ({
       if (!categories?.data || !Array.isArray(categories.data)) {
         throw new Error("No valid Categories data found");
       }
-      setCategories(categories.data);
+      const mainCats = categories.data.filter(
+        (cat) => !cat.parent_id || cat.parent_id === 0
+      );
+      setCategories(mainCats);
     } catch (error) {
       Alert.alert(
         "Something went wrong", // Title (optional)
@@ -79,12 +82,14 @@ const Categories = ({
 
     const db = await getDatabase();
 
+    const uniqueCategories = Array.from(new Set(selectedCategories));
+
     try {
       await db.execAsync("BEGIN TRANSACTION");
 
       await db.runAsync("DELETE FROM staff_categories");
 
-      for (const id of selectedCategories) {
+      for (const id of uniqueCategories) {
         await db.runAsync(
           "INSERT INTO staff_categories (category_id) VALUES (?)",
           [id]
@@ -94,7 +99,7 @@ const Categories = ({
       await db.execAsync("COMMIT");
       setFormData((prev) => ({
         ...prev,
-        categories: selectedCategories,
+        categories: uniqueCategories,
       }));
       setIsLoading(false);
       onNext();

@@ -15,9 +15,18 @@ const getDatabase = async () => {
         name TEXT NOT NULL
       );
       
-      CREATE TABLE IF NOT EXISTS service_categories (
+      CREATE TABLE IF NOT EXISTS categories (
         id INTEGER PRIMARY KEY,
-        title TEXT NOT NULL
+        title TEXT NOT NULL,
+        parent_id INTEGER
+      );
+
+      CREATE TABLE IF NOT EXISTS service_categories (
+        service_id INTEGER NOT NULL,
+        category_id INTEGER NOT NULL,
+        PRIMARY KEY (service_id, category_id),
+        FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
+        FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
       );
       
       CREATE TABLE IF NOT EXISTS sync_metadata (

@@ -91,7 +91,7 @@ const BasicInfo = ({
     if (!mounted) return;
     setIsLoading(true);
     try {
-      const response = await axios.get("https://restcountries.com/v3.1/all");
+      const response = await axios.get("https://restcountries.com/v3.1/all?fields=idd,cca2");
 
       const tempCallingCodeToCountry = {};
       response.data.forEach((country) => {

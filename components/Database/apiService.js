@@ -34,11 +34,11 @@ const fetchServices = async () => {
       } services`
     );
 
-    services = response.data.services.map((service) => ({
+    const services = response.data.services.map((service) => ({
       id: service.id,
       name: service.name,
+      category_ids: service.category_id || [],
     }));
-
     await saveAllServices(services);
     await setLastFetchDate("last_fetch_date_services");
 
@@ -136,7 +136,7 @@ const fetchGroupZone = async () => {
       } groupData`
     );
 
-    groupData = response.data.groupData.map((group) => ({
+    const groupData = response.data.groupData.map((group) => ({
       group_id: group.id,
       group_name: group.group_name,
       zone_name: group.zone.join(", "),

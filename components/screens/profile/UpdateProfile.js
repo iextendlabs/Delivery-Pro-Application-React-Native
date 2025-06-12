@@ -23,6 +23,7 @@ import Splash from "../Splash";
 import { loadProfileLocalData } from "../../Database/profile";
 import { Ionicons } from "@expo/vector-icons";
 import GroupZones from "./GroupZones";
+import SubCategories from "./SubCategories";
 
 const labels = [
   "Basic Info",
@@ -31,6 +32,7 @@ const labels = [
   "Gallery",
   "Groups & Zones",
   "Categories",
+  "Sub Categories",
   "Services",
   "Documents",
 ];
@@ -138,7 +140,12 @@ const UpdateProfile = ({ navigation }) => {
     setCurrentStep((prev) => prev + 1);
   };
 
-  const handlePrevious = () => setCurrentStep((prev) => prev - 1);
+  const handlePrevious = (steps = 1) => {
+    setCurrentStep((prev) => {
+      const stepBack = typeof steps === "number" && steps > 0 ? steps : 1;
+      return prev - stepBack >= 0 ? prev - stepBack : prev - 1;
+    });
+  };
 
   const handleSubmit = async () => {
     setCurrentStep(0);
@@ -248,7 +255,7 @@ const UpdateProfile = ({ navigation }) => {
       currentStep,
       totalSteps: labels.length,
       onBack: () => navigation.goBack(),
-      onPrevious: handlePrevious,
+      onPrevious: () => handlePrevious(),
       onSubmit: handleSubmit,
       formData,
       setFormData,
@@ -267,8 +274,10 @@ const UpdateProfile = ({ navigation }) => {
       case 5:
         return <Categories {...commonProps} onNext={handleNext} />;
       case 6:
-        return <Services {...commonProps} onNext={handleNext} />;
+        return <SubCategories {...commonProps} onNext={handleNext} />;
       case 7:
+        return <Services {...commonProps} onNext={handleNext} />;
+      case 8:
         return <Documents {...commonProps} onNext={handleNext} />;
       default:
         return null;
@@ -336,7 +345,7 @@ const UpdateProfile = ({ navigation }) => {
         <StepIndicator
           customStyles={customStyles}
           currentPosition={getVisibleSteps().indexOf(currentStep)}
-          labels={getVisibleSteps().map((i) => labels[i])}
+          // labels={getVisibleSteps().map((i) => labels[i])}
           stepCount={getVisibleSteps().length}
           renderStepIndicator={renderStepIndicator}
         />

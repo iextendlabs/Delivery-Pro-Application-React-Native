@@ -6,6 +6,7 @@ const clearDatabase = async () => {
     const db = await getDatabase();
     await db.execAsync(`
       DELETE FROM services;
+      DELETE FROM categories;
       DELETE FROM service_categories;
       DELETE FROM sub_titles;
       DELETE FROM sync_metadata;
@@ -50,13 +51,23 @@ const saveAllServices = async (services) => {
     try {
       // Delete existing services
       await db.runAsync("DELETE FROM services");
-
+      await db.runAsync("DELETE FROM service_categories");
       // Insert new services
       for (const service of services) {
         await db.runAsync("INSERT INTO services (id, name) VALUES (?, ?)", [
           service.id,
           service.name,
         ]);
+
+        if (service.category_ids && service.category_ids.length > 0) {
+          const uniqueCategories = [...new Set(service.category_ids)];
+          for (const categoryId of uniqueCategories) {
+            await db.runAsync(
+              "INSERT INTO service_categories (service_id, category_id) VALUES (?, ?)",
+              [service.id, categoryId]
+            );
+          }
+        }
       }
 
       // Commit transaction
@@ -82,12 +93,12 @@ const saveAllCategories = async (categories) => {
 
     try {
       if (categories.length > 0) {
-        await db.runAsync("DELETE FROM service_categories");
+        await db.runAsync("DELETE FROM categories");
 
         for (const category of categories) {
           await db.runAsync(
-            "INSERT INTO service_categories (id, title) VALUES (?, ?)",
-            [category.id, category.title]
+            "INSERT INTO categories (id, title, parent_id) VALUES (?, ?, ?)",
+            [category.id, category.title, category.parent_id || null]
           );
         }
       }

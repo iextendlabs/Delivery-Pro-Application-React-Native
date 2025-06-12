@@ -43,10 +43,6 @@ import {
   clearDatabase,
   clearUserData,
 } from "./components/Database/servicesRepository";
-import { loadAndRefreshData } from "./components/Database/dataService";
-import { loadAndRefreshSubTitleData } from "./components/Database/dataSubTitles";
-import { loadAndRefreshCategoryData } from "./components/Database/dataCategories";
-import { loadAndRefreshGroupZoneData } from "./components/Database/groupData";
 
 const Stack = createStackNavigator();
 

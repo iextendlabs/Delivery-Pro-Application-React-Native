@@ -43,13 +43,14 @@ export const loadLocalCategoriesData = async () => {
   try {
     const db = await getDatabase();
     const result = await db.getAllAsync(
-      `SELECT * FROM service_categories ORDER BY title`
+      `SELECT * FROM categories ORDER BY title`
     );
 
     console.log(`[CATEGORIES] Found ${result.length} category records`);
     return result.map((row) => ({
       id: row.id,
       title: row.title,
+      parent_id: row.parent_id,
     }));
   } catch (error) {
     console.error("[CATEGORIES ERROR] Failed to load local categories:", error);

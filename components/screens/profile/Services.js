@@ -13,6 +13,7 @@ import StepNavigation from "./StepNavigation";
 import { getDatabase } from "../../Database/database";
 import { loadAndRefreshData } from "../../Database/dataService";
 import Splash from "../Splash";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ITEMS_PER_PAGE = 10;
 const Services = ({
@@ -59,11 +60,16 @@ const Services = ({
       if (!services?.data || !Array.isArray(services.data)) {
         throw new Error("No valid Services data found");
       }
-      setServices(services.data);
+      // Filter services by selected categories
+      const selectedCategoryIds = formData.categories || [];
+      const filteredServices = services.data.filter((service) =>
+        service.category_ids.some((catId) => selectedCategoryIds.includes(catId))
+      );
+      setServices(filteredServices);
     } catch (error) {
       Alert.alert(
         "Something went wrong",
-        "Please uninstall the app\nand install the latest version to continue.", // Message with line break
+        "Please uninstall the app\nand install the latest version to continue.",
         [{ text: "OK" }]
       );
     }
@@ -106,6 +112,16 @@ const Services = ({
     setIsLoading(false);
   };
 
+  const handlePreviousPress = async () => {
+    try {
+      const subCategory = await AsyncStorage.getItem("@subCategory");
+      if (subCategory === "0") {
+        AsyncStorage.setItem("@subCategory", "1");
+        onPrevious(2);
+      }
+      onPrevious();
+    } catch (error) {}
+  };
   const toggleService = (id) => {
     const newServices = selectedServices.includes(id)
       ? selectedServices.filter((item) => item !== id)
@@ -173,7 +189,7 @@ const Services = ({
           currentStep={currentStep}
           totalSteps={totalSteps}
           onBack={onBack}
-          onPrevious={onPrevious}
+          onPrevious={handlePreviousPress}
           onNext={handleNextPress}
           onSubmit={() => alert("Submit")}
         />

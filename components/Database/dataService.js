@@ -37,12 +37,27 @@ export const loadLocalData = async () => {
   console.log("[DATA] Loading local services data...");
   try {
     const db = await getDatabase();
-    const result = await db.getAllAsync(`SELECT * FROM services ORDER BY name`);
+
+    // Get services with their categories
+    const result = await db.getAllAsync(`
+      SELECT 
+        s.id, 
+        s.name,
+        GROUP_CONCAT(sc.category_id) AS category_ids
+      FROM services s
+      LEFT JOIN service_categories sc ON s.id = sc.service_id
+      GROUP BY s.id, s.name
+      ORDER BY s.name
+    `);
 
     console.log(`[SERVICES] Found ${result.length} services records`);
+
     return result.map((row) => ({
       id: row.id,
       name: row.name,
+      category_ids: row.category_ids
+        ? row.category_ids.split(",").map(Number)
+        : [],
     }));
   } catch (error) {
     console.error("[SERVICES ERROR] Failed to load local services:", error);
