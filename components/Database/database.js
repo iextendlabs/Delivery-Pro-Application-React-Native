@@ -39,11 +39,24 @@ const getDatabase = async () => {
         name TEXT NOT NULL
       );
 
-      CREATE TABLE IF NOT EXISTS group_zone_data (
+      CREATE TABLE IF NOT EXISTS zone_data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        group_id INTEGER,
-        group_name TEXT,
+        zone_id INTEGER,
         zone_name TEXT
+      );
+
+      CREATE TABLE IF NOT EXISTS timeSlots (
+        id INTEGER PRIMARY KEY,
+        name TEXT,
+        time_start TEXT,
+        time_end TEXT,
+        date TEXT, -- nullable, can be NULL
+        type TEXT
+      );
+
+      CREATE TABLE IF NOT EXISTS driver (
+        id INTEGER PRIMARY KEY,
+        name TEXT
       );
 
       CREATE TABLE IF NOT EXISTS users (
@@ -71,8 +84,8 @@ const getDatabase = async () => {
         video TEXT
       );
 
-      CREATE TABLE IF NOT EXISTS staff_groups (
-        group_id INTEGER
+      CREATE TABLE IF NOT EXISTS staff_zones (
+        zone_id INTEGER
       );
 
       CREATE TABLE IF NOT EXISTS staff_categories (
@@ -96,6 +109,18 @@ const getDatabase = async () => {
 
       CREATE TABLE IF NOT EXISTS designations (
         designation_id INTEGER
+      );
+
+      CREATE TABLE IF NOT EXISTS staff_timeSlots (
+        timeSlot_id INTEGER
+      );
+
+      CREATE TABLE IF NOT EXISTS staff_drivers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        staff_id INTEGER,
+        driver_id INTEGER,
+        day TEXT,
+        time_slot_id INTEGER
       );
     `);
   }

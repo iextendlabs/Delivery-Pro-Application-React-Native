@@ -1,22 +1,22 @@
-// groupData.js
-import { fetchGroupZone } from "./apiService";
+// dataDriver.js
+import { fetchDriver } from "./apiService";
 import { getDatabase } from "./database";
 
-export const loadAndRefreshGroupZoneData = async () => {
+export const loadAndRefreshDriverData = async () => {
   console.log("[DATA] Starting data load and refresh...");
   try {
-    const fetchGroupZoneData = await fetchGroupZone();
+    const freshDriver = await fetchDriver();
 
-    if (fetchGroupZoneData) {
-      console.log("[DATA] Successfully loaded fresh groupZone data");
+    if (freshDriver) {
+      console.log("[DATA] Successfully loaded fresh drivers data");
       return {
         success: true,
-        data: fetchGroupZoneData,
+        data: freshDriver,
         message: "Data refreshed successfully",
       };
     } else {
       console.log("[DATA] No fresh data available, loading local data");
-      const localData = await loadLocalGroupZoneData();
+      const localData = await loadLocalDriverData();
       return {
         success: true,
         data: localData,
@@ -33,22 +33,22 @@ export const loadAndRefreshGroupZoneData = async () => {
   }
 };
 
-export const loadLocalGroupZoneData = async () => {
-  console.log("[DATA] Loading local groupZone data...");
+export const loadLocalDriverData = async () => {
+  console.log("[DATA] Loading drivers data...");
   try {
     const db = await getDatabase();
     const result = await db.getAllAsync(
-      `SELECT * FROM group_zone_data ORDER BY id`
+      `SELECT * FROM driver ORDER BY name`
     );
 
-    console.log(`[GroupZone] Found ${result.length} groupZone records`);
+    console.log(`[DRIVERS] Found ${result.length} drivers records`);
     return result.map((row) => ({
-      group_id: row.group_id,
-      group_name: row.group_name,
-      zone_name: row.zone_name,
+      id: row.id,
+      name: row.name,
     }));
+
   } catch (error) {
-    console.error("[GroupZone ERROR] Failed to load local groupZone:", error);
+    console.error("[DRIVERS ERROR] Failed to load local drivers:", error);
     return [];
   }
 };

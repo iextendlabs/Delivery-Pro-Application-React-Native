@@ -18,22 +18,25 @@ import GalleryVideos from "./GalleryVideos";
 import Categories from "./Categories";
 import Services from "./Services";
 import Documents from "./Documents";
-import { IndexUrl, updateUserUrl } from "../../config/Api";
+import { updateUserUrl } from "../../config/Api";
 import Splash from "../Splash";
 import { loadProfileLocalData } from "../../Database/profile";
 import { Ionicons } from "@expo/vector-icons";
-import GroupZones from "./GroupZones";
 import SubCategories from "./SubCategories";
+import TimeSlots from "./TimeSlots";
+import Zones from "./Zones";
+import Profile from "../../styles/Profile";
 
 const labels = [
   "Basic Info",
   "Designation",
+  "Zones",
+  "Time Slots",
   "Driver",
-  "Gallery",
-  "Groups & Zones",
   "Categories",
   "Sub Categories",
   "Services",
+  "Gallery",
   "Documents",
 ];
 
@@ -91,6 +94,7 @@ const UpdateProfile = ({ navigation }) => {
           password: "",
           confirmPassword: "",
           designations: profileData.subTitles ?? [],
+          timeSlots: profileData.timeSlots ?? [],
           getQuoteEnabled: Boolean(profileData.get_quote) ?? false,
           driverAssigned: false,
           location: profileData.location ?? "",
@@ -98,7 +102,7 @@ const UpdateProfile = ({ navigation }) => {
           affiliate: "",
           galleryImages: profileData.staffImages ?? [],
           youtubeVideos: profileData.staffYoutubeVideo ?? [],
-          staffGroups: profileData.staffGroups ?? [],
+          staffZones: profileData.staffZones ?? [],
           categories: profileData.category_ids ?? [],
           services: profileData.service_ids ?? [],
           addressProof: profileData.document[0]?.address_proof || null,
@@ -109,6 +113,7 @@ const UpdateProfile = ({ navigation }) => {
           drivingLicense: profileData.document[0]?.driving_license || null,
           education: profileData.document[0]?.education || null,
           other: profileData.document[0]?.other || null,
+          driverAssignments: profileData.driverAssignments || [],
         });
       } catch (error) {
         Alert.alert(
@@ -209,12 +214,16 @@ const UpdateProfile = ({ navigation }) => {
       }
     });
 
-    formData.staffGroups?.forEach((groupId, index) => {
-      formattedData.append(`staff_groups[${index}]`, groupId);
+    formData.staffZones?.forEach((zoneId, index) => {
+      formattedData.append(`staffZones[${index}]`, zoneId);
     });
 
     formData.designations?.forEach((subtitleId, index) => {
       formattedData.append(`subtitles[${index}]`, subtitleId);
+    });
+
+    formData.timeSlots?.forEach((timeSlotId, index) => {
+      formattedData.append(`timeSlots[${index}]`, timeSlotId);
     });
 
     formData.categories?.forEach((categoryId, index) => {
@@ -224,7 +233,31 @@ const UpdateProfile = ({ navigation }) => {
     formData.services?.forEach((serviceId, index) => {
       formattedData.append(`staff_services[${index}]`, serviceId);
     });
+
+    if (formData.driverAssignments) {
+      Object.entries(formData.driverAssignments).forEach(
+        ([day, assignments]) => {
+          assignments.forEach((assignment, index) => {
+            if (assignment.driverId && assignment.timeSlotId) {
+              formattedData.append(
+                `driver_assignments[${day}][${index}][driver_id]`,
+                assignment.driverId
+              );
+              formattedData.append(
+                `driver_assignments[${day}][${index}][time_slot_id]`,
+                assignment.timeSlotId
+              );
+              formattedData.append(
+                `driver_assignments[${day}][${index}][staff_id]`,
+                assignment.staffId
+              );
+            }
+          });
+        }
+      );
+    }
     setLoading(true);
+    AsyncStorage.setItem("@profileComplete", "true");
 
     try {
       const response = await axios.post(`${updateUserUrl}`, formattedData, {
@@ -233,11 +266,7 @@ const UpdateProfile = ({ navigation }) => {
         },
       });
       if (response.status === 200) {
-        setSuccess(true);
-        setError(false);
-        setTimeout(() => {
-          setSuccess(false);
-        }, 5000);
+        navigation.navigate('Home', { success: true });
       } else if (response.status === 201) {
         setSuccess(false);
         setError(true);
@@ -266,11 +295,11 @@ const UpdateProfile = ({ navigation }) => {
       case 1:
         return <Designation {...commonProps} onNext={handleNext} />;
       case 2:
-        return <DriverAssignment {...commonProps} onNext={handleNext} />;
+        return <Zones {...commonProps} onNext={handleNext} />;
       case 3:
-        return <GalleryVideos {...commonProps} onNext={handleNext} />;
+        return <TimeSlots {...commonProps} onNext={handleNext} />;
       case 4:
-        return <GroupZones {...commonProps} onNext={handleNext} />;
+        return <DriverAssignment {...commonProps} onNext={handleNext} />;
       case 5:
         return <Categories {...commonProps} onNext={handleNext} />;
       case 6:
@@ -278,6 +307,8 @@ const UpdateProfile = ({ navigation }) => {
       case 7:
         return <Services {...commonProps} onNext={handleNext} />;
       case 8:
+        return <GalleryVideos {...commonProps} onNext={handleNext} />;
+      case 9:
         return <Documents {...commonProps} onNext={handleNext} />;
       default:
         return null;
@@ -364,49 +395,6 @@ const UpdateProfile = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#e4fbfb",
-    padding: 10,
-  },
-  topBar: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: 10,
-    paddingTop: 10,
-  },
-  stepIndicatorContainer: {
-    marginTop: 20,
-  },
-  homeButton: {
-    backgroundColor: "#000",
-    paddingVertical: 5,
-    paddingHorizontal: 5,
-    borderRadius: 20,
-  },
-  content: {
-    flex: 1,
-    marginTop: 20,
-  },
-  error: {
-    color: "red",
-    backgroundColor: "#ffebee",
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 10,
-    textAlign: "center",
-    fontWeight: "500",
-  },
-  success: {
-    color: "green",
-    backgroundColor: "#e8f5e9",
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 10,
-    textAlign: "center",
-    fontWeight: "500",
-  },
-});
+const styles = StyleSheet.create(Profile);
 
 export default UpdateProfile;

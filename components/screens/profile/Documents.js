@@ -16,6 +16,7 @@ import StepNavigation from "./StepNavigation";
 import * as FileSystem from "expo-file-system";
 import Splash from "../Splash";
 import { getDatabase } from "../../Database/database";
+import Profile from "../../styles/Profile";
 
 const getFileExtension = (url) => {
   return url.substring(url.lastIndexOf("."));
@@ -159,14 +160,10 @@ const Documents = ({
   };
 
   const handleSubmit = async () => {
-    if (
-      !documents.idCardFront ||
-      !documents.idCardBack ||
-      !documents.passport
-    ) {
+    if (!documents.idCardFront || !documents.idCardBack) {
       Alert.alert(
         "Validation Error",
-        "Please upload ID Card Front, ID Card Back, and Passport."
+        "Please upload ID Card Front and ID Card Back."
       );
       return;
     }
@@ -232,7 +229,7 @@ const Documents = ({
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <View style={styles.container}>
+      <View style={styles.contentContainer}>
         <View style={styles.header}>
           <Text style={styles.sectionTitle}>Document Upload</Text>
         </View>
@@ -246,7 +243,7 @@ const Documents = ({
           </Text>
           {renderDocumentField("idCardFront", "ID Card Front Side", true)}
           {renderDocumentField("idCardBack", "ID Card Back Side", true)}
-          {renderDocumentField("passport", "Passport", true)}
+          {renderDocumentField("passport", "Passport")}
           {renderDocumentField("addressProof", "Address Proof")}
           {renderDocumentField("noc", "NOC (No Objection Certificate)")}
           {renderDocumentField("drivingLicense", "Driving License")}
@@ -266,86 +263,6 @@ const Documents = ({
   );
 };
 
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  innerContent: {
-    paddingVertical: 20,
-    justifyContent: "center",
-  },
-  required: {
-    color: "red",
-  },
-  note: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 20,
-    fontStyle: "italic",
-    textAlign: "center",
-  },
-  documentField: {
-    marginBottom: 20,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    backgroundColor: "#ffffff",
-  },
-  documentLabel: {
-    fontSize: 16,
-    marginBottom: 8,
-    fontWeight: "600",
-    color: "#333",
-  },
-  selectButton: {
-    backgroundColor: "#0d6efd",
-    padding: 12,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  selectButtonText: {
-    color: "#fff",
-  },
-  previewBox: {
-    marginTop: 12,
-    alignItems: "center",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 6,
-    backgroundColor: "#d9d9d9",
-    minHeight: 110,
-    justifyContent: "center",
-  },
-  imagePreview: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-  },
-  pdfLink: {
-    fontSize: 16,
-    color: "#007bff",
-    textDecorationLine: "underline",
-  },
-});
+const styles = StyleSheet.create(Profile);
 
 export default Documents;

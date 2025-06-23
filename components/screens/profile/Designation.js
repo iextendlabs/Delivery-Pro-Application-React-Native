@@ -6,13 +6,17 @@ import {
   FlatList,
   StyleSheet,
   Alert,
+  ScrollView,
   SafeAreaView,
 } from "react-native";
 import { loadAndRefreshSubTitleData } from "../../Database/dataSubTitles";
 import StepNavigation from "./StepNavigation";
 import { getDatabase } from "../../Database/database";
 import Splash from "../Splash";
-const ITEMS_PER_PAGE = 10;
+import Profile from "../../styles/Profile";
+
+const ITEMS_PER_PAGE = 20;
+
 const Designation = ({
   currentStep,
   totalSteps,
@@ -25,7 +29,6 @@ const Designation = ({
   const [designations, setDesignations] = useState([]);
   const [selectedDesignations, setSelectedDesignations] = useState([]);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
 
@@ -51,9 +54,9 @@ const Designation = ({
       setDesignations(subtitleData.data);
     } catch (error) {
       Alert.alert(
-        "Something went wrong", // Title (optional)
-        "Please uninstall the app\nand install the latest version to continue.", // Message with line break
-        [{ text: "OK" }] // Button
+        "Something went wrong",
+        "Please wait a moment and try again later.\n\nWe're currently experiencing some technical issues.\nThank you for your patience.",
+        [{ text: "OK" }]
       );
     }
     setIsDataLoading(false);
@@ -77,12 +80,10 @@ const Designation = ({
     }
 
     setIsLoading(true);
-
     const db = await getDatabase();
 
     try {
       await db.execAsync("BEGIN TRANSACTION");
-
       await db.runAsync("DELETE FROM designations");
 
       for (const id of selectedDesignations) {
@@ -112,6 +113,15 @@ const Designation = ({
     setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
   };
 
+  // Separate selected and available designations
+  const selectedItems = designations
+    .filter((item) => selectedDesignations.includes(item.id))
+    .slice(0, visibleCount);
+
+  const availableItems = designations
+    .filter((item) => !selectedDesignations.includes(item.id))
+    .slice(0, visibleCount);
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
@@ -131,36 +141,58 @@ const Designation = ({
     </TouchableOpacity>
   );
 
+  const renderLoadMoreButton = () => (
+    <TouchableOpacity style={styles.loadMoreButton} onPress={loadMore}>
+      <Text style={styles.loadMoreText}>Load More</Text>
+    </TouchableOpacity>
+  );
+
   if (isLoading || isDataLoading) {
     return <Splash />;
   }
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <View style={styles.container}>
+      <View style={styles.contentContainer}>
         <View style={styles.header}>
           <Text style={styles.sectionTitle}>Select Your Designation(s)</Text>
           <Text style={styles.subtitle}>You can select multiple options</Text>
-          {error && <Text style={styles.error}>{error}</Text>}
         </View>
 
-        <View style={styles.listWrapper}>
-          <FlatList
-            data={designations.slice(0, visibleCount)}
-            keyExtractor={(item) => item.id.toString()}
-            numColumns={2}
-            renderItem={renderItem}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.listContainer}
-          />
-
-          {visibleCount < designations.length && (
-            <TouchableOpacity onPress={loadMore}>
-              <Text style={styles.loadMoreText}>Load More</Text>
-            </TouchableOpacity>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Selected Designations Section */}
+          {selectedItems.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionHeader}>Selected Designations</Text>
+              <FlatList
+                data={selectedItems}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={2}
+                renderItem={renderItem}
+                scrollEnabled={false}
+              />
+            </View>
           )}
-        </View>
 
+          {/* Available Designations Section */}
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionHeader}>
+              {selectedItems.length > 0
+                ? "Available Designations"
+                : "All Designations"}
+            </Text>
+            <FlatList
+              data={availableItems}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={2}
+              renderItem={renderItem}
+              scrollEnabled={false}
+            />
+          </View>
+
+          {/* Load More Button */}
+          {visibleCount < designations.length && renderLoadMoreButton()}
+        </ScrollView>
         <StepNavigation
           currentStep={currentStep}
           totalSteps={totalSteps}
@@ -168,75 +200,13 @@ const Designation = ({
           onPrevious={onPrevious}
           onNext={handleNextPress}
           onSubmit={() => alert("Submit")}
+          showScrollPrompt={true}
         />
       </View>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  error: {
-    color: "red",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  listWrapper: {
-    flex: 1,
-  },
-  listContainer: {
-    paddingBottom: 20,
-    paddingTop: 20,
-  },
-  itemButton: {
-    flex: 1,
-    margin: 5,
-    padding: 15,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: "45%",
-  },
-  selectedButton: {
-    backgroundColor: "#000",
-    borderColor: "#000",
-  },
-  itemText: {
-    color: "#333",
-  },
-  selectedText: {
-    color: "#fff",
-  },
-  loadMoreText: {
-    color: "#007bff",
-    textAlign: "center",
-    marginTop: 15,
-    fontSize: 16,
-  },
-});
+const styles = StyleSheet.create(Profile);
 
 export default Designation;

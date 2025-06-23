@@ -10,7 +10,9 @@ const clearDatabase = async () => {
       DELETE FROM service_categories;
       DELETE FROM sub_titles;
       DELETE FROM sync_metadata;
-      DELETE FROM group_zone_data;
+      DELETE FROM zone_data;
+      DELETE FROM timeSlots;
+      DELETE FROM driver;
     `);
     console.log("[DATABASE] Cleanup completed successfully");
   } catch (error) {
@@ -27,11 +29,12 @@ const clearUserData = async () => {
       DELETE FROM users;
       DELETE FROM images;
       DELETE FROM youtube_videos;
-      DELETE FROM staff_groups;
+      DELETE FROM staff_zones;
       DELETE FROM staff_categories;
       DELETE FROM staff_services;
       DELETE FROM documents;
-      DELETE FROM designations;
+      DELETE FROM staff_timeSlots;
+      DELETE FROM staff_drivers;
     `);
     console.log("[DATABASE] Cleanup completed successfully");
   } catch (error) {
@@ -154,8 +157,8 @@ const saveAllSubTitle = async (sub_titles) => {
   }
 };
 
-const saveAllGroupData = async (groupData) => {
-  console.log("[GroupData] Starting to save groupData...");
+const saveAllZoneData = async (zoneData) => {
+  console.log("[zoneData] Starting to save zoneData...");
   const db = await getDatabase();
 
   try {
@@ -163,29 +166,104 @@ const saveAllGroupData = async (groupData) => {
     await db.execAsync("BEGIN TRANSACTION");
 
     try {
-      // Delete existing groupData
-      await db.runAsync("DELETE FROM group_zone_data");
+      // Delete existing zoneData
+      await db.runAsync("DELETE FROM zone_data");
 
-      // Insert new GroupData
-      for (const group of groupData) {
+      // Insert new zoneData
+      for (const zone of zoneData) {
         await db.runAsync(
-          "INSERT INTO group_zone_data (group_id, group_name,zone_name) VALUES (?, ?, ?)",
-          [group.group_id, group.group_name, group.zone_name]
+          "INSERT INTO zone_data (zone_id, zone_name) VALUES (?, ?)",
+          [zone.zone_id, zone.zone_name]
         );
       }
 
       // Commit transaction
       await db.execAsync("COMMIT");
-      console.log(
-        `[GroupData] Successfully saved ${groupData.length} groupData`
-      );
+      console.log(`[zoneData] Successfully saved ${zoneData.length} zoneData`);
     } catch (error) {
       // Rollback on error
       await db.execAsync("ROLLBACK");
       throw error;
     }
   } catch (error) {
-    console.error("[GroupData ERROR] Failed to save groupData:", error);
+    console.error("[zoneData ERROR] Failed to save zoneData:", error);
+    throw error;
+  }
+};
+
+const saveTimeSlot = async (timeSlots) => {
+  console.log("[TIMESLOTS] Starting to save timeSlots...");
+  const db = await getDatabase();
+
+  try {
+    await db.execAsync("BEGIN TRANSACTION");
+
+    try {
+      if (timeSlots.length > 0) {
+        await db.runAsync("DELETE FROM timeSlots");
+
+        for (const timeSlot of timeSlots) {
+          await db.runAsync(
+            "INSERT INTO timeSlots (id, name, time_start, time_end, date, type) VALUES (?, ?, ?, ?, ?, ?)",
+            [
+              timeSlot.id,
+              timeSlot.name,
+              timeSlot.time_start,
+              timeSlot.time_end,
+              timeSlot.date,
+              timeSlot.type,
+            ]
+          );
+        }
+      }
+
+      await db.execAsync("COMMIT");
+      if (timeSlots.length > 0) {
+        console.log(`[TIMESLOTS] Saved ${timeSlots.length} timeSlots`);
+      } else {
+        console.log("[TIMESLOTS] No timeSlots to save");
+      }
+    } catch (error) {
+      await db.execAsync("ROLLBACK");
+      throw error;
+    }
+  } catch (error) {
+    console.error("[TIMESLOTS ERROR] Failed to save timeSlots:", error);
+    throw error;
+  }
+};
+
+const saveDrivers = async (drivers) => {
+  console.log("[DRIVERS] Starting to save drivers...");
+  const db = await getDatabase();
+
+  try {
+    await db.execAsync("BEGIN TRANSACTION");
+
+    try {
+      if (drivers.length > 0) {
+        await db.runAsync("DELETE FROM driver");
+
+        for (const driver of drivers) {
+          await db.runAsync("INSERT INTO driver (id, name) VALUES (?, ?)", [
+            driver.id,
+            driver.name,
+          ]);
+        }
+      }
+
+      await db.execAsync("COMMIT");
+      if (drivers.length > 0) {
+        console.log(`[DRIVERS] Saved ${drivers.length} drivers`);
+      } else {
+        console.log("[DRIVERS] No drivers to save");
+      }
+    } catch (error) {
+      await db.execAsync("ROLLBACK");
+      throw error;
+    }
+  } catch (error) {
+    console.error("[DRIVERS ERROR] Failed to save drivers:", error);
     throw error;
   }
 };
@@ -238,11 +316,11 @@ const saveProfile = async (data) => {
     }
 
     // Save groups
-    await db.runAsync("DELETE FROM staff_groups");
-    if (data.staffGroups && data.staffGroups.length > 0) {
-      for (const groupId of data.staffGroups) {
-        await db.runAsync("INSERT INTO staff_groups (group_id) VALUES (?)", [
-          groupId,
+    await db.runAsync("DELETE FROM staff_zones");
+    if (data.staffZones && data.staffZones.length > 0) {
+      for (const zoneId of data.staffZones) {
+        await db.runAsync("INSERT INTO staff_zones (zone_id) VALUES (?)", [
+          zoneId,
         ]);
       }
     }
@@ -307,6 +385,33 @@ const saveProfile = async (data) => {
       }
     }
 
+    // Save staff timeSlot
+    await db.runAsync("DELETE FROM staff_timeSlots");
+    if (data.timeSlots && data.timeSlots.length > 0) {
+      for (const timeSlotId of data.timeSlots) {
+        await db.runAsync(
+          "INSERT INTO staff_timeSlots (timeSlot_id) VALUES (?)",
+          [timeSlotId]
+        );
+      }
+    }
+
+    // Save staff driver
+    await db.runAsync("DELETE FROM staff_drivers");
+    if (data.drivers && data.drivers.length > 0) {
+      for (const driver of data.drivers) {
+        await db.runAsync(
+          "INSERT INTO staff_drivers (id, staff_id, driver_id, day, time_slot_id) VALUES (?, ?, ?, ?, ?)",
+          [
+            driver.id,
+            driver.staff_id,
+            driver.driver_id,
+            driver.day,
+            driver.time_slot_id,
+          ]
+        );
+      }
+    }
     await db.execAsync("COMMIT");
     console.log("[PROFILE] Profile saved successfully");
   } catch (error) {
@@ -368,9 +473,11 @@ export {
   setLastFetchDate,
   shouldFetchToday,
   saveAllSubTitle,
-  saveAllGroupData,
+  saveAllZoneData,
   clearDatabase,
   saveAllCategories,
   saveProfile,
   clearUserData,
+  saveTimeSlot,
+  saveDrivers,
 };

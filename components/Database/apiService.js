@@ -2,12 +2,14 @@
 import axios from "axios";
 import {
   saveAllCategories,
-  saveAllGroupData,
+  saveAllZoneData,
   saveAllServices,
   saveAllSubTitle,
   saveProfile,
   setLastFetchDate,
   shouldFetchToday,
+  saveTimeSlot,
+  saveDrivers,
 } from "./servicesRepository";
 import { BaseUrl, getStaffProfileUrl } from "../config/Api";
 
@@ -20,7 +22,7 @@ const fetchServices = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "AppServicesData.json", {
+    const response = await axios.get(BaseUrl + "StaffAppServicesData.json", {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -113,16 +115,16 @@ const fetchSubTitles = async () => {
   }
 };
 
-const fetchGroupZone = async () => {
-  console.log("[API] Fetching groupData from server...");
+const fetchZone = async () => {
+  console.log("[API] Fetching zoneData from server...");
   try {
-    const shouldFetch = await shouldFetchToday("last_fetch_date_group_data");
+    const shouldFetch = await shouldFetchToday("last_fetch_date_zone_data");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "AppGroupData.json", {
+    const response = await axios.get(BaseUrl + "AppZoneData.json", {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -132,26 +134,88 @@ const fetchGroupZone = async () => {
 
     console.log(
       `[API] Successfully fetched ${
-        response.data.groupData?.length || 0
-      } groupData`
+        response.data.zoneData?.length || 0
+      } zoneData`
     );
 
-    const groupData = response.data.groupData.map((group) => ({
-      group_id: group.id,
-      group_name: group.group_name,
-      zone_name: group.zone.join(", "),
+    const zoneData = response.data.zoneData.map((zone) => ({
+      zone_id: zone.id,
+      zone_name: zone.name,
     }));
 
-    await saveAllGroupData(groupData);
-    await setLastFetchDate("last_fetch_date_group_data");
+    await saveAllZoneData(zoneData);
+    await setLastFetchDate("last_fetch_date_zone_data");
 
-    return groupData;
+    return zoneData;
   } catch (error) {
-    console.error("[API ERROR] Failed to fetch groupData:", error);
+    console.error("[API ERROR] Failed to fetch zoneData:", error);
     throw error;
   }
 };
 
+const fetchTimeSlot = async () => {
+  console.log("[API] Fetching timeSlots from server...");
+  try {
+    const shouldFetch = await shouldFetchToday("last_fetch_date_timeSlot");
+
+    if (!shouldFetch) {
+      console.log("Skipping fetch - already fetched today");
+      return null;
+    }
+    const response = await axios.get(BaseUrl + "AppTimeSlotsData.json", {
+      timeout: 10000,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log(
+      `[API] Successfully fetched ${
+        response.data.timeSlots?.length || 0
+      } timeSlots`
+    );
+
+    await saveTimeSlot(response.data.timeSlots);
+    await setLastFetchDate("last_fetch_date_timeSlot");
+
+    return response.data.timeSlots;
+  } catch (error) {
+    console.error("[API ERROR] Failed to fetch timeSlots:", error);
+    throw error;
+  }
+};
+
+const fetchDriver = async () => {
+  console.log("[API] Fetching drivers from server...");
+  try {
+    const shouldFetch = await shouldFetchToday("last_fetch_date_driver");
+
+    if (!shouldFetch) {
+      console.log("Skipping fetch - already fetched today");
+      return null;
+    }
+    const response = await axios.get(BaseUrl + "AppDriverData.json", {
+      timeout: 10000,
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log(
+      `[API] Successfully fetched ${response.data.drivers?.length || 0} drivers`
+    );
+
+    await saveDrivers(response.data.drivers);
+    await setLastFetchDate("last_fetch_date_driver");
+
+    return response.data.drivers;
+  } catch (error) {
+    console.error("[API ERROR] Failed to fetch drivers:", error);
+    throw error;
+  }
+};
 const fetchProfile = async (userId) => {
   console.log("[API] Fetching Profile from server...");
   try {
@@ -186,5 +250,7 @@ export {
   fetchSubTitles,
   fetchCategories,
   fetchProfile,
-  fetchGroupZone,
+  fetchZone,
+  fetchTimeSlot,
+  fetchDriver,
 };

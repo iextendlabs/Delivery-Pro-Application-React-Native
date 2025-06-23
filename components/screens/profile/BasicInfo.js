@@ -9,6 +9,7 @@ import {
   Platform,
   Switch,
   Alert,
+  StyleSheet,
 } from "react-native";
 import CustomTextInput from "../../common/CustomTextInput";
 import * as ImagePicker from "expo-image-picker";
@@ -20,6 +21,7 @@ import { getDatabase } from "../../Database/database";
 const db = SQLite.openDatabaseAsync("lipslay.db");
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Splash from "../Splash";
+import Profile from "../../styles/Profile";
 
 const BasicInfo = ({
   currentStep,
@@ -91,7 +93,9 @@ const BasicInfo = ({
     if (!mounted) return;
     setIsLoading(true);
     try {
-      const response = await axios.get("https://restcountries.com/v3.1/all?fields=idd,cca2");
+      const response = await axios.get(
+        "https://restcountries.com/v3.1/all?fields=idd,cca2"
+      );
 
       const tempCallingCodeToCountry = {};
       response.data.forEach((country) => {
@@ -408,7 +412,12 @@ const BasicInfo = ({
               onPress={handleImageUpload}
               style={styles.imageContainer}
             >
-              <Image source={{ uri: image }} style={styles.profileImage} />
+              <Image
+                source={
+                  image ? { uri: image } : require("../../images/icon.jpeg")
+                }
+                style={styles.profileImage}
+              />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -530,58 +539,6 @@ const BasicInfo = ({
   );
 };
 
-const styles = {
-  header: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  imageContainer: {
-    alignItems: "center",
-    margin: 20,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-  },
-  uploadButton: {
-    backgroundColor: "#e0e0e0",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    margin: 20,
-  },
-  uploadText: {
-    color: "#333",
-  },
-  subSectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginVertical: 15,
-    textAlign: "center",
-  },
-  description: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  switchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 10,
-    marginVertical: 10,
-  },
-  switchLabel: {
-    fontSize: 16,
-  },
-};
+const styles = StyleSheet.create(Profile);
 
 export default BasicInfo;

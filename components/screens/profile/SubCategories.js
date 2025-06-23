@@ -14,6 +14,7 @@ import { loadAndRefreshCategoryData } from "../../Database/dataCategories";
 import { getDatabase } from "../../Database/database";
 import Splash from "../Splash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Profile from "../../styles/Profile";
 
 const SubCategories = ({
   currentStep,
@@ -26,7 +27,6 @@ const SubCategories = ({
 }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [error, setError] = useState(null);
   const [mounted, setMounted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
@@ -67,7 +67,7 @@ const SubCategories = ({
     } catch (error) {
       Alert.alert(
         "Something went wrong",
-        "Please uninstall the app\nand install the latest version to continue.",
+        "Please wait a moment and try again later.\n\nWe're currently experiencing some technical issues.\nThank you for your patience.",
         [{ text: "OK" }]
       );
     }
@@ -139,18 +139,14 @@ const SubCategories = ({
         {/* Top Header remains the same */}
         <View style={styles.header}>
           <Text style={styles.sectionTitle}>Select Subcategories</Text>
-          <Text style={styles.infoText}>
+          <Text style={styles.subtitle}>
             Please select subcategories for each of your chosen categories
             below.
           </Text>
-          {error && <Text style={styles.error}>{error}</Text>}
         </View>
 
         {/* Scrollable Content */}
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-        >
+        <ScrollView contentContainerStyle={styles.scrollContent}>
           {grouped.map(({ parent, children }) => (
             <View key={parent.id} style={styles.categoryGroup}>
               <Text style={styles.parentTitle}>
@@ -162,7 +158,7 @@ const SubCategories = ({
                   <TouchableOpacity
                     key={child.id}
                     style={[
-                      styles.itemButton,
+                      styles.subItemButton,
                       selectedCategories.includes(child.id) &&
                         styles.selectedButton,
                     ]}
@@ -200,84 +196,6 @@ const SubCategories = ({
   );
 };
 
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  error: {
-    color: "red",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 10,
-    paddingBottom: 20,
-  },
-  categoryGroup: {
-    marginBottom: 20,
-  },
-  parentTitle: {
-    fontWeight: "bold",
-    fontSize: 16,
-    paddingVertical: 15,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-  },
-  itemsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  itemButton: {
-    width: "48%",
-    minHeight: 60,
-    marginBottom: 10,
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  selectedButton: {
-    backgroundColor: "#000",
-    borderColor: "#000",
-  },
-  itemText: {
-    color: "#333",
-    textAlign: "center",
-    fontSize: 14,
-  },
-  selectedText: {
-    color: "#fff",
-  },
-  infoText: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-    marginTop: 8,
-    marginBottom: 4,
-  },
-  parentName: {
-    color: "#007AFF",
-    fontWeight: "bold",
-  },
-});
+const styles = StyleSheet.create(Profile);
 
 export default SubCategories;

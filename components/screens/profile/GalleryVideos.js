@@ -17,6 +17,7 @@ import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getDatabase } from "../../Database/database";
 import Splash from "../Splash";
+import Profile from "../../styles/Profile";
 
 const GalleryVideos = ({
   currentStep,
@@ -177,7 +178,7 @@ const GalleryVideos = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.subtitle}>Gallery Images</Text>
+        <Text style={styles.subSectionTitle}>Gallery Images</Text>
         <TouchableOpacity style={styles.addButton} onPress={addGalleryImage}>
           <Text style={styles.addButtonText}>Add Images to Gallery</Text>
         </TouchableOpacity>
@@ -189,7 +190,7 @@ const GalleryVideos = ({
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.galleryList}
           renderItem={({ item, index }) => (
-            <View style={styles.imageContainer}>
+            <View style={styles.galleryImageContainer}>
               <Image source={{ uri: item }} style={styles.galleryImage} />
               <TouchableOpacity
                 style={styles.removeButton}
@@ -201,7 +202,7 @@ const GalleryVideos = ({
           )}
         />
 
-        <Text style={styles.subtitle}>YouTube Videos</Text>
+        <Text style={styles.subSectionTitle}>YouTube Videos</Text>
         <Text style={styles.note}>
           Note: Videos should not be uploaded to any social media before
           submission. We need new videos that haven't been shared anywhere else.
@@ -247,121 +248,6 @@ const GalleryVideos = ({
   );
 };
 
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-  },
-  header: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 20,
-    paddingBottom: 40, // for footer spacing
-  },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginTop: 15,
-    marginBottom: 10,
-  },
-  addButton: {
-    backgroundColor: "#e0e0e0",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginBottom: 15,
-  },
-  addButtonText: {
-    color: "#333",
-  },
-  imageContainer: {
-    margin: 5,
-    position: "relative",
-  },
-  galleryImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 5,
-  },
-  removeButton: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: "red",
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  removeButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  note: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 15,
-  },
-  whatsappButton: {
-    backgroundColor: "#25D366",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-    marginVertical: 15,
-  },
-  whatsappButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  agreementContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    borderWidth: 1,
-    borderColor: "#000",
-    marginRight: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  checkedBox: {
-    backgroundColor: "#000",
-  },
-  checkmark: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  agreementText: {
-    flex: 1,
-    fontSize: 14,
-  },
-  galleryList: {
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-  },
-  imageContainer: {
-    marginRight: 10,
-    position: "relative",
-  },
-  galleryImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 8,
-    backgroundColor: "#f0f0f0",
-  },
-});
+const styles = StyleSheet.create(Profile);
 
 export default GalleryVideos;
