@@ -1,5 +1,14 @@
 import { getDatabase } from "./database";
 
+// Utility function for batch inserts
+const batchInsert = async (db, table, columns, data) => {
+  if (data.length === 0) return;
+  
+  const placeholders = data.map(() => `(${columns.map(() => '?').join(',')})`).join(',');
+  const query = `INSERT INTO ${table} (${columns.join(',')}) VALUES ${placeholders}`;
+  await db.runAsync(query, data.flat());
+};
+
 const clearDatabase = async () => {
   console.log("[DATABASE] Starting database cleanup...");
   try {
@@ -48,36 +57,31 @@ const saveAllServices = async (services) => {
   const db = await getDatabase();
 
   try {
-    // Start transaction manually
     await db.execAsync("BEGIN TRANSACTION");
 
     try {
-      // Delete existing services
+      // Delete existing data
       await db.runAsync("DELETE FROM services");
       await db.runAsync("DELETE FROM service_categories");
-      // Insert new services
-      for (const service of services) {
-        await db.runAsync("INSERT INTO services (id, name) VALUES (?, ?)", [
-          service.id,
-          service.name,
-        ]);
 
-        if (service.category_ids && service.category_ids.length > 0) {
-          const uniqueCategories = [...new Set(service.category_ids)];
-          for (const categoryId of uniqueCategories) {
-            await db.runAsync(
-              "INSERT INTO service_categories (service_id, category_id) VALUES (?, ?)",
-              [service.id, categoryId]
-            );
-          }
-        }
-      }
+      // Prepare batch inserts
+      const servicesBatch = services.map(service => [service.id, service.name]);
+      
+      const categoriesBatch = services.flatMap(service => 
+        (service.category_ids && service.category_ids.length > 0) 
+          ? [...new Set(service.category_ids)].map(categoryId => [service.id, categoryId])
+          : []
+      );
 
-      // Commit transaction
+      // Batch insert services
+      await batchInsert(db, 'services', ['id', 'name'], servicesBatch);
+      
+      // Batch insert categories
+      await batchInsert(db, 'service_categories', ['service_id', 'category_id'], categoriesBatch);
+
       await db.execAsync("COMMIT");
       console.log(`[SERVICES] Successfully saved ${services.length} services`);
     } catch (error) {
-      // Rollback on error
       await db.execAsync("ROLLBACK");
       throw error;
     }
@@ -95,23 +99,15 @@ const saveAllCategories = async (categories) => {
     await db.execAsync("BEGIN TRANSACTION");
 
     try {
-      if (categories.length > 0) {
-        await db.runAsync("DELETE FROM categories");
+      await db.runAsync("DELETE FROM categories");
 
-        for (const category of categories) {
-          await db.runAsync(
-            "INSERT INTO categories (id, title, parent_id) VALUES (?, ?, ?)",
-            [category.id, category.title, category.parent_id || null]
-          );
-        }
+      if (categories.length > 0) {
+        const batch = categories.map(cat => [cat.id, cat.title, cat.parent_id || null]);
+        await batchInsert(db, 'categories', ['id', 'title', 'parent_id'], batch);
       }
 
       await db.execAsync("COMMIT");
-      if (categories.length > 0) {
-        console.log(`[CATEGORIES] Saved ${categories.length} categories`);
-      } else {
-        console.log("[CATEGORIES] No categories to save");
-      }
+      console.log(`[CATEGORIES] ${categories.length > 0 ? `Saved ${categories.length} categories` : 'No categories to save'}`);
     } catch (error) {
       await db.execAsync("ROLLBACK");
       throw error;
@@ -130,23 +126,15 @@ const saveAllSubTitle = async (sub_titles) => {
     await db.execAsync("BEGIN TRANSACTION");
 
     try {
-      if (sub_titles.length > 0) {
-        await db.runAsync("DELETE FROM sub_titles");
+      await db.runAsync("DELETE FROM sub_titles");
 
-        for (const sub_title of sub_titles) {
-          await db.runAsync("INSERT INTO sub_titles (id, name) VALUES (?, ?)", [
-            sub_title.id,
-            sub_title.name,
-          ]);
-        }
+      if (sub_titles.length > 0) {
+        const batch = sub_titles.map(st => [st.id, st.name]);
+        await batchInsert(db, 'sub_titles', ['id', 'name'], batch);
       }
 
       await db.execAsync("COMMIT");
-      if (sub_titles.length > 0) {
-        console.log(`[SUBTITLES] Saved ${sub_titles.length} subtitles`);
-      } else {
-        console.log("[SUBTITLES] No subtitles to save");
-      }
+      console.log(`[SUBTITLES] ${sub_titles.length > 0 ? `Saved ${sub_titles.length} subtitles` : 'No subtitles to save'}`);
     } catch (error) {
       await db.execAsync("ROLLBACK");
       throw error;
@@ -162,26 +150,19 @@ const saveAllZoneData = async (zoneData) => {
   const db = await getDatabase();
 
   try {
-    // Start transaction manually
     await db.execAsync("BEGIN TRANSACTION");
 
     try {
-      // Delete existing zoneData
       await db.runAsync("DELETE FROM zone_data");
 
-      // Insert new zoneData
-      for (const zone of zoneData) {
-        await db.runAsync(
-          "INSERT INTO zone_data (zone_id, zone_name) VALUES (?, ?)",
-          [zone.zone_id, zone.zone_name]
-        );
+      if (zoneData.length > 0) {
+        const batch = zoneData.map(zone => [zone.zone_id, zone.zone_name]);
+        await batchInsert(db, 'zone_data', ['zone_id', 'zone_name'], batch);
       }
 
-      // Commit transaction
       await db.execAsync("COMMIT");
-      console.log(`[zoneData] Successfully saved ${zoneData.length} zoneData`);
+      console.log(`[zoneData] ${zoneData.length > 0 ? `Saved ${zoneData.length} zoneData` : 'No zone data to save'}`);
     } catch (error) {
-      // Rollback on error
       await db.execAsync("ROLLBACK");
       throw error;
     }
@@ -199,30 +180,25 @@ const saveTimeSlot = async (timeSlots) => {
     await db.execAsync("BEGIN TRANSACTION");
 
     try {
-      if (timeSlots.length > 0) {
-        await db.runAsync("DELETE FROM timeSlots");
+      await db.runAsync("DELETE FROM timeSlots");
 
-        for (const timeSlot of timeSlots) {
-          await db.runAsync(
-            "INSERT INTO timeSlots (id, name, time_start, time_end, date, type) VALUES (?, ?, ?, ?, ?, ?)",
-            [
-              timeSlot.id,
-              timeSlot.name,
-              timeSlot.time_start,
-              timeSlot.time_end,
-              timeSlot.date,
-              timeSlot.type,
-            ]
-          );
-        }
+      if (timeSlots.length > 0) {
+        const batch = timeSlots.map(ts => [
+          ts.id, 
+          ts.name, 
+          ts.time_start, 
+          ts.time_end, 
+          ts.date, 
+          ts.type
+        ]);
+        await batchInsert(db, 'timeSlots', 
+          ['id', 'name', 'time_start', 'time_end', 'date', 'type'], 
+          batch
+        );
       }
 
       await db.execAsync("COMMIT");
-      if (timeSlots.length > 0) {
-        console.log(`[TIMESLOTS] Saved ${timeSlots.length} timeSlots`);
-      } else {
-        console.log("[TIMESLOTS] No timeSlots to save");
-      }
+      console.log(`[TIMESLOTS] ${timeSlots.length > 0 ? `Saved ${timeSlots.length} timeSlots` : 'No timeSlots to save'}`);
     } catch (error) {
       await db.execAsync("ROLLBACK");
       throw error;
@@ -241,23 +217,15 @@ const saveDrivers = async (drivers) => {
     await db.execAsync("BEGIN TRANSACTION");
 
     try {
-      if (drivers.length > 0) {
-        await db.runAsync("DELETE FROM driver");
+      await db.runAsync("DELETE FROM driver");
 
-        for (const driver of drivers) {
-          await db.runAsync("INSERT INTO driver (id, name) VALUES (?, ?)", [
-            driver.id,
-            driver.name,
-          ]);
-        }
+      if (drivers.length > 0) {
+        const batch = drivers.map(d => [d.id, d.name]);
+        await batchInsert(db, 'driver', ['id', 'name'], batch);
       }
 
       await db.execAsync("COMMIT");
-      if (drivers.length > 0) {
-        console.log(`[DRIVERS] Saved ${drivers.length} drivers`);
-      } else {
-        console.log("[DRIVERS] No drivers to save");
-      }
+      console.log(`[DRIVERS] ${drivers.length > 0 ? `Saved ${drivers.length} drivers` : 'No drivers to save'}`);
     } catch (error) {
       await db.execAsync("ROLLBACK");
       throw error;
@@ -274,148 +242,123 @@ const saveProfile = async (data) => {
 
   try {
     await db.execAsync("BEGIN TRANSACTION");
-    await db.runAsync("DELETE FROM users");
 
-    // Save user data
-    await db.runAsync(
-      `INSERT INTO users (
-        id, name, email, phone, whatsapp, get_quote, status, image, 
-        location, nationality, about
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        data.user_id,
-        data.name,
-        data.email,
-        data.phone,
-        data.whatsapp,
-        data.get_quote,
-        data.status,
-        data.image,
-        data.location,
-        data.nationality,
-        data.about,
-      ]
-    );
-
-    // Save images
-    await db.runAsync("DELETE FROM images");
-    if (data.staffImages && data.staffImages.length > 0) {
-      for (const image of data.staffImages) {
-        await db.runAsync("INSERT INTO images (image) VALUES (?)", [image]);
-      }
-    }
-
-    // Save youtube videos
-    await db.runAsync("DELETE FROM youtube_videos");
-    if (data.staffYoutubeVideo && data.staffYoutubeVideo.length > 0) {
-      for (const video of data.staffYoutubeVideo) {
-        await db.runAsync("INSERT INTO youtube_videos (video) VALUES (?)", [
-          video,
-        ]);
-      }
-    }
-
-    // Save groups
-    await db.runAsync("DELETE FROM staff_zones");
-    if (data.staffZones && data.staffZones.length > 0) {
-      for (const zoneId of data.staffZones) {
-        await db.runAsync("INSERT INTO staff_zones (zone_id) VALUES (?)", [
-          zoneId,
-        ]);
-      }
-    }
-
-    // Save categories
-    await db.runAsync("DELETE FROM staff_categories");
-    if (data.category_ids && data.category_ids.length > 0) {
-      for (const categoryId of data.category_ids) {
-        await db.runAsync(
-          "INSERT INTO staff_categories (category_id) VALUES (?)",
-          [categoryId]
-        );
-      }
-    }
-
-    // Save services
-    await db.runAsync("DELETE FROM staff_services");
-    if (data.service_ids && data.service_ids.length > 0) {
-      for (const serviceId of data.service_ids) {
-        await db.runAsync(
-          "INSERT INTO staff_services (service_id) VALUES (?)",
-          [serviceId]
-        );
-      }
-    }
-
-    // Save documents
-    await db.runAsync("DELETE FROM documents");
-    if (data.document) {
+    try {
+      // Save user data
+      await db.runAsync("DELETE FROM users");
       await db.runAsync(
-        `INSERT INTO documents (
-          address_proof,
-          driving_license,
-          education,
-          id_card_back,
-          id_card_front,
-          noc,
-          other,
-          passport
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO users (
+          id, name, email, phone, whatsapp, get_quote, status, image, 
+          location, nationality, about
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          data.document.address_proof,
-          data.document.driving_license,
-          data.document.education,
-          data.document.id_card_back,
-          data.document.id_card_front,
-          data.document.noc,
-          data.document.other,
-          data.document.passport,
+          data.user_id,
+          data.name,
+          data.email,
+          data.phone,
+          data.whatsapp,
+          data.get_quote,
+          data.status,
+          data.image,
+          data.location,
+          data.nationality,
+          data.about,
         ]
       );
-    }
 
-    // Save designations (subTitles in your data)
-    await db.runAsync("DELETE FROM designations");
-    if (data.subTitles && data.subTitles.length > 0) {
-      for (const designationId of data.subTitles) {
-        await db.runAsync(
-          "INSERT INTO designations (designation_id) VALUES (?)",
-          [designationId]
-        );
+      // Save images
+      await db.runAsync("DELETE FROM images");
+      if (data.staffImages?.length > 0) {
+        const batch = data.staffImages.map(img => [img]);
+        await batchInsert(db, 'images', ['image'], batch);
       }
-    }
 
-    // Save staff timeSlot
-    await db.runAsync("DELETE FROM staff_timeSlots");
-    if (data.timeSlots && data.timeSlots.length > 0) {
-      for (const timeSlotId of data.timeSlots) {
-        await db.runAsync(
-          "INSERT INTO staff_timeSlots (timeSlot_id) VALUES (?)",
-          [timeSlotId]
-        );
+      // Save youtube videos
+      await db.runAsync("DELETE FROM youtube_videos");
+      if (data.staffYoutubeVideo?.length > 0) {
+        const batch = data.staffYoutubeVideo.map(video => [video]);
+        await batchInsert(db, 'youtube_videos', ['video'], batch);
       }
-    }
 
-    // Save staff driver
-    await db.runAsync("DELETE FROM staff_drivers");
-    if (data.drivers && data.drivers.length > 0) {
-      for (const driver of data.drivers) {
+      // Save groups
+      await db.runAsync("DELETE FROM staff_zones");
+      if (data.staffZones?.length > 0) {
+        const batch = data.staffZones.map(zoneId => [zoneId]);
+        await batchInsert(db, 'staff_zones', ['zone_id'], batch);
+      }
+
+      // Save categories
+      await db.runAsync("DELETE FROM staff_categories");
+      if (data.category_ids?.length > 0) {
+        const batch = data.category_ids.map(catId => [catId]);
+        await batchInsert(db, 'staff_categories', ['category_id'], batch);
+      }
+
+      // Save services
+      await db.runAsync("DELETE FROM staff_services");
+      if (data.service_ids?.length > 0) {
+        const batch = data.service_ids.map(serviceId => [serviceId]);
+        await batchInsert(db, 'staff_services', ['service_id'], batch);
+      }
+
+      // Save documents
+      await db.runAsync("DELETE FROM documents");
+      if (data.document) {
         await db.runAsync(
-          "INSERT INTO staff_drivers (id, staff_id, driver_id, day, time_slot_id) VALUES (?, ?, ?, ?, ?)",
+          `INSERT INTO documents (
+            address_proof, driving_license, education, id_card_back,
+            id_card_front, noc, other, passport
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            driver.id,
-            driver.staff_id,
-            driver.driver_id,
-            driver.day,
-            driver.time_slot_id,
+            data.document.address_proof,
+            data.document.driving_license,
+            data.document.education,
+            data.document.id_card_back,
+            data.document.id_card_front,
+            data.document.noc,
+            data.document.other,
+            data.document.passport,
           ]
         );
       }
+
+      // Save designations
+      await db.runAsync("DELETE FROM designations");
+      if (data.subTitles?.length > 0) {
+        const batch = data.subTitles.map(designationId => [designationId]);
+        await batchInsert(db, 'designations', ['designation_id'], batch);
+      }
+
+      // Save staff timeSlot
+      await db.runAsync("DELETE FROM staff_timeSlots");
+      if (data.timeSlots?.length > 0) {
+        const batch = data.timeSlots.map(timeSlotId => [timeSlotId]);
+        await batchInsert(db, 'staff_timeSlots', ['timeSlot_id'], batch);
+      }
+
+      // Save staff driver
+      await db.runAsync("DELETE FROM staff_drivers");
+      if (data.drivers?.length > 0) {
+        const batch = data.drivers.map(driver => [
+          driver.id,
+          driver.staff_id,
+          driver.driver_id,
+          driver.day,
+          driver.time_slot_id
+        ]);
+        await batchInsert(db, 'staff_drivers', 
+          ['id', 'staff_id', 'driver_id', 'day', 'time_slot_id'], 
+          batch
+        );
+      }
+
+      await db.execAsync("COMMIT");
+      console.log("[PROFILE] Profile saved successfully");
+    } catch (error) {
+      await db.execAsync("ROLLBACK");
+      throw error;
     }
-    await db.execAsync("COMMIT");
-    console.log("[PROFILE] Profile saved successfully");
   } catch (error) {
-    await db.execAsync("ROLLBACK");
     console.error("[PROFILE ERROR] Failed to save profile:", error);
     throw error;
   }
@@ -446,22 +389,15 @@ const shouldFetchToday = async ($key) => {
       [$key]
     );
 
-    if (!result) {
-      console.log("[SYNC] No previous fetch found - need to fetch");
-      return true;
-    }
+    if (!result) return true;
 
     const lastFetch = new Date(result.value);
     const today = new Date();
-    console.log(`[SYNC] Last fetch was at: ${lastFetch}`);
-
-    const isDifferentDay =
+    return (
       lastFetch.getDate() !== today.getDate() ||
       lastFetch.getMonth() !== today.getMonth() ||
-      lastFetch.getFullYear() !== today.getFullYear();
-
-    console.log(`[SYNC] Need to fetch today: ${isDifferentDay}`);
-    return isDifferentDay;
+      lastFetch.getFullYear() !== today.getFullYear()
+    );
   } catch (error) {
     console.error("[SYNC ERROR] Failed to check fetch status:", error);
     return true;
