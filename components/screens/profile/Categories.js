@@ -8,6 +8,8 @@ import {
   Alert,
   SafeAreaView,
   ScrollView,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import StepNavigation from "./StepNavigation";
 import { loadAndRefreshCategoryData } from "../../Database/dataCategories";
@@ -156,7 +158,7 @@ const Categories = ({
     </TouchableOpacity>
   );
 
-  if (isLoading || isDataLoading) {
+  if (isLoading) {
     return <Splash />;
   }
 
@@ -215,6 +217,21 @@ const Categories = ({
           showScrollPrompt={true}
         />
       </View>
+      <Modal
+        transparent={true}
+        visible={isDataLoading}
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#ffffff" />
+            <Text style={styles.loadingText}>
+              Please wait, data is being loaded.
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

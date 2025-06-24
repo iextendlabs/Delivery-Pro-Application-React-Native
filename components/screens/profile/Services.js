@@ -8,6 +8,8 @@ import {
   Alert,
   SafeAreaView,
   ScrollView,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import StepNavigation from "./StepNavigation";
 import { getDatabase } from "../../Database/database";
@@ -30,7 +32,8 @@ const Services = ({
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
   const [mounted, setMounted] = useState(true);
-  const [visibleServicesCount, setVisibleServicesCount] = useState(ITEMS_PER_PAGE);
+  const [visibleServicesCount, setVisibleServicesCount] =
+    useState(ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
 
@@ -63,7 +66,9 @@ const Services = ({
       // Filter services by selected categories
       const selectedCategoryIds = formData.categories || [];
       const filteredServices = services.data.filter((service) =>
-        service.category_ids.some((catId) => selectedCategoryIds.includes(catId))
+        service.category_ids.some((catId) =>
+          selectedCategoryIds.includes(catId)
+        )
       );
       setServices(filteredServices);
     } catch (error) {
@@ -133,11 +138,11 @@ const Services = ({
 
   // Separate selected and available services
   const selectedItems = services
-    .filter(item => selectedServices.includes(item.id))
+    .filter((item) => selectedServices.includes(item.id))
     .slice(0, visibleServicesCount);
-  
+
   const availableItems = services
-    .filter(item => !selectedServices.includes(item.id))
+    .filter((item) => !selectedServices.includes(item.id))
     .slice(0, visibleServicesCount);
 
   const renderItem = ({ item }) => (
@@ -165,7 +170,7 @@ const Services = ({
     </TouchableOpacity>
   );
 
-  if (isLoading || isDataLoading) {
+  if (isLoading) {
     return <Splash />;
   }
 
@@ -196,7 +201,7 @@ const Services = ({
           {/* Available Services Section */}
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionHeader}>
-              {selectedItems.length > 0 ? 'Available Services' : 'All Services'}
+              {selectedItems.length > 0 ? "Available Services" : "All Services"}
             </Text>
             <FlatList
               data={availableItems}
@@ -222,12 +227,26 @@ const Services = ({
           showScrollPrompt={true}
         />
       </View>
+      <Modal
+        transparent={true}
+        visible={isDataLoading}
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#ffffff" />
+            <Text style={styles.loadingText}>
+              Please wait, data is being loaded.
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 // All styles remain exactly the same as original
 const styles = StyleSheet.create(Profile);
-
 
 export default Services;

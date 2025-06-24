@@ -506,6 +506,25 @@ const Profile = {
     color: "#007bff",
     textDecorationLine: "underline",
   },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker semi-transparent background
+  },
+  loadingContainer: {
+    backgroundColor: "transparent", // Make container transparent
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    width: "80%", // Take up most of screen width
+  },
+  loadingText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: "#ffffff", // White text
+    textAlign: "center",
+  },
 };
 
 export default Profile;

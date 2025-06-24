@@ -21,12 +21,6 @@ import HomeMenu from "./components/HomeMenu";
 import VersionCheck from "react-native-version-check";
 import UpdateModal from "../common/UpdateModal";
 import Constants from "expo-constants";
-import { loadAndRefreshData } from "../Database/dataService";
-import { loadAndRefreshCategoryData } from "../Database/dataCategories";
-import { loadAndRefreshSubTitleData } from "../Database/dataSubTitles";
-import { loadAndRefreshZoneData } from "../Database/zoneData";
-import { loadAndRefreshTimeSlotData } from "../Database/dataTimeSlot";
-import { loadAndRefreshDriverData } from "../Database/dataDriver";
 import { useRoute } from "@react-navigation/native";
 
 const Home = ({ navigation }) => {
@@ -43,7 +37,6 @@ const Home = ({ navigation }) => {
   const [profileStatus, setProfileStatus] = useState("");
   const route = useRoute();
   const [showSuccess, setShowSuccess] = useState(false);
-  const [dataSaving, setDataSaving] = useState(false);
 
   useEffect(() => {
     if (route.params?.success) {
@@ -56,75 +49,6 @@ const Home = ({ navigation }) => {
       }, 10000);
     }
   }, [route.params?.success]);
-
-  const initializeApp = async () => {
-    setDataSaving(true);
-    try {
-      await AsyncStorage.setItem("@loading", "1");
-      console.log("[INIT] Step 4: Loading services data...");
-      const serviceResult = await loadAndRefreshData();
-      if (!serviceResult.success) {
-        throw new Error("Failed to load services data");
-      }
-      console.log("[INIT] Services load succeeded");
-
-      console.log("[INIT] Step 5: Loading categories data...");
-      const categoryResult = await loadAndRefreshCategoryData();
-      if (!categoryResult.success) {
-        throw new Error("Failed to load categories data");
-      }
-      console.log("[INIT] Categories load succeeded");
-
-      console.log("[INIT] Step 6: Loading subtitles data...");
-      const subTitleResult = await loadAndRefreshSubTitleData();
-      if (!subTitleResult.success) {
-        throw new Error("Failed to load subtitles data");
-      }
-      console.log("[INIT] Subtitles load succeeded");
-
-      console.log("[INIT] Step 4: Loading zone data...");
-      const zoneResult = await loadAndRefreshZoneData();
-      if (!zoneResult.success) {
-        throw new Error("Failed to load zone data");
-      }
-      console.log("[INIT] zone load succeeded");
-
-      console.log("[INIT] Step 4: Loading TimeSlot data...");
-      const timeSlotsResult = await loadAndRefreshTimeSlotData();
-      if (!timeSlotsResult.success) {
-        throw new Error("Failed to load TimeSlot data");
-      }
-      console.log("[INIT] TimeSlot load succeeded");
-
-      console.log("[INIT] Step 4: Loading Driver data...");
-      const driversResult = await loadAndRefreshDriverData();
-      if (!driversResult.success) {
-        throw new Error("Failed to load Driver data");
-      }
-      console.log("[INIT] Driver load succeeded");
-      await AsyncStorage.setItem("@loading", "0");
-    } catch (error) {
-      await AsyncStorage.setItem("@loading", "0");
-      console.error("[INIT ERROR] Initialization failed:", error);
-      throw error; // Re-throw to allow calling code to handle
-    }
-    setDataSaving(false);
-  };
-
-  // // Usage in component
-  useEffect(() => {
-    const initialize = async () => {
-      try {
-        // Initialize the app
-        await initializeApp();
-      } catch (error) {
-        console.error("Initialization failed:", error);
-        // Optionally show error to user or retry
-      }
-    };
-
-    initialize();
-  }, []);
 
   useEffect(() => {
     fetchData();
@@ -215,6 +139,9 @@ const Home = ({ navigation }) => {
       await AsyncStorage.removeItem("@access_token");
       await AsyncStorage.removeItem("@notifications");
       await AsyncStorage.removeItem("@signup_step");
+      await AsyncStorage.removeItem("@profileComplete");
+      await AsyncStorage.removeItem("@videoAgreement");
+      await AsyncStorage.removeItem("@subCategory");
       navigation.reset({
         index: 0,
         routes: [{ name: "Login" }],
@@ -251,15 +178,6 @@ const Home = ({ navigation }) => {
       setError("Failed to update profile. Please try again.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleEdit = async () => {
-    const loading = await AsyncStorage.getItem("@loading");
-    if (loading === "1") {
-      alert("Please wait, data is being loaded. Try again in a few minutes.");
-    } else {
-      navigation.navigate("UpdateProfile");
     }
   };
 
@@ -322,7 +240,9 @@ const Home = ({ navigation }) => {
                 }
                 bgColor="#4CAF50"
                 textColor="#fff"
-                onPress={handleEdit}
+                onPress={() => {
+                  navigation.navigate("UpdateProfile");
+                }}
               />
 
               <CommonButton
@@ -377,7 +297,9 @@ const Home = ({ navigation }) => {
             userData={userData}
             handleToggle={handleToggle}
             handleLogout={handleLogout}
-            handleEdit={handleEdit}
+            handleEdit={() => {
+              navigation.navigate("UpdateProfile");
+            }}
             supervisors={supervisors}
             version={version}
           />
@@ -469,48 +391,10 @@ const Home = ({ navigation }) => {
     <View style={{ flex: 1 }}>
       {/* Main content */}
       {renderMainContent()}
-
-      {/* Data saving overlay */}
-      <Modal
-        transparent={true}
-        visible={dataSaving}
-        animationType="fade"
-        onRequestClose={() => {}}
-      >
-        <View style={styles.overlay}>
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#ffffff" />
-            <Text style={styles.loadingText}>
-              Please wait, data is being loaded.
-            </Text>
-          </View>
-        </View>
-      </Modal>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  ...HomeStyle,
-  overlay: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker semi-transparent background
-  },
-  loadingContainer: {
-    backgroundColor: "transparent", // Make container transparent
-    padding: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    width: "80%", // Take up most of screen width
-  },
-  loadingText: {
-    marginTop: 20,
-    fontSize: 16,
-    color: "#ffffff", // White text
-    textAlign: "center",
-  },
-});
+const styles = StyleSheet.create(HomeStyle);
 
 export default Home;

@@ -245,16 +245,16 @@ const BasicInfo = ({
       validationErrors.number = "Phone number is required";
     } else if (number.length < 6) {
       validationErrors.number = "Phone number is too short";
-    } else if (!/^\d+$/.test(number)) {
-      validationErrors.number = "Phone number must contain only digits";
+    } else if (!/^[\d\s]+$/.test(number)) {
+      validationErrors.number = "Phone number must contain only digits and spaces";
     }
 
     if (!whatsapp || whatsapp.trim().length === 0) {
       validationErrors.whatsapp = "WhatsApp number is required";
     } else if (whatsapp.length < 6) {
       validationErrors.whatsapp = "WhatsApp number is too short";
-    } else if (!/^\d+$/.test(whatsapp)) {
-      validationErrors.whatsapp = "WhatsApp number must contain only digits";
+    } else if (!/^[\d\s]+$/.test(whatsapp)) {
+      validationErrors.whatsapp = "WhatsApp number must contain only digits and spaces";
     }
 
     if (password || confirmPassword) {
