@@ -41,11 +41,33 @@ const SubCategories = ({
 
   useEffect(() => {
     setIsLoading(true);
+
     if (formData?.categories) {
-      setSelectedCategories(formData.categories);
+      const selectedCategories = new Set(formData.categories);
+
+      // Function to check if ALL ancestors of a category are selected
+      const hasAllAncestorsSelected = (categoryId) => {
+        const category = categories.find((c) => c.id === categoryId);
+        if (!category?.parent_id) {
+          return true; // Root category (no parent) is always valid
+        }
+        // Check if parent is selected, and recursively check its ancestors
+        return (
+          selectedCategories.has(category.parent_id) &&
+          hasAllAncestorsSelected(category.parent_id)
+        );
+      };
+
+      // Filter: Keep only categories where ALL ancestors are selected
+      const validCategories = Array.from(selectedCategories).filter((catId) =>
+        hasAllAncestorsSelected(catId)
+      );
+
+      setSelectedCategories(validCategories);
     }
+
     setIsLoading(false);
-  }, [formData]);
+  }, [formData, categories]);
 
   const fetchData = async () => {
     if (!mounted || !formData) return;
@@ -61,8 +83,13 @@ const SubCategories = ({
         formData.categories.includes(cat.parent_id)
       );
       if (!hasChild) {
+        const parentCategories = formData.categories.filter((catId) => {
+          const category = categories.data.find((c) => c.id === catId);
+          return category && !category.parent_id;
+        });
+
         AsyncStorage.setItem("@subCategory", "0");
-        handleNextPress(formData.categories);
+        handleNextPress(parentCategories);
       }
     } catch (error) {
       Alert.alert(
@@ -120,9 +147,31 @@ const SubCategories = ({
   };
 
   const toggleCategory = (id) => {
-    setSelectedCategories((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+    setSelectedCategories((prev) => {
+      // If the category is already selected, remove it + its children
+      if (prev.includes(id)) {
+        // Get all children (and grandchildren, etc.) recursively
+        const getDescendants = (parentId) => {
+          const children = categories.filter(
+            (cat) => cat.parent_id === parentId
+          );
+          const descendants = children.flatMap((child) => [
+            child.id,
+            ...getDescendants(child.id), // Recursively get grandchildren
+          ]);
+          return descendants;
+        };
+
+        const descendantsToRemove = getDescendants(id);
+        return prev.filter(
+          (item) => item !== id && !descendantsToRemove.includes(item)
+        );
+      }
+      // If the category is not selected, just add it
+      else {
+        return [...prev, id];
+      }
+    });
   };
 
   if (isLoading || isDataLoading) {
@@ -190,6 +239,7 @@ const SubCategories = ({
           onPrevious={onPrevious}
           onNext={() => handleNextPress()}
           onSubmit={() => alert("Submit")}
+          showScrollPrompt={true}
         />
       </View>
     </SafeAreaView>

@@ -1,4 +1,6 @@
+import { BaseUrl } from "../config/Api";
 import { getDatabase } from "./database";
+import axios from "axios";
 
 // Utility function for batch inserts
 const batchInsert = async (db, table, columns, data) => {
@@ -364,43 +366,65 @@ const saveProfile = async (data) => {
   }
 };
 
-const setLastFetchDate = async ($key) => {
-  const now = new Date().toISOString();
-  console.log("[SYNC] Setting last fetch date to:", now);
-
+const setLastFetchDate = async (key) => {
   try {
+    const response = await axios.get(BaseUrl + "updatesDataVersion.json");
+    const serverVersions = response.data;
+
+    if (typeof serverVersions[key] === "undefined") {
+      console.warn(`[SYNC WARNING] Key ${key} not found in server timestamps`);
+      return;
+    }
+
+    const version = serverVersions[key];
+    console.log("[SYNC] Setting last fetch version to:", version);
+
     const db = await getDatabase();
     await db.runAsync(
       "INSERT OR REPLACE INTO sync_metadata (key, value) VALUES (?, ?)",
-      [$key, now]
+      [key, version]
     );
-    console.log("[SYNC] Last fetch date set successfully");
+    console.log("[SYNC] Last fetch version set successfully");
   } catch (error) {
-    console.error("[SYNC ERROR] Failed to set last fetch date:", error);
-    throw error;
+    console.error("[SYNC ERROR] Failed to set last fetch version:", error);
+    return;
   }
 };
 
-const shouldFetchToday = async ($key) => {
+const shouldFetchToday = async (key) => {
   try {
     const db = await getDatabase();
-    const result = await db.getFirstAsync(
+    const localResult = await db.getFirstAsync(
       "SELECT value FROM sync_metadata WHERE key = ?",
-      [$key]
+      [key]
     );
 
-    if (!result) return true;
+    const response = await axios.get(BaseUrl + "updatesDataVersion.json");
+    const serverVersions = response.data;
 
-    const lastFetch = new Date(result.value);
-    const today = new Date();
-    return (
-      lastFetch.getDate() !== today.getDate() ||
-      lastFetch.getMonth() !== today.getMonth() ||
-      lastFetch.getFullYear() !== today.getFullYear()
-    );
+    if (typeof serverVersions[key] === "undefined") {
+      console.warn(`[SYNC WARNING] Key ${key} not found in server timestamps`);
+      return true;
+    }
+
+    const serverVersion = Number(serverVersions[key]);
+    const localVersion = localResult ? Number(localResult.value) : null;
+
+    if (!localVersion || serverVersion > localVersion) {
+      return true;
+    }
+
+    return false;
   } catch (error) {
     console.error("[SYNC ERROR] Failed to check fetch status:", error);
-    return true;
+    if (axios.isAxiosError(error)) {
+      console.error("Axios error details:", {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data,
+      });
+    }
+    return true; // Default to fetching if there's an error
   }
 };
 

@@ -510,19 +510,31 @@ const Profile = {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // Darker semi-transparent background
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   loadingContainer: {
-    backgroundColor: "transparent", // Make container transparent
+    backgroundColor: "transparent",
     padding: 20,
     borderRadius: 10,
     alignItems: "center",
-    width: "80%", // Take up most of screen width
+    width: "80%",
   },
   loadingText: {
     marginTop: 20,
     fontSize: 16,
-    color: "#ffffff", // White text
+    color: "#ffffff",
+    textAlign: "center",
+  },
+  noItemContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    marginTop: 50,
+  },
+  noItemText: {
+    fontSize: 16,
+    color: "#666",
     textAlign: "center",
   },
 };

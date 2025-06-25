@@ -16,7 +16,7 @@ import { BaseUrl, getStaffProfileUrl } from "../config/Api";
 const fetchServices = async () => {
   console.log("[API] Fetching services from server...");
   try {
-    const shouldFetch = await shouldFetchToday("last_fetch_date_services");
+    const shouldFetch = await shouldFetchToday("services");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -42,7 +42,7 @@ const fetchServices = async () => {
       category_ids: service.category_id || [],
     }));
     await saveAllServices(services);
-    await setLastFetchDate("last_fetch_date_services");
+    await setLastFetchDate("services");
 
     return services;
   } catch (error) {
@@ -54,7 +54,7 @@ const fetchServices = async () => {
 const fetchCategories = async () => {
   console.log("[API] Fetching categories from server...");
   try {
-    const shouldFetch = await shouldFetchToday("last_fetch_date_categories");
+    const shouldFetch = await shouldFetchToday("categories");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -74,7 +74,7 @@ const fetchCategories = async () => {
       } categories`
     );
     await saveAllCategories(response.data.categories);
-    await setLastFetchDate("last_fetch_date_categories");
+    await setLastFetchDate("categories");
 
     return response.data.categories;
   } catch (error) {
@@ -86,7 +86,7 @@ const fetchCategories = async () => {
 const fetchSubTitles = async () => {
   console.log("[API] Fetching subtitles from server...");
   try {
-    const shouldFetch = await shouldFetchToday("last_fetch_date_subtitles");
+    const shouldFetch = await shouldFetchToday("subtitles");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -106,7 +106,7 @@ const fetchSubTitles = async () => {
       } subtitles`
     );
     await saveAllSubTitle(response.data.subTitles);
-    await setLastFetchDate("last_fetch_date_subtitles");
+    await setLastFetchDate("subtitles");
 
     return response.data.subTitles;
   } catch (error) {
@@ -118,7 +118,7 @@ const fetchSubTitles = async () => {
 const fetchZone = async () => {
   console.log("[API] Fetching zoneData from server...");
   try {
-    const shouldFetch = await shouldFetchToday("last_fetch_date_zone_data");
+    const shouldFetch = await shouldFetchToday("zones");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -144,7 +144,7 @@ const fetchZone = async () => {
     }));
 
     await saveAllZoneData(zoneData);
-    await setLastFetchDate("last_fetch_date_zone_data");
+    await setLastFetchDate("zones");
 
     return zoneData;
   } catch (error) {
@@ -156,7 +156,7 @@ const fetchZone = async () => {
 const fetchTimeSlot = async () => {
   console.log("[API] Fetching timeSlots from server...");
   try {
-    const shouldFetch = await shouldFetchToday("last_fetch_date_timeSlot");
+    const shouldFetch = await shouldFetchToday("timeSlots");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -177,7 +177,7 @@ const fetchTimeSlot = async () => {
     );
 
     await saveTimeSlot(response.data.timeSlots);
-    await setLastFetchDate("last_fetch_date_timeSlot");
+    await setLastFetchDate("timeSlots");
 
     return response.data.timeSlots;
   } catch (error) {
@@ -189,7 +189,7 @@ const fetchTimeSlot = async () => {
 const fetchDriver = async () => {
   console.log("[API] Fetching drivers from server...");
   try {
-    const shouldFetch = await shouldFetchToday("last_fetch_date_driver");
+    const shouldFetch = await shouldFetchToday("drivers");
 
     if (!shouldFetch) {
       console.log("Skipping fetch - already fetched today");
@@ -208,7 +208,7 @@ const fetchDriver = async () => {
     );
 
     await saveDrivers(response.data.drivers);
-    await setLastFetchDate("last_fetch_date_driver");
+    await setLastFetchDate("drivers");
 
     return response.data.drivers;
   } catch (error) {

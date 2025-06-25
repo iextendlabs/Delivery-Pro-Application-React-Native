@@ -82,10 +82,6 @@ const Services = ({
   };
 
   const handleNextPress = async () => {
-    if (selectedServices.length < 1) {
-      Alert.alert("Validation Error", "Please select at least one service.");
-      return;
-    }
     setIsLoading(true);
     const db = await getDatabase();
 
@@ -180,40 +176,56 @@ const Services = ({
         {/* Top Header */}
         <View style={styles.header}>
           <Text style={styles.sectionTitle}>Services Selection</Text>
+          <Text style={styles.subtitle}>
+            Skip this step if you need to deliver all services. If you only want
+            to deliver specific services, select those instead.
+          </Text>
         </View>
 
         {/* Scrollable Content */}
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Selected Services Section */}
-          {selectedItems.length > 0 && (
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionHeader}>Selected Services</Text>
-              <FlatList
-                data={selectedItems}
-                keyExtractor={(item) => item.id.toString()}
-                numColumns={2}
-                renderItem={renderItem}
-                scrollEnabled={false}
-              />
+          {services.length === 0 ? (
+            <View style={styles.noItemContainer}>
+              <Text style={styles.noItemText}>
+                No services available in your selected categories
+              </Text>
             </View>
+          ) : (
+            <>
+              {/* Selected Services Section */}
+              {selectedItems.length > 0 && (
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionHeader}>Selected Services</Text>
+                  <FlatList
+                    data={selectedItems}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={2}
+                    renderItem={renderItem}
+                    scrollEnabled={false}
+                  />
+                </View>
+              )}
+
+              {/* Available Services Section */}
+              <View style={styles.sectionContainer}>
+                <Text style={styles.sectionHeader}>
+                  {selectedItems.length > 0
+                    ? "Available Services"
+                    : "All Services"}
+                </Text>
+                <FlatList
+                  data={availableItems}
+                  keyExtractor={(item) => item.id.toString()}
+                  numColumns={2}
+                  renderItem={renderItem}
+                  scrollEnabled={false}
+                />
+              </View>
+
+              {/* Load More Button */}
+              {visibleServicesCount < services.length && renderLoadMoreButton()}
+            </>
           )}
-
-          {/* Available Services Section */}
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionHeader}>
-              {selectedItems.length > 0 ? "Available Services" : "All Services"}
-            </Text>
-            <FlatList
-              data={availableItems}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={2}
-              renderItem={renderItem}
-              scrollEnabled={false}
-            />
-          </View>
-
-          {/* Load More Button */}
-          {visibleServicesCount < services.length && renderLoadMoreButton()}
         </ScrollView>
 
         {/* Fixed Bottom Step Navigation */}
@@ -225,6 +237,7 @@ const Services = ({
           onNext={handleNextPress}
           onSubmit={() => alert("Submit")}
           showScrollPrompt={true}
+          showSkip="true"
         />
       </View>
       <Modal
@@ -246,7 +259,6 @@ const Services = ({
   );
 };
 
-// All styles remain exactly the same as original
 const styles = StyleSheet.create(Profile);
 
 export default Services;

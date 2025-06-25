@@ -172,38 +172,48 @@ const Categories = ({
 
         {/* Scrollable Content */}
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Selected Categories Section */}
-          {selectedItems.length > 0 && (
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionHeader}>Selected Categories</Text>
-              <FlatList
-                data={selectedItems}
-                keyExtractor={(item) => item.id.toString()}
-                numColumns={2}
-                renderItem={renderItem}
-                scrollEnabled={false}
-              />
+          {selectedItems.length === 0 ? (
+            <View style={styles.noItemContainer}>
+              <Text style={styles.noItemText}>
+                No categories available
+              </Text>
             </View>
+          ) : (
+            <>
+              {selectedItems.length > 0 && (
+                <View style={styles.sectionContainer}>
+                  <Text style={styles.sectionHeader}>Selected Categories</Text>
+                  <FlatList
+                    data={selectedItems}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={2}
+                    renderItem={renderItem}
+                    scrollEnabled={false}
+                  />
+                </View>
+              )}
+
+              {/* Available Categories Section */}
+              <View style={styles.sectionContainer}>
+                <Text style={styles.sectionHeader}>
+                  {selectedItems.length > 0
+                    ? "Available Categories"
+                    : "All Categories"}
+                </Text>
+                <FlatList
+                  data={availableItems}
+                  keyExtractor={(item) => item.id.toString()}
+                  numColumns={2}
+                  renderItem={renderItem}
+                  scrollEnabled={false}
+                />
+              </View>
+
+              {/* Load More Button */}
+              {visibleCategoriesCount < categories.length &&
+                renderLoadMoreButton()}
+            </>
           )}
-
-          {/* Available Categories Section */}
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionHeader}>
-              {selectedItems.length > 0
-                ? "Available Categories"
-                : "All Categories"}
-            </Text>
-            <FlatList
-              data={availableItems}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={2}
-              renderItem={renderItem}
-              scrollEnabled={false}
-            />
-          </View>
-
-          {/* Load More Button */}
-          {visibleCategoriesCount < categories.length && renderLoadMoreButton()}
         </ScrollView>
 
         {/* Fixed Bottom Step Navigation */}
