@@ -368,7 +368,7 @@ const saveProfile = async (data) => {
 
 const setLastFetchDate = async (key) => {
   try {
-    const response = await axios.get(BaseUrl + "updatesDataVersion.json");
+    const response = await axios.get(BaseUrl + "storage/updatesDataVersion.json");
     const serverVersions = response.data;
 
     if (typeof serverVersions[key] === "undefined") {
@@ -399,7 +399,7 @@ const shouldFetchToday = async (key) => {
       [key]
     );
 
-    const response = await axios.get(BaseUrl + "updatesDataVersion.json");
+    const response = await axios.get(BaseUrl + "storage/updatesDataVersion.json");
     const serverVersions = response.data;
 
     if (typeof serverVersions[key] === "undefined") {

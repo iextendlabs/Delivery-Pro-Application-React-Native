@@ -172,7 +172,7 @@ const Categories = ({
 
         {/* Scrollable Content */}
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {selectedItems.length === 0 ? (
+          {categories.length === 0 ? (
             <View style={styles.noItemContainer}>
               <Text style={styles.noItemText}>
                 No categories available

@@ -22,7 +22,7 @@ const fetchServices = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "StaffAppServicesData.json", {
+    const response = await axios.get(BaseUrl + "storage/StaffAppServicesData.json", {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -60,7 +60,7 @@ const fetchCategories = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "AppCategories.json", {
+    const response = await axios.get(BaseUrl + "storage/AppCategories.json", {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -92,7 +92,7 @@ const fetchSubTitles = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "AppSubTitles.json", {
+    const response = await axios.get(BaseUrl + "storage/AppSubTitles.json", {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -124,7 +124,7 @@ const fetchZone = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "AppZoneData.json", {
+    const response = await axios.get(BaseUrl + "storage/AppZoneData.json", {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -162,7 +162,7 @@ const fetchTimeSlot = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "AppTimeSlotsData.json", {
+    const response = await axios.get(BaseUrl + "storage/AppTimeSlotsData.json", {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -195,7 +195,7 @@ const fetchDriver = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "AppDriverData.json", {
+    const response = await axios.get(BaseUrl + "storage/AppDriverData.json", {
       timeout: 10000,
       headers: {
         Accept: "application/json",
