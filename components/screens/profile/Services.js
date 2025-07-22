@@ -17,6 +17,8 @@ import { loadAndRefreshData } from "../../Database/dataService";
 import Splash from "../Splash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Profile from "../../styles/Profile";
+import { deleteSyncMetadataKey } from "../../Database/servicesRepository";
+import { useNavigation } from "@react-navigation/native";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -29,6 +31,7 @@ const Services = ({
   onNext,
   setFormData,
 }) => {
+  const navigation = useNavigation();
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState([]);
   const [mounted, setMounted] = useState(true);
@@ -75,7 +78,21 @@ const Services = ({
       Alert.alert(
         "Something went wrong",
         "Please wait a moment and try again later.\n\nWe're currently experiencing some technical issues.\nThank you for your patience.",
-        [{ text: "OK" }]
+        [
+          {
+            text: "OK",
+            onPress: async () => {
+              try {
+                const db = await getDatabase();
+                await db.execAsync(`DELETE FROM services;`);
+                await deleteSyncMetadataKey("services");
+              } catch (e) {
+                // Optionally handle DB error
+              }
+              navigation.navigate("Home"); // Change "Home" to your actual home route name
+            },
+          },
+        ]
       );
     }
     setIsDataLoading(false);

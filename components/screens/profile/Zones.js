@@ -14,6 +14,8 @@ import { loadAndRefreshZoneData } from "../../Database/zoneData";
 import Splash from "../Splash";
 import { getDatabase } from "../../Database/database";
 import Profile from "../../styles/Profile";
+import { deleteSyncMetadataKey } from "../../Database/servicesRepository";
+import { useNavigation } from "@react-navigation/native";
 
 const Zones = ({
   currentStep,
@@ -24,6 +26,7 @@ const Zones = ({
   onNext,
   setFormData,
 }) => {
+  const navigation = useNavigation();
   const [zones, setZones] = useState([]);
   const [selectedZones, setSelectedZones] = useState([]);
   const [mounted, setMounted] = useState(true);
@@ -57,7 +60,21 @@ const Zones = ({
       Alert.alert(
         "Something went wrong",
         "Please wait a moment and try again later.\n\nWe're currently experiencing some technical issues.\nThank you for your patience.",
-        [{ text: "OK" }]
+        [
+          {
+            text: "OK",
+            onPress: async () => {
+              try {
+                const db = await getDatabase();
+                await db.execAsync(`DELETE FROM zone_data;`);
+                await deleteSyncMetadataKey("zones");
+              } catch (e) {
+                // Optionally handle DB error
+              }
+              navigation.navigate("Home"); // Change "Home" to your actual home route name
+            },
+          },
+        ]
       );
     }
     setIsDataLoading(false);
@@ -187,6 +204,5 @@ const Zones = ({
 };
 
 const styles = StyleSheet.create(Profile);
-
 
 export default Zones;

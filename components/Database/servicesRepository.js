@@ -428,6 +428,17 @@ const shouldFetchToday = async (key) => {
   }
 };
 
+const deleteSyncMetadataKey = async (key) => {
+  try {
+    const db = await getDatabase();
+    await db.runAsync("DELETE FROM sync_metadata WHERE key = ?", [key]);
+    console.log(`[SYNC] Deleted sync_metadata row for key: ${key}`);
+  } catch (error) {
+    console.error(`[SYNC ERROR] Failed to delete sync_metadata row for key: ${key}`, error);
+    throw error;
+  }
+};
+
 export {
   saveAllServices,
   setLastFetchDate,
@@ -440,4 +451,5 @@ export {
   clearUserData,
   saveTimeSlot,
   saveDrivers,
+  deleteSyncMetadataKey
 };

@@ -13,6 +13,8 @@ import { loadAndRefreshTimeSlotData } from "../../Database/dataTimeSlot";
 import Splash from "../Splash";
 import { getDatabase } from "../../Database/database";
 import Profile from "../../styles/Profile";
+import { deleteSyncMetadataKey } from "../../Database/servicesRepository";
+import { useNavigation } from "@react-navigation/native";
 
 const TimeSlots = ({
   currentStep,
@@ -23,6 +25,7 @@ const TimeSlots = ({
   onNext,
   setFormData,
 }) => {
+  const navigation = useNavigation();
   const [timeSlots, setTimeSlots] = useState([]);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState([]);
   const [mounted, setMounted] = useState(true);
@@ -58,7 +61,21 @@ const TimeSlots = ({
       Alert.alert(
         "Something went wrong",
         "Please wait a moment and try again later.\n\nWe're currently experiencing some technical issues.\nThank you for your patience.",
-        [{ text: "OK" }]
+        [
+          {
+            text: "OK",
+            onPress: async () => {
+              try {
+                const db = await getDatabase();
+                await db.execAsync(`DELETE FROM timeSlots;`);
+                await deleteSyncMetadataKey("timeSlots");
+              } catch (e) {
+                // Optionally handle DB error
+              }
+              navigation.navigate("Home"); // Change "Home" to your actual home route name
+            },
+          },
+        ]
       );
     }
     setIsDataLoading(false);

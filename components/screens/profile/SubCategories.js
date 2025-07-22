@@ -15,6 +15,8 @@ import { getDatabase } from "../../Database/database";
 import Splash from "../Splash";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Profile from "../../styles/Profile";
+import { deleteSyncMetadataKey } from "../../Database/servicesRepository";
+import { useNavigation } from "@react-navigation/native";
 
 const SubCategories = ({
   currentStep,
@@ -25,6 +27,7 @@ const SubCategories = ({
   onNext,
   setFormData,
 }) => {
+  const navigation = useNavigation();
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [mounted, setMounted] = useState(true);
@@ -95,7 +98,21 @@ const SubCategories = ({
       Alert.alert(
         "Something went wrong",
         "Please wait a moment and try again later.\n\nWe're currently experiencing some technical issues.\nThank you for your patience.",
-        [{ text: "OK" }]
+        [
+          {
+            text: "OK",
+            onPress: async () => {
+              try {
+                const db = await getDatabase();
+                await db.execAsync(`DELETE FROM categories;`);
+                await deleteSyncMetadataKey("categories");
+              } catch (e) {
+                // Optionally handle DB error
+              }
+              navigation.navigate("Home"); // Change "Home" to your actual home route name
+            },
+          },
+        ]
       );
     }
     setIsDataLoading(false);

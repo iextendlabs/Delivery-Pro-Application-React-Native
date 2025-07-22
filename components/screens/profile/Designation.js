@@ -14,6 +14,8 @@ import StepNavigation from "./StepNavigation";
 import { getDatabase } from "../../Database/database";
 import Splash from "../Splash";
 import Profile from "../../styles/Profile";
+import { deleteSyncMetadataKey } from "../../Database/servicesRepository";
+import { useNavigation } from "@react-navigation/native";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -26,6 +28,7 @@ const Designation = ({
   onNext,
   setFormData,
 }) => {
+  const navigation = useNavigation();
   const [designations, setDesignations] = useState([]);
   const [selectedDesignations, setSelectedDesignations] = useState([]);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
@@ -56,7 +59,21 @@ const Designation = ({
       Alert.alert(
         "Something went wrong",
         "Please wait a moment and try again later.\n\nWe're currently experiencing some technical issues.\nThank you for your patience.",
-        [{ text: "OK" }]
+        [
+          {
+            text: "OK",
+            onPress: async () => {
+              try {
+                const db = await getDatabase();
+                await db.execAsync(`DELETE FROM sub_titles;`);
+                await deleteSyncMetadataKey("subtitles");
+              } catch (e) {
+                // Optionally handle DB error
+              }
+              navigation.navigate("Home"); // Change "Home" to your actual home route name
+            },
+          },
+        ]
       );
     }
     setIsDataLoading(false);
