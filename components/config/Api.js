@@ -1,4 +1,4 @@
-const BaseUrl = "https://partner.lipslay.com/";
+const BaseUrl = "https://admin.tadhem.com/";
 
 const getStaffProfileUrl = BaseUrl + "api/getStaffProfile?";
 const IndexUrl = BaseUrl + "api/index?";
