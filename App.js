@@ -43,6 +43,7 @@ import {
   clearDatabase,
   clearUserData,
 } from "./components/Database/servicesRepository";
+import ChangePassword from "./components/screens/ChangePassword";
 
 const Stack = createStackNavigator();
 
@@ -373,6 +374,11 @@ const App = () => {
                 </TouchableOpacity>
               ),
             })}
+          />
+          <Stack.Screen
+            options={{ headerShown: false }}
+            name="ChangePassword"
+            component={ChangePassword}
           />
         </Stack.Navigator>
       </NavigationContainer>

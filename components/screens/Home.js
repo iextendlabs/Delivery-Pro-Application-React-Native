@@ -304,6 +304,15 @@ const Home = ({ navigation }) => {
             version={version}
           />
 
+          <View style={{ marginBottom: 20 }}>
+            <CommonButton
+              title={"Change Password"}
+              bgColor={"#fd245f"}
+              textColor={"#fff"}
+              onPress={() => navigation.navigate("ChangePassword")}
+            />
+          </View>
+
           <HomeMenu navigation={navigation} />
 
           <View style={styles.financialSummaryContainer}>
