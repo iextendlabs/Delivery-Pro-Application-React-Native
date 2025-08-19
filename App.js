@@ -38,6 +38,7 @@ import ViewQuoteScreen from "./components/screens/ViewQuoteScreen";
 import BidsScreen from "./components/screens/BidsScreen";
 import Icon from "react-native-vector-icons/Ionicons";
 import UpdateProfile from "./components/screens/profile/UpdateProfile";
+import WhatsappIcon from "./components/common/WhatsappIcon";
 import { getDatabase } from "./components/Database/database";
 import {
   clearDatabase,
@@ -263,124 +264,29 @@ const App = () => {
             headerTintColor: "#000",
           }}
         >
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Login"
-            component={Login}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Signup"
-            component={Signup}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="UpdateProfile"
-            component={UpdateProfile}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Notification"
-            component={Notification}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Home"
-            component={Home}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Transactions"
-            component={Transactions}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="OrderList"
-            component={OrderList}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Orders"
-            component={Orders}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Holidays"
-            component={Holidays}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="HolidayModal"
-            component={HolidayModal}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="WithdrawModal"
-            component={WithdrawModal}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="Withdraws"
-            component={Withdraws}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="EditProfile"
-            component={EditProfile}
-          />
-          <Stack.Screen
-            options={{ title: "Deposit" }}
-            name="DepositModal"
-            component={DepositModal}
-          />
-          <Stack.Screen
-            options={{ title: "Terms & Condition" }}
-            name="TermsCondition"
-            component={TermsCondition}
-          />
-          <Stack.Screen
-            options={{ title: "Privacy Policy" }}
-            name="PrivacyPolicy"
-            component={PrivacyPolicy}
-          />
-          <Stack.Screen
-            options={{ title: "Membership Plans" }}
-            name="MembershipPlans"
-            component={MembershipPlans}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="QuoteListScreen"
-            component={QuoteListScreen}
-          />
-          <Stack.Screen
-            options={{ title: "Quote" }}
-            name="ViewQuote"
-            component={ViewQuoteScreen}
-          />
-          <Stack.Screen
-            name="BidsScreen"
-            component={BidsScreen}
-            options={({ navigation }) => ({
-              title: "Bid",
-              headerLeft: () => (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("QuoteListScreen");
-                  }}
-                  style={{ marginLeft: 15 }}
-                >
-                  <Icon name="arrow-back" size={24} color="#000" />
-                </TouchableOpacity>
-              ),
-            })}
-          />
-          <Stack.Screen
-            options={{ headerShown: false }}
-            name="ChangePassword"
-            component={ChangePassword}
-          />
+          <Stack.Screen options={{ headerShown: false }} name="Login" component={Login} />
+          <Stack.Screen options={{ headerShown: false }} name="Signup" component={Signup} />
+          <Stack.Screen options={{ headerShown: false }} name="UpdateProfile" component={UpdateProfile} />
+          <Stack.Screen options={{ headerShown: false }} name="Notification" component={Notification} />
+          <Stack.Screen options={{ headerShown: false }} name="Home" component={Home} />
+          <Stack.Screen options={{ headerShown: false }} name="Transactions" component={Transactions} />
+          <Stack.Screen options={{ headerShown: false }} name="OrderList" component={OrderList} />
+          <Stack.Screen options={{ headerShown: false }} name="Orders" component={Orders} />
+          <Stack.Screen options={{ headerShown: false }} name="Holidays" component={Holidays} />
+          <Stack.Screen options={{ headerShown: false }} name="HolidayModal" component={HolidayModal} />
+          <Stack.Screen options={{ headerShown: false }} name="WithdrawModal" component={WithdrawModal} />
+          <Stack.Screen options={{ headerShown: false }} name="Withdraws" component={Withdraws} />
+          <Stack.Screen options={{ headerShown: false }} name="EditProfile" component={EditProfile} />
+          <Stack.Screen options={{ title: "Deposit" }} name="DepositModal" component={DepositModal} />
+          <Stack.Screen options={{ title: "Terms & Condition" }} name="TermsCondition" component={TermsCondition} />
+          <Stack.Screen options={{ title: "Privacy Policy" }} name="PrivacyPolicy" component={PrivacyPolicy} />
+          <Stack.Screen options={{ title: "Membership Plans" }} name="MembershipPlans" component={MembershipPlans} />
+          <Stack.Screen options={{ headerShown: false }} name="QuoteListScreen" component={QuoteListScreen} />
+          <Stack.Screen options={{ title: "Quote" }} name="ViewQuote" component={ViewQuoteScreen} />
+          <Stack.Screen name="BidsScreen" component={BidsScreen} options={({ navigation }) => ({ title: "Bid", headerLeft: () => (<TouchableOpacity onPress={() => { navigation.navigate("QuoteListScreen"); }} style={{ marginLeft: 15 }}><Icon name="arrow-back" size={24} color="#000" /></TouchableOpacity>), })} />
+          <Stack.Screen options={{ headerShown: false }} name="ChangePassword" component={ChangePassword} />
         </Stack.Navigator>
+        <WhatsappIcon />
       </NavigationContainer>
     </StripeProvider>
   );

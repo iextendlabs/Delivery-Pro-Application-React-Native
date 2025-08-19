@@ -92,6 +92,12 @@ const Home = ({ navigation }) => {
     if (userId) {
       try {
         const response = await axios.get(`${IndexUrl}user_id=${userId}`);
+        if (response.data.whatsapp_number) {
+          await AsyncStorage.setItem(
+            "@whatsapp",
+            response.data.whatsapp_number
+          );
+        }
         if (response.status == 202) {
           setUserMessage(
             "✅ Account Successfully Created – Under Review\n\n" +
@@ -114,12 +120,6 @@ const Home = ({ navigation }) => {
           setUserMessage("");
           setPlanExpire(false);
           setUserData(response.data);
-          if (response.data.whatsapp_number) {
-            await AsyncStorage.setItem(
-              "@whatsapp",
-              response.data.whatsapp_number
-            );
-          }
           setSupervisors(response.data.supervisors);
         }
       } catch (error) {
