@@ -4,11 +4,11 @@
     "slug": "lipslay-staff",
     "version": "20.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.jpeg",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-screen.jpeg",
+      "image": "./assets/splash-screen.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
@@ -21,7 +21,7 @@
       "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.jpeg",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.forexleo.lipslaystaff",

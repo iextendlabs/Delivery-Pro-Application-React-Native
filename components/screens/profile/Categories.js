@@ -18,6 +18,7 @@ import Splash from "../Splash";
 import Profile from "../../styles/Profile";
 import { deleteSyncMetadataKey } from "../../Database/servicesRepository";
 import { useNavigation } from "@react-navigation/native";
+import SearchBox from "../../common/SearchBox";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -38,6 +39,15 @@ const Categories = ({
     useState(ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchText);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [searchText]);
 
   useEffect(() => {
     return () => {
@@ -84,7 +94,7 @@ const Categories = ({
               } catch (e) {
                 // Optionally handle DB error
               }
-              navigation.navigate("Home"); // Change "Home" to your actual home route name
+              navigation.navigate("Home");
             },
           },
         ]
@@ -141,12 +151,17 @@ const Categories = ({
     setVisibleCategoriesCount((prev) => prev + ITEMS_PER_PAGE);
   };
 
-  // Separate selected and available categories
-  const selectedItems = categories
+  const filteredCategories = debouncedSearch
+    ? categories.filter((cat) =>
+        cat.title.toLowerCase().includes(debouncedSearch.toLowerCase())
+      )
+    : categories;
+
+  const selectedItems = filteredCategories
     .filter((item) => selectedCategories.includes(item.id))
     .slice(0, visibleCategoriesCount);
 
-  const availableItems = categories
+  const availableItems = filteredCategories
     .filter((item) => !selectedCategories.includes(item.id))
     .slice(0, visibleCategoriesCount);
 
@@ -182,18 +197,20 @@ const Categories = ({
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.contentContainer}>
-        {/* Top Header */}
         <View style={styles.header}>
           <Text style={styles.sectionTitle}>Categories Selection</Text>
         </View>
 
-        {/* Scrollable Content */}
+        <SearchBox
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder="Search categories..."
+        />
+
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {categories.length === 0 ? (
+          {filteredCategories.length === 0 ? (
             <View style={styles.noItemContainer}>
-              <Text style={styles.noItemText}>
-                No categories available
-              </Text>
+              <Text style={styles.noItemText}>No categories available</Text>
             </View>
           ) : (
             <>
@@ -210,7 +227,6 @@ const Categories = ({
                 </View>
               )}
 
-              {/* Available Categories Section */}
               <View style={styles.sectionContainer}>
                 <Text style={styles.sectionHeader}>
                   {selectedItems.length > 0
@@ -226,14 +242,12 @@ const Categories = ({
                 />
               </View>
 
-              {/* Load More Button */}
-              {visibleCategoriesCount < categories.length &&
+              {visibleCategoriesCount < filteredCategories.length &&
                 renderLoadMoreButton()}
             </>
           )}
         </ScrollView>
 
-        {/* Fixed Bottom Step Navigation */}
         <StepNavigation
           currentStep={currentStep}
           totalSteps={totalSteps}

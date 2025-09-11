@@ -22,7 +22,7 @@ const fetchServices = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "storage/StaffAppServicesData.json", {
+    const response = await axios.get(`${BaseUrl}storage/StaffAppServicesData.json?v=${Math.random()}`, {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -60,7 +60,7 @@ const fetchCategories = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "storage/AppCategories.json", {
+    const response = await axios.get(`${BaseUrl}storage/AppCategories.json?v=${Math.random()}`, {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -92,7 +92,7 @@ const fetchSubTitles = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "storage/AppSubTitles.json", {
+    const response = await axios.get(`${BaseUrl}storage/AppSubTitles.json?v=${Math.random()}`, {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -124,7 +124,7 @@ const fetchZone = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "storage/AppZoneData.json", {
+    const response = await axios.get(`${BaseUrl}storage/AppZoneData.json?v=${Math.random()}`, {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -141,6 +141,7 @@ const fetchZone = async () => {
     const zoneData = response.data.zoneData.map((zone) => ({
       zone_id: zone.id,
       zone_name: zone.name,
+      country: zone.country,
     }));
 
     await saveAllZoneData(zoneData);
@@ -162,7 +163,7 @@ const fetchTimeSlot = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "storage/AppTimeSlotsData.json", {
+    const response = await axios.get(`${BaseUrl}storage/AppTimeSlotsData.json?v=${Math.random()}`, {
       timeout: 10000,
       headers: {
         Accept: "application/json",
@@ -195,7 +196,7 @@ const fetchDriver = async () => {
       console.log("Skipping fetch - already fetched today");
       return null;
     }
-    const response = await axios.get(BaseUrl + "storage/AppDriverData.json", {
+    const response = await axios.get(`${BaseUrl}storage/AppDriverData.json?v=${Math.random()}`, {
       timeout: 10000,
       headers: {
         Accept: "application/json",

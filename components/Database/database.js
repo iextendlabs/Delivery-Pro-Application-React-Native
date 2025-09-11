@@ -36,13 +36,15 @@ const getDatabase = async () => {
       
       CREATE TABLE IF NOT EXISTS sub_titles (
         id INTEGER PRIMARY KEY,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        parent_id INTEGER
       );
 
       CREATE TABLE IF NOT EXISTS zone_data (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         zone_id INTEGER,
-        zone_name TEXT
+        zone_name TEXT,
+        country TEXT
       );
 
       CREATE TABLE IF NOT EXISTS timeSlots (

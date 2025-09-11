@@ -131,8 +131,8 @@ const saveAllSubTitle = async (sub_titles) => {
       await db.runAsync("DELETE FROM sub_titles");
 
       if (sub_titles.length > 0) {
-        const batch = sub_titles.map(st => [st.id, st.name]);
-        await batchInsert(db, 'sub_titles', ['id', 'name'], batch);
+        const batch = sub_titles.map(st => [st.id, st.name, st.parent_id]);
+        await batchInsert(db, 'sub_titles', ['id', 'name', 'parent_id'], batch);
       }
 
       await db.execAsync("COMMIT");
@@ -158,8 +158,8 @@ const saveAllZoneData = async (zoneData) => {
       await db.runAsync("DELETE FROM zone_data");
 
       if (zoneData.length > 0) {
-        const batch = zoneData.map(zone => [zone.zone_id, zone.zone_name]);
-        await batchInsert(db, 'zone_data', ['zone_id', 'zone_name'], batch);
+        const batch = zoneData.map(zone => [zone.zone_id, zone.zone_name, zone.country]);
+        await batchInsert(db, 'zone_data', ['zone_id', 'zone_name', 'country'], batch);
       }
 
       await db.execAsync("COMMIT");

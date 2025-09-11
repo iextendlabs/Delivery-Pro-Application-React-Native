@@ -19,7 +19,7 @@ const WhatsAppButton = () => {
 const styles = StyleSheet.create({
   button: {
     position: "absolute",
-    bottom: 50,
+    bottom: 80,
     right: 20,
     zIndex: 999,
     backgroundColor: "#25D366",

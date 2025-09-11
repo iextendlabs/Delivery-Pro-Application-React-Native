@@ -50,6 +50,7 @@ export const loadLocalSubTitleData = async () => {
     return result.map((row) => ({
       id: row.id,
       name: row.name,
+      parent_id: row.parent_id,
     }));
   } catch (error) {
     console.error("[SUBTITLES ERROR] Failed to load local subtitle:", error);

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  FlatList,
   StyleSheet,
   ScrollView,
   Alert,
@@ -17,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Profile from "../../styles/Profile";
 import { deleteSyncMetadataKey } from "../../Database/servicesRepository";
 import { useNavigation } from "@react-navigation/native";
+import SearchBox from "../../common/SearchBox";
 
 const SubCategories = ({
   currentStep,
@@ -33,6 +33,15 @@ const SubCategories = ({
   const [mounted, setMounted] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchText);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [searchText]);
 
   useEffect(() => {
     return () => setMounted(false);
@@ -48,20 +57,17 @@ const SubCategories = ({
     if (formData?.categories) {
       const selectedCategories = new Set(formData.categories);
 
-      // Function to check if ALL ancestors of a category are selected
       const hasAllAncestorsSelected = (categoryId) => {
         const category = categories.find((c) => c.id === categoryId);
         if (!category?.parent_id) {
-          return true; // Root category (no parent) is always valid
+          return true;
         }
-        // Check if parent is selected, and recursively check its ancestors
         return (
           selectedCategories.has(category.parent_id) &&
           hasAllAncestorsSelected(category.parent_id)
         );
       };
 
-      // Filter: Keep only categories where ALL ancestors are selected
       const validCategories = Array.from(selectedCategories).filter((catId) =>
         hasAllAncestorsSelected(catId)
       );
@@ -109,7 +115,7 @@ const SubCategories = ({
               } catch (e) {
                 // Optionally handle DB error
               }
-              navigation.navigate("Home"); // Change "Home" to your actual home route name
+              navigation.navigate("Home");
             },
           },
         ]
@@ -157,7 +163,12 @@ const SubCategories = ({
     return selectedCategories
       .map((parentId) => {
         const parent = categories.find((cat) => cat.id === parentId);
-        const children = categories.filter((cat) => cat.parent_id === parentId);
+        const children = categories.filter(
+          (cat) =>
+            cat.parent_id === parentId &&
+            (!debouncedSearch ||
+              cat.title.toLowerCase().includes(debouncedSearch.toLowerCase()))
+        );
         return children.length > 0 ? { parent, children } : null;
       })
       .filter(Boolean);
@@ -165,16 +176,14 @@ const SubCategories = ({
 
   const toggleCategory = (id) => {
     setSelectedCategories((prev) => {
-      // If the category is already selected, remove it + its children
       if (prev.includes(id)) {
-        // Get all children (and grandchildren, etc.) recursively
         const getDescendants = (parentId) => {
           const children = categories.filter(
             (cat) => cat.parent_id === parentId
           );
           const descendants = children.flatMap((child) => [
             child.id,
-            ...getDescendants(child.id), // Recursively get grandchildren
+            ...getDescendants(child.id),
           ]);
           return descendants;
         };
@@ -183,9 +192,7 @@ const SubCategories = ({
         return prev.filter(
           (item) => item !== id && !descendantsToRemove.includes(item)
         );
-      }
-      // If the category is not selected, just add it
-      else {
+      } else {
         return [...prev, id];
       }
     });
@@ -197,12 +204,9 @@ const SubCategories = ({
 
   const grouped = getGroupedSubCategories();
 
-  if (!grouped.length) return null;
-
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
-        {/* Top Header remains the same */}
         <View style={styles.header}>
           <Text style={styles.sectionTitle}>Select Subcategories</Text>
           <Text style={styles.subtitle}>
@@ -211,43 +215,55 @@ const SubCategories = ({
           </Text>
         </View>
 
-        {/* Scrollable Content */}
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {grouped.map(({ parent, children }) => (
-            <View key={parent.id} style={styles.categoryGroup}>
-              <Text style={styles.parentTitle}>
-                Subcategories of{" "}
-                <Text style={styles.parentName}>{parent.title}</Text>
-              </Text>
-              <View style={styles.itemsContainer}>
-                {children.map((child) => (
-                  <TouchableOpacity
-                    key={child.id}
-                    style={[
-                      styles.subItemButton,
-                      selectedCategories.includes(child.id) &&
-                        styles.selectedButton,
-                    ]}
-                    onPress={() => toggleCategory(child.id)}
-                  >
-                    <Text
-                      style={[
-                        styles.itemText,
-                        selectedCategories.includes(child.id) &&
-                          styles.selectedText,
-                      ]}
-                      numberOfLines={2}
-                      adjustsFontSizeToFit={true}
-                      minimumFontScale={0.8}
-                    >
-                      {child.title}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          ))}
-        </ScrollView>
+        <SearchBox
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder="Search subcategories..."
+        />
+        {grouped.length === 0 ? (
+          <View style={styles.noItemContainer}>
+            <Text style={styles.noItemText}>No categories available</Text>
+          </View>
+        ) : (
+          <>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+              {grouped.map(({ parent, children }) => (
+                <View key={parent.id} style={styles.categoryGroup}>
+                  <Text style={styles.parentTitle}>
+                    Subcategories of{" "}
+                    <Text style={styles.parentName}>{parent.title}</Text>
+                  </Text>
+                  <View style={styles.itemsContainer}>
+                    {children.map((child) => (
+                      <TouchableOpacity
+                        key={child.id}
+                        style={[
+                          styles.subItemButton,
+                          selectedCategories.includes(child.id) &&
+                            styles.selectedButton,
+                        ]}
+                        onPress={() => toggleCategory(child.id)}
+                      >
+                        <Text
+                          style={[
+                            styles.itemText,
+                            selectedCategories.includes(child.id) &&
+                              styles.selectedText,
+                          ]}
+                          numberOfLines={2}
+                          adjustsFontSizeToFit={true}
+                          minimumFontScale={0.8}
+                        >
+                          {child.title}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </>
+        )}
 
         <StepNavigation
           currentStep={currentStep}

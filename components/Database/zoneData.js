@@ -43,6 +43,7 @@ export const loadLocalZoneData = async () => {
     return result.map((row) => ({
       zone_id: row.zone_id,
       zone_name: row.zone_name,
+      country: row.country,
     }));
   } catch (error) {
     console.error("[Zone ERROR] Failed to load local Zone:", error);

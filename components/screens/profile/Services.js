@@ -19,6 +19,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Profile from "../../styles/Profile";
 import { deleteSyncMetadataKey } from "../../Database/servicesRepository";
 import { useNavigation } from "@react-navigation/native";
+import SearchBox from "../../common/SearchBox";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -39,6 +40,15 @@ const Services = ({
     useState(ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchText);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [searchText]);
 
   useEffect(() => {
     return () => {
@@ -66,7 +76,6 @@ const Services = ({
       if (!services?.data || !Array.isArray(services.data)) {
         throw new Error("No valid Services data found");
       }
-      // Filter services by selected categories
       const selectedCategoryIds = formData.categories || [];
       const filteredServices = services.data.filter((service) =>
         service.category_ids.some((catId) =>
@@ -89,7 +98,7 @@ const Services = ({
               } catch (e) {
                 // Optionally handle DB error
               }
-              navigation.navigate("Home"); // Change "Home" to your actual home route name
+              navigation.navigate("Home");
             },
           },
         ]
@@ -149,12 +158,17 @@ const Services = ({
     setVisibleServicesCount((prev) => prev + ITEMS_PER_PAGE);
   };
 
-  // Separate selected and available services
-  const selectedItems = services
+  const filteredServices = debouncedSearch
+    ? services.filter((service) =>
+        service.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+      )
+    : services;
+
+  const selectedItems = filteredServices
     .filter((item) => selectedServices.includes(item.id))
     .slice(0, visibleServicesCount);
 
-  const availableItems = services
+  const availableItems = filteredServices
     .filter((item) => !selectedServices.includes(item.id))
     .slice(0, visibleServicesCount);
 
@@ -190,7 +204,6 @@ const Services = ({
   return (
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
-        {/* Top Header */}
         <View style={styles.header}>
           <Text style={styles.sectionTitle}>Services Selection</Text>
           <Text style={styles.subtitle}>
@@ -199,9 +212,14 @@ const Services = ({
           </Text>
         </View>
 
-        {/* Scrollable Content */}
+        <SearchBox
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder="Search services..."
+        />
+
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {services.length === 0 ? (
+          {filteredServices.length === 0 ? (
             <View style={styles.noItemContainer}>
               <Text style={styles.noItemText}>
                 No services available in your selected categories
@@ -209,7 +227,6 @@ const Services = ({
             </View>
           ) : (
             <>
-              {/* Selected Services Section */}
               {selectedItems.length > 0 && (
                 <View style={styles.sectionContainer}>
                   <Text style={styles.sectionHeader}>Selected Services</Text>
@@ -223,7 +240,6 @@ const Services = ({
                 </View>
               )}
 
-              {/* Available Services Section */}
               <View style={styles.sectionContainer}>
                 <Text style={styles.sectionHeader}>
                   {selectedItems.length > 0
@@ -239,13 +255,12 @@ const Services = ({
                 />
               </View>
 
-              {/* Load More Button */}
-              {visibleServicesCount < services.length && renderLoadMoreButton()}
+              {visibleServicesCount < filteredServices.length &&
+                renderLoadMoreButton()}
             </>
           )}
         </ScrollView>
 
-        {/* Fixed Bottom Step Navigation */}
         <StepNavigation
           currentStep={currentStep}
           totalSteps={totalSteps}

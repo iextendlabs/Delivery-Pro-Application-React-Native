@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
   Alert,
   ScrollView,
   SafeAreaView,
@@ -16,6 +15,7 @@ import Splash from "../Splash";
 import Profile from "../../styles/Profile";
 import { deleteSyncMetadataKey } from "../../Database/servicesRepository";
 import { useNavigation } from "@react-navigation/native";
+import SearchBox from "../../common/SearchBox";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -31,9 +31,21 @@ const Designation = ({
   const navigation = useNavigation();
   const [designations, setDesignations] = useState([]);
   const [selectedDesignations, setSelectedDesignations] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [groupedDesignations, setGroupedDesignations] = useState([]);
+  const [expandedParents, setExpandedParents] = useState([]);
+  const [visibleParentCount, setVisibleParentCount] = useState(ITEMS_PER_PAGE);
+  const [searchText, setSearchText] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  const toggleParent = (parentId) => {
+    setExpandedParents((prev) =>
+      prev.includes(parentId)
+        ? prev.filter((id) => id !== parentId)
+        : [...prev, parentId]
+    );
+  };
 
   useEffect(() => {
     fetchData();
@@ -43,9 +55,69 @@ const Designation = ({
     setIsLoading(true);
     if (formData?.designations) {
       setSelectedDesignations(formData.designations);
+      setGroupedDesignations((prevGroups) => {
+        if (!Array.isArray(prevGroups)) return prevGroups;
+        const selectedParentIds = formData.designations.filter((id) => {
+          const item = designations.find((d) => d.id === id);
+          return item && item.parent_id === null;
+        });
+        const unselectedGroups = prevGroups.filter(
+          (g) => !selectedParentIds.includes(g.parent.id)
+        );
+        const selectedGroups = prevGroups.filter((g) =>
+          selectedParentIds.includes(g.parent.id)
+        );
+        const reorderChildren = (group) => {
+          const selectedChildIds = formData.designations.filter((id) => {
+            const item = designations.find((d) => d.id === id);
+            return item && item.parent_id === group.parent.id;
+          });
+          const unselectedChildren = group.children.filter(
+            (c) => !selectedChildIds.includes(c.id)
+          );
+          const selectedChildren = group.children.filter((c) =>
+            selectedChildIds.includes(c.id)
+          );
+          return {
+            ...group,
+            children: [...selectedChildren, ...unselectedChildren],
+          };
+        };
+        const reorderedSelectedGroups = selectedGroups.map(reorderChildren);
+        const reorderedUnselectedGroups = unselectedGroups.map(reorderChildren);
+        return [...reorderedSelectedGroups, ...reorderedUnselectedGroups];
+      });
     }
     setIsLoading(false);
-  }, [formData]);
+  }, [formData, designations]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchText);
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [searchText]);
+
+  const filteredGroups = debouncedSearch
+    ? groupedDesignations
+        .map(({ parent, children }) => {
+          const parentMatch = parent.name
+            .toLowerCase()
+            .includes(debouncedSearch.toLowerCase());
+          const filteredChildren = children.filter((child) =>
+            child.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+          );
+          if (parentMatch || filteredChildren.length > 0) {
+            return {
+              parent,
+              children: filteredChildren,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean)
+    : groupedDesignations.slice(0, visibleParentCount);
 
   const fetchData = async () => {
     setIsDataLoading(true);
@@ -54,7 +126,17 @@ const Designation = ({
       if (!subtitleData?.data || !Array.isArray(subtitleData.data)) {
         throw new Error("No valid subtitle data found");
       }
-      setDesignations(subtitleData.data);
+      const sortedData = [...subtitleData.data].sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+      );
+      setDesignations(sortedData);
+      const parents = sortedData.filter((item) => item.parent_id === null);
+      const children = sortedData.filter((item) => item.parent_id !== null);
+      const grouped = parents.map((parent) => ({
+        parent,
+        children: children.filter((child) => child.parent_id === parent.id),
+      }));
+      setGroupedDesignations(grouped);
     } catch (error) {
       Alert.alert(
         "Something went wrong",
@@ -80,11 +162,38 @@ const Designation = ({
   };
 
   const toggleDesignation = (id) => {
-    setSelectedDesignations((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((item) => item !== id)
-        : [...prevSelected, id]
-    );
+    setSelectedDesignations((prevSelected) => {
+      const parent = designations.find(
+        (item) => item.id === id && item.parent_id === null
+      );
+      const child = designations.find(
+        (item) => item.id === id && item.parent_id !== null
+      );
+      let updated = [...prevSelected];
+
+      if (prevSelected.includes(id)) {
+        updated = updated.filter((item) => item !== id);
+        if (child) {
+          const siblings = designations.filter(
+            (item) => item.parent_id === child.parent_id && item.id !== id
+          );
+          const anySiblingSelected = siblings.some((sib) =>
+            updated.includes(sib.id)
+          );
+          if (!anySiblingSelected) {
+            updated = updated.filter((item) => item !== child.parent_id);
+          }
+        }
+      } else {
+        updated.push(id);
+        if (child) {
+          if (!updated.includes(child.parent_id)) {
+            updated.push(child.parent_id);
+          }
+        }
+      }
+      return updated;
+    });
   };
 
   const handleNextPress = async () => {
@@ -126,19 +235,6 @@ const Designation = ({
     setIsLoading(false);
   };
 
-  const loadMore = () => {
-    setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
-  };
-
-  // Separate selected and available designations
-  const selectedItems = designations
-    .filter((item) => selectedDesignations.includes(item.id))
-    .slice(0, visibleCount);
-
-  const availableItems = designations
-    .filter((item) => !selectedDesignations.includes(item.id))
-    .slice(0, visibleCount);
-
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={[
@@ -158,12 +254,6 @@ const Designation = ({
     </TouchableOpacity>
   );
 
-  const renderLoadMoreButton = () => (
-    <TouchableOpacity style={styles.loadMoreButton} onPress={loadMore}>
-      <Text style={styles.loadMoreText}>Load More</Text>
-    </TouchableOpacity>
-  );
-
   if (isLoading || isDataLoading) {
     return <Splash />;
   }
@@ -176,39 +266,71 @@ const Designation = ({
           <Text style={styles.subtitle}>You can select multiple options</Text>
         </View>
 
+        <SearchBox
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder="Search designation/subtitle..."
+        />
+
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Selected Designations Section */}
-          {selectedItems.length > 0 && (
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionHeader}>Selected Designations</Text>
-              <FlatList
-                data={selectedItems}
-                keyExtractor={(item) => item.id.toString()}
-                numColumns={2}
-                renderItem={renderItem}
-                scrollEnabled={false}
-              />
+          {filteredGroups.map(({ parent, children }) => (
+            <View key={parent.id}>
+              <TouchableOpacity
+                style={[
+                  styles.itemButton,
+                  selectedDesignations.includes(parent.id) &&
+                    styles.selectedButton,
+                  children.length > 0 && styles.parentWithChildren,
+                ]}
+                onPress={() => {
+                  if (children.length > 0) {
+                    toggleParent(parent.id);
+                  } else {
+                    toggleDesignation(parent.id);
+                  }
+                }}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.itemText,
+                    selectedDesignations.includes(parent.id) &&
+                      styles.selectedText,
+                  ]}
+                >
+                  {parent.name}
+                </Text>
+                {children.length > 0 && (
+                  <Text style={styles.arrowIcon}>
+                    {expandedParents.includes(parent.id) ? "\u25BC" : "\u25B6"}
+                  </Text>
+                )}
+              </TouchableOpacity>
+              {children.length > 0 && expandedParents.includes(parent.id) && (
+                <>
+                  <FlatList
+                    data={children}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={2}
+                    renderItem={renderItem}
+                    scrollEnabled={false}
+                  />
+                  <View style={styles.hr} />
+                </>
+              )}
             </View>
-          )}
-
-          {/* Available Designations Section */}
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionHeader}>
-              {selectedItems.length > 0
-                ? "Available Designations"
-                : "All Designations"}
-            </Text>
-            <FlatList
-              data={availableItems}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={2}
-              renderItem={renderItem}
-              scrollEnabled={false}
-            />
-          </View>
-
-          {/* Load More Button */}
-          {visibleCount < designations.length && renderLoadMoreButton()}
+          ))}
+          {!debouncedSearch &&
+            visibleParentCount < groupedDesignations.length && (
+              <TouchableOpacity
+                style={styles.loadMoreButton}
+                onPress={() =>
+                  setVisibleParentCount((prev) => prev + ITEMS_PER_PAGE)
+                }
+              >
+                <Text style={styles.loadMoreText}>Load More</Text>
+              </TouchableOpacity>
+            )}
         </ScrollView>
         <StepNavigation
           currentStep={currentStep}
@@ -224,6 +346,25 @@ const Designation = ({
   );
 };
 
-const styles = StyleSheet.create(Profile);
+const styles = {
+  ...Profile,
+  arrowIcon: {
+    marginLeft: 8,
+    fontSize: 18,
+    color: "#555",
+    alignSelf: "center",
+  },
+  parentWithChildren: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  hr: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginVertical: 8,
+    marginHorizontal: 10,
+  },
+};
 
 export default Designation;
