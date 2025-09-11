@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lipslay Partner",
     "slug": "lipslay-staff",
-    "version": "20.0.0",
+    "version": "21.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
       "jsEngine": "hermes"
     },
     "android": {
-      "versionCode": 20,
+      "versionCode": 21,
       "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
@@ -43,7 +43,16 @@
       }
     },
     "plugins": [
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 34,
+            "targetSdkVersion": 35
+          }
+        }
+      ]
     ]
   }
 }
