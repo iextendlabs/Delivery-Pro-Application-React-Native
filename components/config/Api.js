@@ -29,6 +29,7 @@ const getPlansUrl = BaseUrl + "api/getPlans?";
 const SignupUrl = BaseUrl + "api/staffSignup";
 const getQuotesUrl = BaseUrl + "api/getStaffQuotes?";
 const quoteStatusUpdateUrl = BaseUrl + "api/quotes/update-status";
+const BalanceUpdateURL = BaseUrl + "api/updateUserBalance";
 
 // const stripe_publishable_key = "pk_test_51OrKDSLOkaB2VOci1EiX49C8YbaO8tNF1EUx8BEtdQkBDOKuHM7pvpKhs1mipwX2igoyLhwCq65xz7SHkZAfmW5B00XcTqrdg6";
 
@@ -64,5 +65,6 @@ export {
   quoteStatusUpdateUrl,
   getStaffProfileUrl,
   updateUserUrl,
-  PasswordChangeUrl
+  PasswordChangeUrl,
+  BalanceUpdateURL
 };

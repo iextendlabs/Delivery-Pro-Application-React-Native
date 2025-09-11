@@ -7,10 +7,11 @@ import {
   RefreshControl,
   Modal,
   ActivityIndicator,
+  TouchableOpacity,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { IndexUrl, onlineOfflineUrl } from "../config/Api";
+import { BalanceUpdateURL, IndexUrl, onlineOfflineUrl } from "../config/Api";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import Splash from "./Splash";
@@ -22,6 +23,7 @@ import VersionCheck from "react-native-version-check";
 import UpdateModal from "../common/UpdateModal";
 import Constants from "expo-constants";
 import { useRoute } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const Home = ({ navigation }) => {
   const [userData, setUserData] = useState([]);
@@ -37,6 +39,9 @@ const Home = ({ navigation }) => {
   const [profileStatus, setProfileStatus] = useState("");
   const route = useRoute();
   const [showSuccess, setShowSuccess] = useState(false);
+  const [totalBalance, setTotalBalance] = useState(0);
+  const [rubydubiBalance, setRubydubiBalance] = useState(0);
+  const [fetchingBalance, setFetchingBalance] = useState(false);
 
   useEffect(() => {
     if (route.params?.success) {
@@ -57,6 +62,14 @@ const Home = ({ navigation }) => {
 
   useEffect(() => {
     profile();
+  }, []);
+
+  useEffect(() => {
+    const loadBalance = async () => {
+      const storedTotal = await AsyncStorage.getItem("@total_balance");
+      setTotalBalance(storedTotal ? Number(storedTotal) : 0);
+    };
+    loadBalance();
   }, []);
 
   const profile = async () => {
@@ -178,6 +191,33 @@ const Home = ({ navigation }) => {
       setError("Failed to update profile. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFetchRubydubiBalance = async () => {
+    setFetchingBalance(true);
+    try {
+      const email = userData.email || (await AsyncStorage.getItem("@email"));
+      const userId = userData.id || (await AsyncStorage.getItem("@user_id"));
+      const rubydubiRes = await axios.get(
+        `https://rubydubi.com/api/get_wallet?email=${email}`
+      );
+      const coins = rubydubiRes.data.coins || 0;
+      setRubydubiBalance(coins);
+      // 2. Update wallet on Lipslay
+      const lipslayRes = await axios.post(`${BalanceUpdateURL}`, {
+        user_id: userId,
+        balance: coins,
+      });
+      const total = lipslayRes.data.balance || 0;
+      setTotalBalance(total);
+
+      // 3. Store total in AsyncStorage
+      await AsyncStorage.setItem("@total_balance", String(total));
+    } catch (err) {
+      alert("Failed to fetch balance. Please try again.");
+    } finally {
+      setFetchingBalance(false);
     }
   };
 
@@ -377,6 +417,46 @@ const Home = ({ navigation }) => {
               </View>
             </View>
           )}
+          <View style={styles.financialSummaryContainer}>
+            <Text style={styles.financialSummaryTitle}>RubyDubi Wallet Summary</Text>
+            <View style={styles.financialSummary}>
+              <View style={styles.summaryItem}>
+                <View style={styles.financialCard}>
+                  <Text style={styles.summaryLabel}>Total Balance</Text>
+                  <Text style={styles.summaryValue}>{totalBalance} coins</Text>
+                </View>
+              </View>
+              <View style={styles.summaryItem}>
+                <View style={styles.financialCard}>
+                  <Text style={styles.summaryLabel}>Rubydubi Balance</Text>
+                  <Text style={styles.summaryValue}>{rubydubiBalance} coins</Text>
+                  <TouchableOpacity
+                    style={{
+                      marginTop: 8,
+                      backgroundColor: "#fd245f",
+                      padding: 8,
+                      borderRadius: 5,
+                      alignItems: "center",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                    }}
+                    onPress={handleFetchRubydubiBalance}
+                    disabled={fetchingBalance}
+                  >
+                    {fetchingBalance ? (
+                      <>
+                        <ActivityIndicator size="small" color="#fff" />
+                      </>
+                    ) : (
+                      <>
+                        <Icon name="reload" size={20} color="#fff"/>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </View>
           <View style={{ marginBottom: 70 }}>
             <CommonButton
               title={"Apply Short Holiday"}
