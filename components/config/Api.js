@@ -3,6 +3,7 @@ const BaseUrl = "https://partner.lipslay.com/";
 const getStaffProfileUrl = BaseUrl + "api/getStaffProfile?";
 const IndexUrl = BaseUrl + "api/index?";
 const OrderUrl = BaseUrl + "api/ordersV2?";
+const UpdateDriverCommentUrl = BaseUrl + "api/updateDriverComment";
 const LoginUrl = BaseUrl + "api/login";
 const PasswordChangeUrl = BaseUrl + "api/changePassword";
 const OrderCommentUrl = BaseUrl + "api/addOrderComment";
@@ -37,6 +38,7 @@ const stripe_publishable_key = "pk_live_51OrKDSLOkaB2VOcifspcDKluVndJMmPogfgJZnp
 export {
   OrderUrl,
   LoginUrl,
+  UpdateDriverCommentUrl,
   OrderCommentUrl,
   RescheduleUrl,
   OrderStatusUpdateUrl,

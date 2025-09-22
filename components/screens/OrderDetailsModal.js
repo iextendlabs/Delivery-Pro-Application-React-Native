@@ -1,14 +1,24 @@
 import React, { useState } from "react";
+import { TextInput, ActivityIndicator } from "react-native";
+import { MaterialIcons } from '@expo/vector-icons';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, Image, ScrollView } from "react-native";
 import PhoneNumber from "../modules/PhoneNumber";
 import OrderListStyle from "../styles/OrderListStyle";
 import { ScrollView as GestureScrollView } from "react-native-gesture-handler";
 import WhatsAppElement from "../modules/WhatsappElement";
 import GoogleAddressElement from "../modules/GoogleAddressElement";
-import { BaseUrl } from "../config/Api";
+import { BaseUrl, UpdateDriverCommentUrl } from "../config/Api";
+import axios from "axios";
 
 const OrderDetailsModal = ({ visible, order, onClose }) => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [editingDriverComment, setEditingDriverComment] = useState(false);
+  const [driverComment, setDriverComment] = useState(order?.driver_comment || "");
+  const [loading, setLoading] = useState(false);
+
+  React.useEffect(() => {
+    setDriverComment(order?.driver_comment || "");
+  }, [order]);
 
   const handleModalClose = () => {
     onClose();
@@ -43,6 +53,30 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
         </ScrollView>
       </View>
     );
+  };
+
+  const submitDriverComment = async () => {
+    if (!driverComment.trim()) return;
+    setLoading(true);
+    try {
+      const response = await axios.post(UpdateDriverCommentUrl, {
+        order_id: order.id,
+        driver_comment: driverComment,
+      });
+      const data = response.data;
+      if (data.success) {
+        setEditingDriverComment(false);
+        alert(data.success);
+        order.driver_comment = driverComment;
+      } else if (data.error) {
+        alert(data.error);
+      } else {
+        alert('Failed to update comment');
+      }
+    } catch (e) {
+      alert('Error updating comment');
+    }
+    setLoading(false);
   };
 
   return (
@@ -139,6 +173,45 @@ const OrderDetailsModal = ({ visible, order, onClose }) => {
                       {comment}
                     </Text>
                   ))}
+                </View>
+
+                {/* Box for Driver Comment */}
+                <View style={styles.commentBox}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Text style={styles.detailBoxTitle}>Driver Comments</Text>
+                    <TouchableOpacity onPress={() => setEditingDriverComment(true)}>
+                      <MaterialIcons name="edit" size={20} color="#007AFF" />
+                    </TouchableOpacity>
+                  </View>
+                  {editingDriverComment ? (
+                    <>
+                      <TextInput
+                        style={[styles.commentText, { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, padding: 5, marginTop: 5 }]}
+                        value={driverComment}
+                        onChangeText={setDriverComment}
+                        editable={!loading}
+                        multiline
+                      />
+                      <View style={{ flexDirection: 'row', marginTop: 8 }}>
+                        <TouchableOpacity
+                          style={{ backgroundColor: '#007AFF', padding: 8, borderRadius: 5, marginRight: 10 }}
+                          onPress={submitDriverComment}
+                          disabled={loading}
+                        >
+                          {loading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={{ color: '#fff' }}>Submit</Text>}
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={{ backgroundColor: '#ccc', padding: 8, borderRadius: 5 }}
+                          onPress={() => { setEditingDriverComment(false); setDriverComment(order.driver_comment || ""); }}
+                          disabled={loading}
+                        >
+                          <Text style={{ color: '#333' }}>Cancel</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </>
+                  ) : (
+                    <Text style={styles.commentText}>{order.driver_comment}</Text>
+                  )}
                 </View>
 
                 {/* Box for Shipping Address */}

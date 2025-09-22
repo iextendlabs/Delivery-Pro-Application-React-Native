@@ -2,7 +2,7 @@
   "expo": {
     "name": "Lipslay Partner",
     "slug": "lipslay-staff",
-    "version": "21.0.0",
+    "version": "22.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -17,7 +17,7 @@
       "jsEngine": "hermes"
     },
     "android": {
-      "versionCode": 21,
+      "versionCode": 22,
       "jsEngine": "hermes",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
@@ -48,7 +48,7 @@
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 34,
+            "compileSdkVersion": 35,
             "targetSdkVersion": 35
           }
         }
